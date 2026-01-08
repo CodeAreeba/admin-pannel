@@ -166,10 +166,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setTotalRecords(response.totalRecords);
       }
     } else if (tableType === "Reports") {
-      // Reports are stored in localStorage under 'posReports' by the POSReports component
       try {
         const saved = JSON.parse(localStorage.getItem("posReports") || "[]");
-        // filter by debouncedSearch (title, description, reportType, generatedBy)
         const search = (debouncedSearch || "").trim().toLowerCase();
         let filtered = saved;
         if (search) {
@@ -223,7 +221,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setTotalRecords(response.totalRecords);
       }
     } else {
-      // default fallback
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -238,11 +235,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const isSelected = (id) => selected.includes(id);
 
-  //  Fixed pagination handling
   const handleChangePage = (_, newPage) => {
-    const nextPage = newPage + 1; // Convert MUI’s 0-based to API’s 1-based
-
-    // Prevent going below page 1
+    const nextPage = newPage + 1; 
     if (nextPage < 1) return;
     setPage(nextPage);
   };
@@ -250,7 +244,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleChangeRowsPerPage = (event) => {
     const newLimit = parseInt(event.target.value, 10);
     setRowsPerPage(newLimit);
-    setPage(1); // Always go to page 1 after changing rows per page
+    setPage(1); 
   };
 
   const handleviewClick = (category) => {
