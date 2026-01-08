@@ -19,7 +19,7 @@ function AppWrapper() {
   const navigate = useNavigate();
   const [message, setMessage] = useState({ type: "", text: "" });
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const [resetActive, setResetActive] = useState(false); // 👈 for resetting sidebar active item
+  const [resetActive, setResetActive] = useState(false);  
 
   useEffect(() => {
     if (!isAuthenticated) {
