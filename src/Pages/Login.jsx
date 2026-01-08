@@ -7,21 +7,20 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { login } from "../DAL/auth";
-// import logo from "../Assets/IbrahimMotors.png";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 import { useAlert } from "../Components/Alert/AlertContext";
 
 const Login = ({ onLoginSuccess }) => {
   const { showAlert } = useAlert();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔹 For showing error for each field separately
   const [errors, setErrors] = useState({ email: "", password: "" });
 
-  // 🔹 Auto-fill from localStorage if saved
+  // Auto-fill from localStorage if saved
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
     const savedPassword = localStorage.getItem("password");
@@ -36,7 +35,7 @@ const Login = ({ onLoginSuccess }) => {
 
     setErrors({ email: "", password: "" });
 
-    // Step 2: Front-end validation
+    // Front-end validation
     let hasError = false;
     const newErrors = { email: "", password: "" };
 
@@ -55,57 +54,67 @@ const Login = ({ onLoginSuccess }) => {
 
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("password", password);
-
-    try {
-      const result = await login(formData);
-
-      console.log(" Login API Response:", result);
-
-      if (result.status === 200) {
-        showAlert("success", result?.message || "Login successful!");
+    // 🔥 FAKE LOGIN - Backend ke bagair
+    setTimeout(() => {
+      try {
+        // Fake token generate
+        const fakeToken = "fake-jwt-token-" + Date.now();
         
-        localStorage.setItem("Token", result?.token);
-        
+        // Fake user data with modules
         const userData = {
-          id: result.data.id,
-          name: result.data.name,
-          email: result.data.email,
+          id: "user123",
+          name: email.split("@")[0], // Email se naam bana diya
+          email: email,
           role: {
-            _id: result.data.role._id,
-            name: result.data.role.name,
-            description: result.data.role.description,
-            Modules: result.data.role.Modules  
+            _id: "role123",
+            name: "Admin",
+            description: "Full access to all modules",
+            Modules: [
+              "Dashboard",
+              "Roles",
+              "Users",
+              "Stock Management",
+              "Expense",
+              "Bill History",
+              "Reports",
+              "Sales Report",
+              "Pending Amount"
+            ]
           }
         };
 
-        console.log("💾 Saving userData to localStorage:", userData);
+        console.log("💾 Saving fake userData to localStorage:", userData);
+        
+        // Save to localStorage
+        localStorage.setItem("Token", fakeToken);
         localStorage.setItem("userData", JSON.stringify(userData));
+        
+        // Optional: Save email/password for next time
+        localStorage.setItem("email", email);
+        localStorage.setItem("password", password);
 
         const saved = localStorage.getItem("userData");
         console.log("✅ Verified saved userData:", saved);
-        console.log("📦 Parsed modules:", JSON.parse(saved).role.Modules);
 
-        onLoginSuccess();
+        showAlert("success", "Login successful! Welcome " + userData.name);
 
-        // Removed window.location.reload() - let React Router handle navigation
-      } else {
-        showAlert("error", result?.message || "Login failed.");
+        // Call onLoginSuccess callback
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+
+        // Navigate to dashboard
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
+
+      } catch (error) {
+        console.error("❌ Login Error:", error);
+        showAlert("error", "Something went wrong!");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error(" Login Error:", error);
-      if (error.response) {
-        showAlert("error", error.response.data.message || "An error occurred.");
-      } else if (error.request) {
-        showAlert("error", "No response from the server.");
-      } else {
-        showAlert("error", error?.message || "Unexpected error occurred.");
-      }
-    } finally {
-      setLoading(false);
-    }
+    }, 1000); // 1 second delay for realistic feel
   };
 
   return (
@@ -120,23 +129,15 @@ const Login = ({ onLoginSuccess }) => {
         }}
       >
         <Box component="form" onSubmit={handleLogin}>
-          {/* <Box
-            component="img"
-            src=
-            alt="digitalaura"
-            sx={{
-              width: "30%",
-              display: "block",
-              mx: "auto",
-              my: 3,
-            }}
-          /> */}
-
           <Typography variant="h5" gutterBottom>
             Boss Leathers
           </Typography>
 
-          {/* 🔹 Email Field */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Use any email and password to login
+          </Typography>
+
+          {/* Email Field */}
           <TextField
             fullWidth
             type="email"
@@ -148,7 +149,7 @@ const Login = ({ onLoginSuccess }) => {
             helperText={errors.email}
           />
 
-          {/* 🔹 Password Field */}
+          {/* Password Field */}
           <TextField
             fullWidth
             type="password"
@@ -160,7 +161,7 @@ const Login = ({ onLoginSuccess }) => {
             helperText={errors.password}
           />
 
-          {/* 🔹 Submit Button with Loader */}
+          {/* Submit Button with Loader */}
           <Button
             type="submit"
             fullWidth
@@ -169,9 +170,9 @@ const Login = ({ onLoginSuccess }) => {
               mt: 2,
               py: 1.2,
               borderRadius: "6px",
-              backgroundColor: "var(--primary-color)",
+              backgroundColor: "brown",
               "&:hover": {
-                backgroundColor: "var(--primary-color)",
+                backgroundColor: "brown",
                 opacity: 0.9,
               },
             }}

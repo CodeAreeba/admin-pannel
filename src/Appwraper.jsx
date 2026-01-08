@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   Dialog,
   DialogActions,
@@ -13,60 +13,93 @@ import App from "./App";
 import Login from "./Pages/Login";
 
 function AppWrapper() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    localStorage.getItem("Token")
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // 🔥 Initialize from localStorage immediately
+    return !!localStorage.getItem("Token");
+  });
+  
   const navigate = useNavigate();
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const location = useLocation();
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const [resetActive, setResetActive] = useState(false);  
+  const [resetActive, setResetActive] = useState(false);
+  const isAuthenticatedRef = useRef(isAuthenticated);
 
+  // Keep ref in sync
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    } else {
-      const lastRoute = localStorage.getItem("lastRoute") || "/dashboard";
-      navigate(lastRoute, { replace: true });
+    isAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated]);
+
+  // 🔥 Monitor localStorage changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("Token");
+      console.log("🔍 Checking auth - Token:", token, "Current state:", isAuthenticatedRef.current);
+      
+      if (token && !isAuthenticatedRef.current) {
+        console.log("✅ Token found, setting authenticated");
+        setIsAuthenticated(true);
+      } else if (!token && isAuthenticatedRef.current) {
+        console.log("❌ Token missing, setting unauthenticated");
+        setIsAuthenticated(false);
+      }
+    };
+
+    // Check every 500ms
+    const interval = setInterval(checkAuth, 500);
+    
+    // Also check on storage events
+    window.addEventListener('storage', checkAuth);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, []);
+
+  // 🔥 Handle navigation
+  useEffect(() => {
+    const token = localStorage.getItem("Token");
+    
+    console.log("🧭 Navigation Effect - Auth:", isAuthenticated, "Token:", token, "Path:", location.pathname);
+    
+    if (!isAuthenticated && !token) {
+      if (location.pathname !== "/login") {
+        console.log("🔀 Redirecting to login");
+        navigate("/login", { replace: true });
+      }
+    } else if (isAuthenticated && token) {
+      if (location.pathname === "/login" || location.pathname === "/") {
+        console.log("🔀 Redirecting to dashboard");
+        navigate("/dashboard", { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, location.pathname]);
 
   const handleLoginSuccess = () => {
+    console.log("🎉 Login Success - Setting authenticated");
+    const token = localStorage.getItem("Token");
+    console.log("Token after login:", token);
     setIsAuthenticated(true);
-    setMessage({ type: "success", text: "Login Successfully" });
-    navigate("/dashboard");
   };
 
-  // 👇 open logout confirmation dialog
   const handleLogoutClick = () => {
     setOpenLogoutDialog(true);
   };
 
-  // 👇 confirm logout (with sidebar reset)
   const confirmLogout = () => {
+    console.log("👋 Logging out");
     setIsAuthenticated(false);
-    localStorage.removeItem("Token");
-    localStorage.removeItem("lastRoute");
+    localStorage.clear(); // Clear everything
     setOpenLogoutDialog(false);
-
-    // 👇 trigger sidebar active reset
     setResetActive(true);
-
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
-  // 👇 cancel logout
   const cancelLogout = () => {
     setOpenLogoutDialog(false);
   };
 
-  useEffect(() => {
-    if (message.text) {
-      const timer = setTimeout(() => {
-        setMessage({ type: "", text: "" });
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
+  console.log("🎬 Render - Auth:", isAuthenticated, "Path:", location.pathname);
 
   return (
     <>
@@ -77,8 +110,6 @@ function AppWrapper() {
             element={
               <App
                 onLogout={handleLogoutClick}
-                message={message}
-                setMessage={setMessage}
                 resetActive={resetActive}
                 setResetActive={setResetActive}
               />
@@ -98,7 +129,6 @@ function AppWrapper() {
         )}
       </Routes>
 
-      {/* ✅ Logout Confirmation Dialog */}
       <Dialog
         open={openLogoutDialog}
         onClose={cancelLogout}

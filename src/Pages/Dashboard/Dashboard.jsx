@@ -4,7 +4,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { GrUserWorker } from "react-icons/gr";
 import "./Dashboard.css";
-import { fetchDashboard } from "../../DAL/fetch";
+// import { fetchDashboard } from "../../DAL/fetch"; // ❌ Commented - Backend nahi hai
 // import { exportDashboardPDF } from "../../Utils/ExportPdf";
 import { useNavigate } from "react-router-dom";
 
@@ -21,16 +21,68 @@ const Dashboard = () => {
     const getDashboardData = async () => {
       try {
         setLoading(true);
-        const res = await fetchDashboard();
+        
+        // ❌ Backend call commented out
+        // const res = await fetchDashboard();
 
-        if (res) {
-          setDashboardData(res);
-        } else {
-          setDashboardData(null);
-        }
+        // 🔥 FAKE DATA - Backend ke bagair
+        const res = {
+          products: {
+            totalProducts: {
+              quantity: 1250,
+              price: 3750000
+            },
+            totalSold: {
+              quantity: 850,
+              sale: 2550000
+            },
+            today: {
+              quantity: 25,
+              sale: 75000
+            },
+            yesterday: {
+              quantity: 30,
+              sale: 90000
+            },
+            thisWeek: {
+              quantity: 180,
+              sale: 540000
+            },
+            thisMonth: {
+              quantity: 650,
+              sale: 1950000
+            }
+          },
+          pendingAmount: 450000,
+          expense: {
+            totalExpense: 850000,
+            today: 15000,
+            yesterday: 12000,
+            thisWeek: 95000,
+            thisMonth: 285000
+          },
+          labourCost: {
+            totalLabourCost: 560000,
+            today: 8000,
+            yesterday: 7500,
+            thisWeek: 52000,
+            thisMonth: 180000,
+            lastMonth: 175000
+          }
+        };
+
+        // Simulate API delay
+        setTimeout(() => {
+          if (res) {
+            setDashboardData(res);
+          } else {
+            setDashboardData(null);
+          }
+          setLoading(false);
+        }, 500);
+
       } catch (err) {
         console.error("❌ Error fetching dashboard:", err);
-      } finally {
         setLoading(false);
       }
     };
