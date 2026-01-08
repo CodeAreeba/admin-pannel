@@ -31,7 +31,7 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import StockM from "./Pages/Stock M/StockM";
 import Roles from "./Pages/Roles/Roles";
-import logo from "./assets/BossLeathers.png";
+import logo from "./assets/logo.png";
 import { Tooltip } from "@mui/material";
 import ExpenseM from "./Pages/Expense/Expense";
 import BillHistory from "./Pages/BillHistory/BillHistory";
