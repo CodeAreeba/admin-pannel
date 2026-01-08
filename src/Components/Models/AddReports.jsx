@@ -27,9 +27,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from "@mui/icons-material/Download";
 
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+// import { jsPDF } from "jspdf";
+// import autoTable from "jspdf-autotable";
+// import * as XLSX from "xlsx";
 
 import { 
   fetchAllBillReports,

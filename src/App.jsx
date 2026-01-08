@@ -32,7 +32,7 @@ import BillHistory from "./Pages/BillHistory/BillHistory";
 import Reports from "./Components/Models/AddReports"
 import SalesReport from "./Pages/SalesReport/SalesReport";
 import PendingAmountPage from "./Pages/Pending Amount/PendingAmountPage";
-import ProductSalesReports from "./Pages/ProductSalesReport/ProductSalesReport";
+// import ProductSalesReports from "./Pages/ProductSalesReport/ProductSalesReport";
 
 const App = ({ onLogout }) => {
   const navigate = useNavigate();
@@ -55,8 +55,7 @@ const App = ({ onLogout }) => {
     { id: 9, name: "Reports", route: "/reports", icon: <BiSolidReport />, module: "Reports" },
     { id: 10, name: "Sales Report", route: "/salesReport", icon: <BsGraphUpArrow />, module: "Sales Report" },
     { id: 11, name: "Pending Amount", route: "/PendingAmount", icon: <GiTakeMyMoney />, module: "Pending Amount" },
-    { id: 12, name: "Product Sales Report", route: "/productsSalesReport", icon: <GiTakeMyMoney />, module: "Product Sales Report" }
-  ];
+  ]
 
   // ✅ Get user modules from localStorage on component mount
   useEffect(() => {
@@ -263,10 +262,7 @@ const App = ({ onLogout }) => {
            path="/PendingAmount"
            element={hasAccess("/PendingAmount") ? <PendingAmountPage/> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}
           />
-           <Route
-           path="/productsSalesReport"
-           element={hasAccess("/productsSalesReport") ? <ProductSalesReports/> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}
-          />
+          
 
        
           

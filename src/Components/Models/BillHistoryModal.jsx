@@ -2,9 +2,9 @@ import * as React from "react";
 import { X, Printer, Download } from "lucide-react";
 import { FaPhoneAlt } from "react-icons/fa";
 import { formatDate } from "../../Utils/Formatedate";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import logoo from "../../Assets/logoo.jpg";
+// import html2canvas from "html2canvas";
+// import jsPDF from "jspdf";
+// import logoo from "../../Assets/logoo.jpg";
 import "./billHistory.css"; 
 
 export default function BillHistoryModal({ open, setOpen, Modeldata }) {

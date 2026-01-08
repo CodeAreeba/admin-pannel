@@ -30,7 +30,7 @@ import {
   fetchPendingAmount,
 } from "../../DAL/fetch";
 import { formatDate } from "../../Utils/Formatedate";
-import truncateText from "../../truncateText";
+// import truncateText from "../../truncateText";
 import { useNavigate } from "react-router-dom";
 import {
   deleteAllRoles,
@@ -52,11 +52,11 @@ import SalesReportModal from "./SalesReportModal";
 import Reports from "./AddReports";
 import PendingAmountPage from "../../Pages/Pending Amount/PendingAmountPage";
 import AddPendingAmount from "./AddPendingAmount";
-import OutOfStock from "../OutOfStock";
-import LowStock from "../LowStock";
+// import OutOfStock from "../OutOfStock";
+// import LowStock from "../LowStock";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
-  const { showAlert } = useAlert();
+  const { showAlert } = useAlert(); // Since you created a custom hook
   const savedState =
     JSON.parse(localStorage.getItem(`${tableType}-tableState`)) || {};
   const [page, setPage] = useState(savedState.page || 1);
@@ -75,7 +75,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [openNewStockModal, setOpenNewStockModal] = useState(false);
   const [openExpenseModal, setOpenExpenseModal] = useState(false);
   const [openBillModal, setOpenBillModal] = useState(false);
-  const [openReportsModal, setOpenReportsModal] = useState(false); 
+  const [openReportsModal, setOpenReportsModal] = useState(false); // <- reports modal state
   const [openSalesReportModal, setOpenSalesReportModal] = useState(false);
   const [openPendingAmountModal, setOpenPendingAmountModal] = useState(false);
   const [modeltype, setModeltype] = useState("Add");
@@ -166,8 +166,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setTotalRecords(response.totalRecords);
       }
     } else if (tableType === "Reports") {
+      // Reports are stored in localStorage under 'posReports' by the POSReports component
       try {
         const saved = JSON.parse(localStorage.getItem("posReports") || "[]");
+        // filter by debouncedSearch (title, description, reportType, generatedBy)
         const search = (debouncedSearch || "").trim().toLowerCase();
         let filtered = saved;
         if (search) {
@@ -221,6 +223,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setTotalRecords(response.totalRecords);
       }
     } else {
+      // default fallback
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -235,8 +238,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const isSelected = (id) => selected.includes(id);
 
+  //  Fixed pagination handling
   const handleChangePage = (_, newPage) => {
-    const nextPage = newPage + 1; 
+    const nextPage = newPage + 1; // Convert MUI’s 0-based to API’s 1-based
+
+    // Prevent going below page 1
     if (nextPage < 1) return;
     setPage(nextPage);
   };
@@ -244,7 +250,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleChangeRowsPerPage = (event) => {
     const newLimit = parseInt(event.target.value, 10);
     setRowsPerPage(newLimit);
-    setPage(1); 
+    setPage(1); // Always go to page 1 after changing rows per page
   };
 
   const handleviewClick = (category) => {
@@ -271,7 +277,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     } else if (tableType === "Reports") {
       setOpenReportsModal(true);
       setModelData(category);
-      setModeltype("View"); 
+      setModeltype("View"); // viewing a saved report
     } else if (tableType === "Sales Report") {
       setOpenSalesReportModal(true);
       setModelData(category);
