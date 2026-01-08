@@ -1,5 +1,19 @@
 import { invokeApi } from "../Utils/InvokeApi";
 
+export const createProduct = async (productData) => {
+  const reqObj = {
+    path: `/product/create`,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("Token")}`,
+    },
+    postData: productData,
+  };
+
+  return invokeApi(reqObj);
+};
+
+
 export const createnewuser = async (data) => {
 
   const reqObj = {

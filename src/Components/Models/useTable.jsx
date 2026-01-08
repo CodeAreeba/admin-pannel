@@ -222,7 +222,22 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setData(response.data);
         setTotalRecords(response.totalRecords);
       }
-    } else {
+    }
+    else if (tableType === "Products") {
+  response = await fetchallProductlist(page, rowsPerPage, searchQuery);
+
+  if (response.status === 400) {
+    localStorage.removeItem("Token");
+    navigate("/login");
+    setIsLoading(false);
+  } else {
+    setIsLoading(false);
+
+    // 👇 backend response ke mutabiq
+    setData(response.products);        // products array
+    setTotalRecords(response.totalProducts);
+  }
+} else {
       // default fallback
       setIsLoading(false);
       setData([]);

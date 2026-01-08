@@ -117,6 +117,25 @@ export const fetchallStocklist = async (page, rowsPerPages, searchQuery,filter) 
   return invokeApi(reqObj);
 };
 
+export const fetchAllProductList = async (
+  page,
+  rowsPerPage,
+  searchQuery,
+  filter
+) => {
+  const reqObj = {
+    path: `/product/list?limit=${rowsPerPage}&page=${page}&keyword=${searchQuery}&filter=${filter}`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("Token")}`,
+    },
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+
+
 export const fetchAllStockReports = async (page, rowsPerPages, searchQuery) => {
   const reqObj = {
     path: `/stock/report`,
