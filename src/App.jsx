@@ -4,17 +4,6 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import { IoLogOut } from "react-icons/io5";
 import {
   FaTachometerAlt,
-  
-  
-} from "react-icons/fa";
-import { BiSolidReport } from "react-icons/bi";
-import { BsGraphUpArrow } from "react-icons/bs";
-import { GiMoneyStack } from "react-icons/gi";
-import { RiBillFill } from "react-icons/ri";
-import { GiTakeMyMoney } from "react-icons/gi";
-
-import "./App.css";
-import { 
   FaBoxOpen,
   FaShoppingCart,
   FaUsers,
@@ -26,152 +15,82 @@ import {
   FaCog,
   FaUserShield,
 } from "react-icons/fa";
+import { Tooltip } from "@mui/material";
 
+import "./App.css";
+import logo from "./assets/logo.png";
+
+/* Existing Pages */
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import StockM from "./Pages/Stock M/StockM";
 import Roles from "./Pages/Roles/Roles";
-import logo from "./assets/logo.png";
-import { Tooltip } from "@mui/material";
 import ExpenseM from "./Pages/Expense/Expense";
 import BillHistory from "./Pages/BillHistory/BillHistory";
-import Reports from "./Components/Models/AddReports"
+import Reports from "./Components/Models/AddReports";
 import SalesReport from "./Pages/SalesReport/SalesReport";
 import PendingAmountPage from "./Pages/Pending Amount/PendingAmountPage";
+
+/* Temporary / Placeholder Pages */
+const ProductManagement = () => <h1>Product Management</h1>;
+const OrderManagement = () => <h1>Order Management</h1>;
+const CustomerManagement = () => <h1>Customer Management</h1>;
+const InventoryManagement = () => <h1>Inventory Management</h1>;
+const CategoryManagement = () => <h1>Category Management</h1>;
+const ContentManagement = () => <h1>Content Management</h1>;
+const DiscountManagement = () => <h1>Discount & Promotions</h1>;
+const ReviewsRatings = () => <h1>Reviews & Ratings</h1>;
+const Settings = () => <h1>Settings</h1>;
 
 const App = ({ onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeitems, setActiveitems] = useState(1);
+
+  const [activeItem, setActiveItem] = useState(1);
   const [isOpen, setIsOpen] = useState(true);
 
-  // 🔥 All sidebar items - Sab accessible hain (No access control for now)
-  // const allItems = [
-  //   { id: 1, name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
-  //   { id: 2, name: "Roles", route: "/rolesData", icon: <FaUserShield /> },
-  //   { id: 3, name: "Users", route: "/usersData", icon: <FaUsers /> },
-  //   { id: 4, name: "Stock Management", route: "/stockData", icon: <FaWarehouse /> },
-  //   { id: 5, name: "Expense", route: "/ExpenseData", icon: <GiMoneyStack /> },
-  //   { id: 8, name: "Bill History", route: "/bill-history", icon: <RiBillFill /> },
-  //   { id: 9, name: "Reports", route: "/reports", icon: <BiSolidReport /> },
-  //   { id: 10, name: "Sales Report", route: "/salesReport", icon: <BsGraphUpArrow /> },
-  //   { id: 11, name: "Pending Amount", route: "/PendingAmount", icon: <GiTakeMyMoney /> },
-  // ];
+  const allItems = [
+    { id: 1, name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
+    { id: 2, name: "Product Management", route: "/products", icon: <FaBoxOpen /> },
+    { id: 3, name: "Order Management", route: "/orders", icon: <FaShoppingCart /> },
+    { id: 4, name: "Customer Management", route: "/customers", icon: <FaUsers /> },
+    { id: 5, name: "Inventory Management", route: "/inventory", icon: <FaWarehouse /> },
+    { id: 6, name: "Category Management", route: "/categories", icon: <FaTags /> },
+    { id: 7, name: "Content Management", route: "/content", icon: <FaBullhorn /> },
+    { id: 8, name: "Discount & Promotions", route: "/discounts", icon: <FaBullhorn /> },
+    { id: 9, name: "Reviews & Ratings", route: "/reviews", icon: <FaStar /> },
+    { id: 10, name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
+    { id: 11, name: "Settings", route: "/settings", icon: <FaCog /> },
+    { id: 12, name: "User Role Management", route: "/roles", icon: <FaUserShield /> },
+  ];
 
-   const allItems = [
-  // 🔹 Core Operations
-  {
-    id: 1,
-    name: "Dashboard",
-    route: "/dashboard",
-    icon: <FaTachometerAlt />,
-  },
-  {
-    id: 2,
-    name: "Product Management",
-    route: "/products",
-    icon: <FaBoxOpen />,
-  },
-  {
-    id: 3,
-    name: "Order Management",
-    route: "/orders",
-    icon: <FaShoppingCart />,
-  },
-  {
-    id: 4,
-    name: "Customer Management",
-    route: "/customers",
-    icon: <FaUsers />,
-  },
-  {
-    id: 5,
-    name: "Inventory Management",
-    route: "/inventory",
-    icon: <FaWarehouse />,
-  },
-
-  // 🔹 Organization & Content
-  {
-    id: 6,
-    name: "Category Management",
-    route: "/categories",
-    icon: <FaTags />,
-  },
-  {
-    id: 7,
-    name: "Content Management",
-    route: "/content",
-    icon: <FaBullhorn />,
-  },
-  {
-    id: 8,
-    name: "Discount & Promotions",
-    route: "/discounts",
-    icon: <FaBullhorn />,
-  },
-  {
-    id: 9,
-    name: "Reviews & Ratings",
-    route: "/reviews",
-    icon: <FaStar />,
-  },
-
-  // 🔹 Analytics & Configuration
-  {
-    id: 10,
-    name: "Analytics & Reports",
-    route: "/reports",
-    icon: <FaChartBar />,
-  },
-  {
-    id: 11,
-    name: "Settings",
-    route: "/settings",
-    icon: <FaCog />,
-  },
-  {
-    id: 12,
-    name: "User Role Management",
-    route: "/roles",
-    icon: <FaUserShield />,
-  },
-];
-  // Update active item when route changes
   useEffect(() => {
-    const currentItem = allItems.find(item => item.route === location.pathname);
-    if (currentItem) {
-      setActiveitems(currentItem.id);
-    }
+    const current = allItems.find(i => i.route === location.pathname);
+    if (current) setActiveItem(current.id);
   }, [location.pathname]);
 
-  const handleitemsClick = (item) => {
-    setActiveitems(item.id);
+  const handleItemClick = (item) => {
+    setActiveItem(item.id);
     navigate(item.route);
-  };
-
-  const toggleMenu = () => {
-    setIsOpen((prev) => !prev);
   };
 
   return (
     <div className="App">
       {/* Sidebar */}
       <div className={`app-side-bar ${isOpen ? "" : "closed"}`}>
-        <div className="opencloseicon" onClick={toggleMenu}>
+        <div className="opencloseicon" onClick={() => setIsOpen(!isOpen)}>
           <MdOutlineDoubleArrow className={isOpen ? "rotated" : ""} />
         </div>
 
-        <img src={logo} className="logo" alt="Boss Leathers Logo" />
+        <img src={logo} className="logo" alt="Logo" />
 
         <ul>
-          {/* Show all items */}
-          {allItems.map((item) => {
-            const listItem = (
+          {allItems.map(item => {
+            const li = (
               <li
                 key={item.id}
-                className={activeitems === item.id ? "selected-item" : "unselected"}
-                onClick={() => handleitemsClick(item)}
+                className={activeItem === item.id ? "selected-item" : "unselected"}
+                onClick={() => handleItemClick(item)}
               >
                 {item.icon}
                 {isOpen && <span>{item.name}</span>}
@@ -179,15 +98,12 @@ const App = ({ onLogout }) => {
             );
 
             return !isOpen ? (
-              <Tooltip title={item.name} placement="right" key={item.id} arrow>
-                {listItem}
+              <Tooltip title={item.name} placement="right" arrow key={item.id}>
+                {li}
               </Tooltip>
-            ) : (
-              listItem
-            );
+            ) : li;
           })}
 
-          {/* Logout item */}
           {!isOpen ? (
             <Tooltip title="Logout" placement="right" arrow>
               <li className="unselected" onClick={onLogout}>
@@ -197,27 +113,36 @@ const App = ({ onLogout }) => {
           ) : (
             <li className="unselected" onClick={onLogout}>
               <IoLogOut />
-              {isOpen && <span>Logout</span>}
+              <span>Logout</span>
             </li>
           )}
         </ul>
       </div>
 
-      {/* Right Side Content / Routes */}
+      {/* Routes */}
       <div className="app-right">
         <Routes>
-          {/* All routes accessible - No protection */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/rolesData" element={<Roles />} />
+          <Route path="/products" element={<ProductManagement />} />
+          <Route path="/orders" element={<OrderManagement />} />
+          <Route path="/customers" element={<CustomerManagement />} />
+          <Route path="/inventory" element={<InventoryManagement />} />
+          <Route path="/categories" element={<CategoryManagement />} />
+          <Route path="/content" element={<ContentManagement />} />
+          <Route path="/discounts" element={<DiscountManagement />} />
+          <Route path="/reviews" element={<ReviewsRatings />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/roles" element={<Roles />} />
+
+          {/* Extra existing routes */}
           <Route path="/usersData" element={<Users />} />
           <Route path="/stockData" element={<StockM />} />
           <Route path="/ExpenseData" element={<ExpenseM />} />
           <Route path="/bill-history" element={<BillHistory />} />
-          <Route path="/reports" element={<Reports />} />
           <Route path="/salesReport" element={<SalesReport />} />
           <Route path="/PendingAmount" element={<PendingAmountPage />} />
-          
-          {/* Default redirect to dashboard */}
+
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </div>
