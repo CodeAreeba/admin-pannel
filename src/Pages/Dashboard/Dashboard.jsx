@@ -60,10 +60,10 @@ const Dashboard = () => {
             <p className="dashboard-subtitle">Business performance overview.</p>
           </div>
 
-          <button className="export-button" onClick={() => exportDashboardPDF(dashboardData)}>
+          {/* <button className="export-button" onClick={() => exportDashboardPDF(dashboardData)}>
             <Download size={18} />
             Export Report
-          </button>
+          </button> */}
 
         </div>
 

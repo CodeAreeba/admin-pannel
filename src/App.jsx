@@ -23,7 +23,7 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import StockM from "./Pages/Stock M/StockM";
 import Roles from "./Pages/Roles/Roles";
-// import logo from "./Assets/IbrahimMotors.png";
+import logo from "./assets/BossLeathers.png";
 // import POSBillingSystem from "./Components/POS/Pos";
 // import ReturnManagement from "./Components/POS/Return";
 import { Tooltip } from "@mui/material";
@@ -49,8 +49,8 @@ const App = ({ onLogout }) => {
     { id: 3, name: "Users", route: "/usersData", icon: <FaUsers />, module: "Users" },
     { id: 4, name: "Stock Management", route: "/stockData", icon: <FaWarehouse />, module: "Stock Management" },
     { id: 5, name: "Expense", route: "/ExpenseData", icon: <GiMoneyStack />, module: "Expense" },
-    { id: 6, name: "Billing", route: "/billData", icon: <FaMoneyBillWave />, module: "Billing" },
-    { id: 7, name: "Returns", route: "/ReturnData", icon: <IoIosReturnLeft />, module: "Returns" },
+    // { id: 6, name: "Billing", route: "/billData", icon: <FaMoneyBillWave />, module: "Billing" },
+    // { id: 7, name: "Returns", route: "/ReturnData", icon: <IoIosReturnLeft />, module: "Returns" },
     { id: 8, name: "Bill History", route: "/bill-history", icon: <RiBillFill />  , module: "Bill History" },
     { id: 9, name: "Reports", route: "/reports", icon: <BiSolidReport />, module: "Reports" },
     { id: 10, name: "Sales Report", route: "/salesReport", icon: <BsGraphUpArrow />, module: "Sales Report" },
@@ -234,14 +234,14 @@ const App = ({ onLogout }) => {
             path="/stockData"
             element={hasAccess("/stockData") ? <StockM /> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}
           />
-          <Route
+          {/* <Route
             path="/billData"
             element={hasAccess("/billData") ? <POSBillingSystem /> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}
           />
           <Route
             path="/ReturnData"
             element={hasAccess("/ReturnData") ? <ReturnManagement /> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}
-          />
+          /> */}
           <Route
             path="/ExpenseData"
             element={hasAccess("/ExpenseData") ? <ExpenseM /> : <Navigate to={filteredItems[0]?.route || "/dashboard"} replace />}

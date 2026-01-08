@@ -79,16 +79,22 @@ function AppWrapper() {
                 onLogout={handleLogoutClick}
                 message={message}
                 setMessage={setMessage}
-                resetActive={resetActive} // 👈 passed here
-                setResetActive={setResetActive} // 👈 to reset flag after use
+                resetActive={resetActive}
+                setResetActive={setResetActive}
               />
             }
           />
         ) : (
-          <Route
-            path="/login"
-            element={<Login onLoginSuccess={handleLoginSuccess} />}
-          />
+          <>
+            <Route
+              path="/login"
+              element={<Login onLoginSuccess={handleLoginSuccess} />}
+            />
+            <Route
+              path="*"
+              element={<Login onLoginSuccess={handleLoginSuccess} />}
+            />
+          </>
         )}
       </Routes>
 

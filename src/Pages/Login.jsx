@@ -85,14 +85,12 @@ const Login = ({ onLoginSuccess }) => {
         localStorage.setItem("userData", JSON.stringify(userData));
 
         const saved = localStorage.getItem("userData");
-        console.log("Verified saved userData:", saved);
-        console.log(" Parsed modules:", JSON.parse(saved).role.Modules);
+        console.log("✅ Verified saved userData:", saved);
+        console.log("📦 Parsed modules:", JSON.parse(saved).role.Modules);
 
         onLoginSuccess();
 
-        setTimeout(() => {
-          window.location.reload();
-        }, 100);
+        // Removed window.location.reload() - let React Router handle navigation
       } else {
         showAlert("error", result?.message || "Login failed.");
       }
@@ -135,7 +133,7 @@ const Login = ({ onLoginSuccess }) => {
           /> */}
 
           <Typography variant="h5" gutterBottom>
-            Ibrahim Autos
+            Boss Leathers
           </Typography>
 
           {/* 🔹 Email Field */}
