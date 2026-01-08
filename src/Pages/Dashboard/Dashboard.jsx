@@ -5,7 +5,7 @@ import { GiTakeMyMoney } from "react-icons/gi";
 import { GrUserWorker } from "react-icons/gr";
 import "./Dashboard.css";
 import { fetchDashboard } from "../../DAL/fetch";
-import { exportDashboardPDF } from "../../Utils/ExportPdf";
+// import { exportDashboardPDF } from "../../Utils/ExportPdf";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {

@@ -122,9 +122,9 @@ const Login = ({ onLoginSuccess }) => {
         }}
       >
         <Box component="form" onSubmit={handleLogin}>
-          <Box
+          {/* <Box
             component="img"
-            src={logo}
+            src=
             alt="digitalaura"
             sx={{
               width: "30%",
@@ -132,7 +132,7 @@ const Login = ({ onLoginSuccess }) => {
               mx: "auto",
               my: 3,
             }}
-          />
+          /> */}
 
           <Typography variant="h5" gutterBottom>
             Ibrahim Autos
