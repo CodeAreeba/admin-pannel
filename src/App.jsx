@@ -21,6 +21,7 @@ import "./App.css";
 import logo from "./assets/logo.png";
 
 /* Existing Pages */
+import Products from "./Pages/Products/Product"
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import StockM from "./Pages/Stock M/StockM";
@@ -123,7 +124,7 @@ const App = ({ onLogout }) => {
       <div className="app-right">
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/products" element={<ProductManagement />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/orders" element={<OrderManagement />} />
           <Route path="/customers" element={<CustomerManagement />} />
           <Route path="/inventory" element={<InventoryManagement />} />
