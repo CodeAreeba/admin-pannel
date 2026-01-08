@@ -4,9 +4,8 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import { IoLogOut } from "react-icons/io5";
 import {
   FaTachometerAlt,
-  FaUsers,
-  FaWarehouse,
-  FaUserShield,
+  
+  
 } from "react-icons/fa";
 import { BiSolidReport } from "react-icons/bi";
 import { BsGraphUpArrow } from "react-icons/bs";
@@ -15,6 +14,18 @@ import { RiBillFill } from "react-icons/ri";
 import { GiTakeMyMoney } from "react-icons/gi";
 
 import "./App.css";
+import { 
+  FaBoxOpen,
+  FaShoppingCart,
+  FaUsers,
+  FaWarehouse,
+  FaTags,
+  FaBullhorn,
+  FaStar,
+  FaChartBar,
+  FaCog,
+  FaUserShield,
+} from "react-icons/fa";
 
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
@@ -35,18 +46,97 @@ const App = ({ onLogout }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   // 🔥 All sidebar items - Sab accessible hain (No access control for now)
-  const allItems = [
-    { id: 1, name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
-    { id: 2, name: "Roles", route: "/rolesData", icon: <FaUserShield /> },
-    { id: 3, name: "Users", route: "/usersData", icon: <FaUsers /> },
-    { id: 4, name: "Stock Management", route: "/stockData", icon: <FaWarehouse /> },
-    { id: 5, name: "Expense", route: "/ExpenseData", icon: <GiMoneyStack /> },
-    { id: 8, name: "Bill History", route: "/bill-history", icon: <RiBillFill /> },
-    { id: 9, name: "Reports", route: "/reports", icon: <BiSolidReport /> },
-    { id: 10, name: "Sales Report", route: "/salesReport", icon: <BsGraphUpArrow /> },
-    { id: 11, name: "Pending Amount", route: "/PendingAmount", icon: <GiTakeMyMoney /> },
-  ];
+  // const allItems = [
+  //   { id: 1, name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
+  //   { id: 2, name: "Roles", route: "/rolesData", icon: <FaUserShield /> },
+  //   { id: 3, name: "Users", route: "/usersData", icon: <FaUsers /> },
+  //   { id: 4, name: "Stock Management", route: "/stockData", icon: <FaWarehouse /> },
+  //   { id: 5, name: "Expense", route: "/ExpenseData", icon: <GiMoneyStack /> },
+  //   { id: 8, name: "Bill History", route: "/bill-history", icon: <RiBillFill /> },
+  //   { id: 9, name: "Reports", route: "/reports", icon: <BiSolidReport /> },
+  //   { id: 10, name: "Sales Report", route: "/salesReport", icon: <BsGraphUpArrow /> },
+  //   { id: 11, name: "Pending Amount", route: "/PendingAmount", icon: <GiTakeMyMoney /> },
+  // ];
 
+   const allItems = [
+  // 🔹 Core Operations
+  {
+    id: 1,
+    name: "Dashboard",
+    route: "/dashboard",
+    icon: <FaTachometerAlt />,
+  },
+  {
+    id: 2,
+    name: "Product Management",
+    route: "/products",
+    icon: <FaBoxOpen />,
+  },
+  {
+    id: 3,
+    name: "Order Management",
+    route: "/orders",
+    icon: <FaShoppingCart />,
+  },
+  {
+    id: 4,
+    name: "Customer Management",
+    route: "/customers",
+    icon: <FaUsers />,
+  },
+  {
+    id: 5,
+    name: "Inventory Management",
+    route: "/inventory",
+    icon: <FaWarehouse />,
+  },
+
+  // 🔹 Organization & Content
+  {
+    id: 6,
+    name: "Category Management",
+    route: "/categories",
+    icon: <FaTags />,
+  },
+  {
+    id: 7,
+    name: "Content Management",
+    route: "/content",
+    icon: <FaBullhorn />,
+  },
+  {
+    id: 8,
+    name: "Discount & Promotions",
+    route: "/discounts",
+    icon: <FaBullhorn />,
+  },
+  {
+    id: 9,
+    name: "Reviews & Ratings",
+    route: "/reviews",
+    icon: <FaStar />,
+  },
+
+  // 🔹 Analytics & Configuration
+  {
+    id: 10,
+    name: "Analytics & Reports",
+    route: "/reports",
+    icon: <FaChartBar />,
+  },
+  {
+    id: 11,
+    name: "Settings",
+    route: "/settings",
+    icon: <FaCog />,
+  },
+  {
+    id: 12,
+    name: "User Role Management",
+    route: "/roles",
+    icon: <FaUserShield />,
+  },
+];
   // Update active item when route changes
   useEffect(() => {
     const currentItem = allItems.find(item => item.route === location.pathname);
