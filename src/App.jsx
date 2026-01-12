@@ -18,7 +18,7 @@ import {
 import { Tooltip } from "@mui/material";
 
 import "./App.css";
-import logo from "./assets/logo.png";
+import logo from "./assets/shoe.svg";
 
 import Products from "./Pages/Products/Product"
 /* Existing Pages */

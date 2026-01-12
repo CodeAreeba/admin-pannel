@@ -23,7 +23,7 @@
   --fontsize-medium: 14px;
   --fontsize-large: 16px;
   --all-side-box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.733);
-  --all-side-box-shadow2: 0px 0px 3px #334eac;
+  --all-side-box-shadow2: 0px 0px 3px #ac8833;
   --fontsize-heading: 40px;
   --fontsize-heading-responsive: 30px;
   --space-bellow-hero-section: 88px;
@@ -44,9 +44,9 @@
   --service-card-p-height: 150px;
   --team-background-height: 500px;
   --headings-color: var(--primary-color);
-  --shadow-low1: hsla(217, 48%, 60%, 0.299);
-  --shadow-low2: #006bcf00;
-  --shadow-low3: #0d67bb;
+  --shadow-low1: hsla(36, 48%, 60%, 0.299);
+  --shadow-low2: #cf6b0000;
+  --shadow-low3: #bb7b0d;
   --default-box-shadow: 0 0 2px var(--primary-color);
   --left-space: 5%;
   --mid-space: 90%;
