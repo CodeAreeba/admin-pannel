@@ -30,14 +30,9 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import Roles from "./Pages/Roles/Roles";
 
-const ProductManagement = () => <h1>Product Management</h1>;
-const OrderManagement = () => <h1>Order Management</h1>;
-const CustomerManagement = () => <h1>Customer Management</h1>;
-const InventoryManagement = () => <h1>Inventory Management</h1>;
-const CategoryManagement = () => <h1>Category Management</h1>;
-const ContentManagement = () => <h1>Content Management</h1>;
-const DiscountManagement = () => <h1>Discount & Promotions</h1>;
-const ReviewsRatings = () => <h1>Reviews & Ratings</h1>;
+// const ContentManagement = () => <h1>Content Management</h1>;
+// const DiscountManagement = () => <h1>Discount & Promotions</h1>;
+// const ReviewsRatings = () => <h1>Reviews & Ratings</h1>;
 const Settings = () => <h1>Settings</h1>;
 
 const App = ({ onLogout }) => {
@@ -54,9 +49,9 @@ const App = ({ onLogout }) => {
     { id: 4, name: "Customer Management", route: "/customers", icon: <FaUsers /> },
     { id: 5, name: "Inventory Management", route: "/inventory", icon: <FaWarehouse /> },
     { id: 6, name: "Category Management", route: "/categories", icon: <FaTags /> },
-    { id: 7, name: "Content Management", route: "/content", icon: <FaBullhorn /> },
-    { id: 8, name: "Discount & Promotions", route: "/discounts", icon: <FaBullhorn /> },
-    { id: 9, name: "Reviews & Ratings", route: "/reviews", icon: <FaStar /> },
+    // { id: 7, name: "Content Management", route: "/content", icon: <FaBullhorn /> },
+    // { id: 8, name: "Discount & Promotions", route: "/discounts", icon: <FaBullhorn /> },
+    // { id: 9, name: "Reviews & Ratings", route: "/reviews", icon: <FaStar /> },
     { id: 10, name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
     { id: 11, name: "Settings", route: "/settings", icon: <FaCog /> },
     { id: 12, name: "User Role Management", route: "/roles", icon: <FaUserShield /> },
@@ -126,9 +121,9 @@ const App = ({ onLogout }) => {
           <Route path="/customers" element={<Customer />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/categories" element={<Category />} />
-          <Route path="/content" element={<ContentManagement />} />
+          {/* <Route path="/content" element={<ContentManagement />} />
           <Route path="/discounts" element={<DiscountManagement />} />
-          <Route path="/reviews" element={<ReviewsRatings />} />
+          <Route path="/reviews" element={<ReviewsRatings />} /> */}
           <Route path="/settings" element={<Settings />} />
           <Route path="/roles" element={<Roles />} />
 

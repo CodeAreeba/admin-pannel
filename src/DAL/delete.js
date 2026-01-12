@@ -57,73 +57,9 @@ export const deleteAllUsers = async (data) => {
   return invokeApi(reqObj);
 };
 
-export const deleteAllStock = async (data) => {
-  const reqObj = {
-    path: `/stock/deleteMultiple`,
-    method: "DELETE", // Ensure correct capitalization
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-    postData: data,
-  };
-  
-  return invokeApi(reqObj);
-};
+ 
 
-export const deleteAllExpense = async (data) => {
-  const reqObj = {
-    path: `/expense/multipleDelete`,
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-    postData: data,
-  };
-  
-  return invokeApi(reqObj);
-};
-
-export const deleteAllBills = async (data ) => {
- const reqObj = {
-    path: `/bill/deletemany`,
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-    postData: data,
-  };
-  
-  return invokeApi(reqObj);
-};
-
-export const deleteAllReports = async (data ) => {
- const reqObj = {
-    path: `/bill/report`,
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-    postData: data,
-  };
-  return invokeApi(reqObj);
-};
-export const deleteAllPendingAmount = async (data ) => {
- const reqObj = {
-    path: `/bill/pending/deletemany`,
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-    postData: data,
-  };
-  
-  return invokeApi(reqObj);
-};
+ 
 
 
 
