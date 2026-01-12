@@ -35,6 +35,8 @@ import { useAlert } from "../Alert/AlertContext";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
 import AddRoles from "./AddRoles";
+import AddProduct from "./AddProducts";
+
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const { showAlert } = useAlert(); 
   const savedState =
@@ -55,6 +57,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [modelData, setModelData] = useState({});
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  const [openProductModal, setOpenProductModal] = useState(false);
+
 
   useEffect(() => {
     fetchData();
@@ -153,7 +157,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenUserModal(true);
       setModelData(category);
       setModeltype("Update");
-    } 
+    } else if (tableType === "Products") {
+      setOpenProductModal(true);
+      setModelData(category);
+      setModeltype("Update");
+    }
   };
 
   const handleDelete = async () => {
@@ -192,8 +200,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenUserModal(true);
       setModeltype("Add");
       setModelData();
-    } 
-
+    } else if (tableType === "Products") {
+      setOpenProductModal(true);
+      setModeltype("Add");
+      setModelData();
+    }
   };
 
   const getNestedValue = (obj, path) => {
@@ -212,6 +223,15 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleDeleteClick = () => {
     setOpenDeleteModal(true);
   };
+{openProductModal && (
+  <AddProduct
+    open={openProductModal}
+    setOpen={setOpenProductModal}
+    Modeltype={modeltype}
+    Modeldata={modelData}
+    onResponse={handleResponse}
+  />
+)}
 
   return {
     tableUI: (

@@ -14,8 +14,8 @@
   --grey-color: #ededed;
   --dark-grey-color: #adadad;
   --black-color: #000000;
-  --horizontal-gradient: linear-gradient(to right, #334eac, #081f5c);
-  --vertical-gradient: linear-gradient(to bottom, #334eac, #081f5c);
+  --horizontal-gradient: linear-gradient(to right, #ac7633, #5c4e08);
+  --vertical-gradient: linear-gradient(to bottom, #ac7833, #5c2f08);
   --background-blackScreen: linear-gradient(to bottom, #ffffff00, #000000ac);
   --border-radius: 20px;
   --border-radius-secondary: 4px;

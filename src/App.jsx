@@ -20,14 +20,11 @@ import { Tooltip } from "@mui/material";
 import "./App.css";
 import logo from "./assets/logo.png";
 
-/* Existing Pages */
 import Products from "./Pages/Products/Product"
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import Roles from "./Pages/Roles/Roles";
 
-
-/* Temporary / Placeholder Pages */
 const ProductManagement = () => <h1>Product Management</h1>;
 const OrderManagement = () => <h1>Order Management</h1>;
 const CustomerManagement = () => <h1>Customer Management</h1>;
