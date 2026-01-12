@@ -28,6 +28,7 @@ import {
   fetchallBilllist,
   fetchSaleslist,
   fetchPendingAmount,
+  fetchAllProductList,
 } from "../../DAL/fetch";
 import { formatDate } from "../../Utils/Formatedate";
 // import truncateText from "../../truncateText";
@@ -224,7 +225,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       }
     }
     else if (tableType === "Products") {
-  response = await fetchallProductlist(page, rowsPerPage, searchQuery);
+  response = await fetchAllProductList(page, rowsPerPage, searchQuery);
 
   if (response.status === 400) {
     localStorage.removeItem("Token");

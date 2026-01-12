@@ -124,7 +124,7 @@ export const fetchAllProductList = async (
   filter
 ) => {
   const reqObj = {
-    path: `/product/list?limit=${rowsPerPage}&page=${page}&keyword=${searchQuery}&filter=${filter}`,
+    path: `/product/list`,
     method: "GET",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("Token")}`,
