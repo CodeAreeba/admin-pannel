@@ -21,6 +21,11 @@ import "./App.css";
 import logo from "./assets/logo.png";
 
 import Products from "./Pages/Products/Product"
+/* Existing Pages */
+import Orders from "./Pages/Orders/Orders";
+import Customer from "./Pages/Customer/Customer";
+import Category from "./Pages/Category/Category";
+import Inventory from "./Pages/Inventory/Inventory";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
 import Roles from "./Pages/Roles/Roles";
@@ -117,10 +122,10 @@ const App = ({ onLogout }) => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
-          <Route path="/orders" element={<OrderManagement />} />
-          <Route path="/customers" element={<CustomerManagement />} />
-          <Route path="/inventory" element={<InventoryManagement />} />
-          <Route path="/categories" element={<CategoryManagement />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/customers" element={<Customer />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/categories" element={<Category />} />
           <Route path="/content" element={<ContentManagement />} />
           <Route path="/discounts" element={<DiscountManagement />} />
           <Route path="/reviews" element={<ReviewsRatings />} />
