@@ -24,13 +24,8 @@ import logo from "./assets/logo.png";
 import Products from "./Pages/Products/Product"
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Users from "./Pages/Users/Users";
-import StockM from "./Pages/Stock M/StockM";
 import Roles from "./Pages/Roles/Roles";
-import ExpenseM from "./Pages/Expense/Expense";
-import BillHistory from "./Pages/BillHistory/BillHistory";
-import Reports from "./Components/Models/AddReports";
-import SalesReport from "./Pages/SalesReport/SalesReport";
-import PendingAmountPage from "./Pages/Pending Amount/PendingAmountPage";
+
 
 /* Temporary / Placeholder Pages */
 const ProductManagement = () => <h1>Product Management</h1>;
@@ -138,11 +133,7 @@ const App = ({ onLogout }) => {
 
           {/* Extra existing routes */}
           <Route path="/usersData" element={<Users />} />
-          <Route path="/stockData" element={<StockM />} />
-          <Route path="/ExpenseData" element={<ExpenseM />} />
-          <Route path="/bill-history" element={<BillHistory />} />
-          <Route path="/salesReport" element={<SalesReport />} />
-          <Route path="/PendingAmount" element={<PendingAmountPage />} />
+
 
           <Route path="*" element={<Dashboard />} />
         </Routes>
