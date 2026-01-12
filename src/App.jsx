@@ -127,7 +127,6 @@ const App = ({ onLogout }) => {
           <Route path="/content" element={<ContentManagement />} />
           <Route path="/discounts" element={<DiscountManagement />} />
           <Route path="/reviews" element={<ReviewsRatings />} />
-          <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/roles" element={<Roles />} />
 

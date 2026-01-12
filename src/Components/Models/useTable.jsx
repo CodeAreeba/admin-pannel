@@ -22,42 +22,21 @@ import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   fetchallroleslist,
-  fetchallStocklist,
   fetchalluserlist,
-  fetchallExpenselist,
-  fetchallBilllist,
-  fetchSaleslist,
-  fetchPendingAmount,
   fetchAllProductList,
 } from "../../DAL/fetch";
 import { formatDate } from "../../Utils/Formatedate";
-// import truncateText from "../../truncateText";
 import { useNavigate } from "react-router-dom";
 import {
   deleteAllRoles,
-  deleteAllStock,
   deleteAllUsers,
-  deleteAllExpense,
-  deleteAllBills,
-  deleteAllPendingAmount,
 } from "../../DAL/delete";
 import { useAlert } from "../Alert/AlertContext";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
 import AddRoles from "./AddRoles";
-import AddStock from "./addStockM";
-import AddExpense from "./AddExpense";
-import AddNewStock from "./AddNewStock";
-import BillHistoryModal from "./BillHistoryModal";
-import SalesReportModal from "./SalesReportModal";
-import Reports from "./AddReports";
-import PendingAmountPage from "../../Pages/Pending Amount/PendingAmountPage";
-import AddPendingAmount from "./AddPendingAmount";
-// import OutOfStock from "../OutOfStock";
-// import LowStock from "../LowStock";
-
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
-  const { showAlert } = useAlert(); // Since you created a custom hook
+  const { showAlert } = useAlert(); 
   const savedState =
     JSON.parse(localStorage.getItem(`${tableType}-tableState`)) || {};
   const [page, setPage] = useState(savedState.page || 1);
@@ -72,22 +51,14 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
   const [openRolesModal, setOpenRolesModal] = useState(false);
   const [openUserModal, setOpenUserModal] = useState(false);
-  const [openStockModal, setOpenStockModal] = useState(false);
-  const [openNewStockModal, setOpenNewStockModal] = useState(false);
-  const [openExpenseModal, setOpenExpenseModal] = useState(false);
-  const [openBillModal, setOpenBillModal] = useState(false);
-  const [openReportsModal, setOpenReportsModal] = useState(false); // <- reports modal state
-  const [openSalesReportModal, setOpenSalesReportModal] = useState(false);
-  const [openPendingAmountModal, setOpenPendingAmountModal] = useState(false);
   const [modeltype, setModeltype] = useState("Add");
   const [modelData, setModelData] = useState({});
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
-  const [stockFilter, setStockFilter] = useState("none");
 
   useEffect(() => {
     fetchData();
-  }, [page, rowsPerPage, debouncedSearch, stockFilter]);
+  }, [page, rowsPerPage, debouncedSearch]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -133,97 +104,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setData(response.users);
         setTotalRecords(response.totalUsers);
       }
-    } else if (tableType === "Stock") {
-      response = await fetchallStocklist(page, rowsPerPage, searchQuery,stockFilter);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-      } else {
-        setData(response.data);
-        setTotalRecords(response.totalRecords);
-      }
-
-      setIsLoading(false);
-    } else if (tableType === "Expense") {
-      response = await fetchallExpenselist(page, rowsPerPage, searchQuery);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        setData(response.data);
-        setTotalRecords(response.totalExpense);
-      }
-    } else if (tableType === "Bill History") {
-      response = await fetchallBilllist(page, rowsPerPage, searchQuery);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        setData(response.data);
-        setTotalRecords(response.totalRecords);
-      }
-    } else if (tableType === "Reports") {
-      // Reports are stored in localStorage under 'posReports' by the POSReports component
-      try {
-        const saved = JSON.parse(localStorage.getItem("posReports") || "[]");
-        // filter by debouncedSearch (title, description, reportType, generatedBy)
-        const search = (debouncedSearch || "").trim().toLowerCase();
-        let filtered = saved;
-        if (search) {
-          filtered = saved.filter((r) => {
-            const title = (r.title || "").toString().toLowerCase();
-            const desc = (r.description || "").toString().toLowerCase();
-            const type = (r.reportType || "").toString().toLowerCase();
-            const gen = (r.generatedBy || "").toString().toLowerCase();
-            return (
-              title.includes(search) ||
-              desc.includes(search) ||
-              type.includes(search) ||
-              gen.includes(search)
-            );
-          });
-        }
-
-        // paginate results (API expects page 1-based)
-        const start = (page - 1) * rowsPerPage;
-        const paginated = filtered.slice(start, start + rowsPerPage);
-
-        setData(paginated);
-        setTotalRecords(filtered.length);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Error reading reports from localStorage", err);
-        setData([]);
-        setTotalRecords(0);
-        setIsLoading(false);
-      }
-    } else if (tableType === "Sales Report") {
-      response = await fetchSaleslist(page, rowsPerPage, searchQuery);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        setData(response.data);
-        setTotalRecords(response.totalRecords);
-      }
-    } else if (tableType === "Pending Amount") {
-      response = await fetchPendingAmount(page, rowsPerPage, searchQuery);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        setData(response.data);
-        setTotalRecords(response.totalRecords);
-      }
-    }
+    } 
     else if (tableType === "Products") {
   response = await fetchAllProductList(page, rowsPerPage, searchQuery);
 
@@ -233,13 +114,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     setIsLoading(false);
   } else {
     setIsLoading(false);
-
-    // 👇 backend response ke mutabiq
-    setData(response.products);        // products array
+    setData(response.products);        
     setTotalRecords(response.totalProducts);
   }
 } else {
-      // default fallback
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -254,11 +132,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const isSelected = (id) => selected.includes(id);
 
-  //  Fixed pagination handling
   const handleChangePage = (_, newPage) => {
     const nextPage = newPage + 1; // Convert MUI’s 0-based to API’s 1-based
-
-    // Prevent going below page 1
     if (nextPage < 1) return;
     setPage(nextPage);
   };
@@ -266,7 +141,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleChangeRowsPerPage = (event) => {
     const newLimit = parseInt(event.target.value, 10);
     setRowsPerPage(newLimit);
-    setPage(1); // Always go to page 1 after changing rows per page
+    setPage(1); 
   };
 
   const handleviewClick = (category) => {
@@ -278,37 +153,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenUserModal(true);
       setModelData(category);
       setModeltype("Update");
-    } else if (tableType === "Stock") {
-      setOpenStockModal(true);
-      setModelData(category);
-      setModeltype("Update");
-    } else if (tableType === "Expense") {
-      setOpenExpenseModal(true);
-      setModelData(category);
-      setModeltype("Update");
-    } else if (tableType === "Bill History") {
-      setOpenBillModal(true);
-      setModelData(category);
-      setModeltype("Update");
-    } else if (tableType === "Reports") {
-      setOpenReportsModal(true);
-      setModelData(category);
-      setModeltype("View"); // viewing a saved report
-    } else if (tableType === "Sales Report") {
-      setOpenSalesReportModal(true);
-      setModelData(category);
-      setModeltype("Update");
-    } else if (tableType === "Pending Amount") {
-      setOpenPendingAmountModal(true);
-      setModelData(category);
-      setModeltype("Update");
-    }
-  };
-  const handleAddNew = (category) => {
-    if (tableType === "Stock") {
-      setOpenNewStockModal(true);
-      setModelData(category);
-    }
+    } 
   };
 
   const handleDelete = async () => {
@@ -323,27 +168,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         response = await deleteAllRoles({ ids: selected });
       } else if (tableType === "Users") {
         response = await deleteAllUsers({ ids: selected });
-      } else if (tableType === "Stock") {
-        response = await deleteAllStock({ ids: selected });
-      } else if (tableType === "Expense") {
-        response = await deleteAllExpense({ ids: selected });
-      } else if (tableType === "Bill History") {
-        response = await deleteAllBills({ ids: selected });
-      } else if (tableType === "Reports") {
-        // delete locally stored reports
-        const saved = JSON.parse(localStorage.getItem("posReports") || "[]");
-        const remaining = saved.filter((r) => !selected.includes(r.id));
-        localStorage.setItem("posReports", JSON.stringify(remaining));
-        showAlert("success", "Reports deleted successfully");
-        // refresh table & clear selection
-        fetchData();
-        setSelected([]);
-        return;
-      } else if (tableType === "Sales Report") {
-        response = await deleteAllExpense({ ids: selected });
-      } else if (tableType === "Pending Amount") {
-        response = await deleteAllPendingAmount({ ids: selected });
-      }
+      } 
 
       if (response && response.status === 200) {
         showAlert("success", response.message || "Deleted successfully");
@@ -367,25 +192,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenUserModal(true);
       setModeltype("Add");
       setModelData();
-    } else if (tableType === "Stock") {
-      setOpenStockModal(true);
-      setModeltype("Add");
-      setModelData();
-    } else if (tableType === "Expense") {
-      setOpenExpenseModal(true);
-      setModeltype("Add");
-      setModelData();
-    } else if (tableType === "Reports") {
-      // Open reports modal to add a new report (Reports component handles saving)
-      setOpenReportsModal(true);
-      setModeltype("Add");
-      setModelData();
-    }
-    // else if (tableType === "Sales Report") {
-    //   setOpenSalesReportModal(true);
-    //   setModeltype("Add");
-    //   setModelData();
-    // }
+    } 
+
   };
 
   const getNestedValue = (obj, path) => {
@@ -422,68 +230,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             open={openUserModal}
             setOpen={setOpenUserModal}
             Modeltype={modeltype}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-
-        {openStockModal && (
-          <AddStock
-            open={openStockModal}
-            setOpen={setOpenStockModal}
-            Modeltype={modeltype}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-        {openNewStockModal && (
-          <AddNewStock
-            open={openNewStockModal}
-            setOpen={setOpenNewStockModal}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-        {openExpenseModal && (
-          <AddExpense
-            open={openExpenseModal}
-            setOpen={setOpenExpenseModal}
-            Modeltype={modeltype}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-        {openBillModal && (
-          <BillHistoryModal
-            open={openBillModal}
-            setOpen={setOpenBillModal}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-
-        {openReportsModal && (
-          <Reports
-            open={openReportsModal}
-            setOpen={setOpenReportsModal}
-            Modeltype={modeltype}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-
-        {openSalesReportModal && (
-          <SalesReportModal
-            open={openSalesReportModal}
-            setOpen={setOpenSalesReportModal}
-            Modeldata={modelData}
-            onResponse={handleResponse}
-          />
-        )}
-        {openPendingAmountModal && (
-          <AddPendingAmount
-            open={openPendingAmountModal}
-            setOpen={setOpenPendingAmountModal}
             Modeldata={modelData}
             onResponse={handleResponse}
           />
@@ -540,23 +286,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     ),
                   }}
                 />
-                {tableType === "Stock" && (
-                  <TextField
-                    select
-                    size="small"
-                    value={stockFilter}
-                    onChange={(e) => {
-                      setStockFilter(e.target.value);
-                      setPage(1); // reset pagination for filter change
-                    }}
-                    SelectProps={{ native: true }}
-                    sx={{ width: 180, background: "white", borderRadius: 1 }}
-                  >
-                    <option value="all">All Stock</option>
-                    <option value="out-of-stock">Out of Stock</option>
-                    <option value="low-stock">Low Stock</option>
-                  </TextField>
-                )}
+ 
                 {selected.length > 0 ? (
                   <IconButton onClick={handleDeleteClick} sx={{ color: "red" }}>
                     <DeleteIcon />
@@ -634,9 +364,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     ))}
 
                     <TableCell>Action</TableCell>
-                    {tableType === "Stock" && (
-                      <TableCell>Add Stock</TableCell>
-                    )}
+                  
                   </TableRow>
                 </TableHead>
 
@@ -761,11 +489,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                   {row[attr.id] === 0 ? (
                                     <>
                                       {row[attr.id]}
-                                      <br /> <OutOfStock />
+                                      <br /> 
                                     </>
                                   ) : row[attr.id] < 10 ? (
                                     <>
-                                      {row[attr.id]} <br /> <LowStock />
+                                      {row[attr.id]} <br /> 
                                     </>
                                   ) : (
                                     row[attr.id]
@@ -852,25 +580,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             </Button>
                           </TableCell>
 
-                          {tableType === "Stock" && (
-                            <TableCell>
-                              <Button
-                                size="small"
-                                variant="contained"
-                                onClick={() => handleAddNew(row)}
-                                sx={{
-                                  textTransform: "none",
-                                  background: "var(--primary-color)",
-                                  color: "#fff",
-                                  "&:hover": {
-                                    background: "var(--secondary-color)",
-                                  },
-                                }}
-                              >
-                                Add Stock
-                              </Button>
-                            </TableCell>
-                          )}
                         </TableRow>
                       );
                     })
