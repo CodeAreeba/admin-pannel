@@ -36,6 +36,10 @@ import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
 import AddRoles from "./AddRoles";
 import AddProduct from "./AddProducts";
+import AddOrders from "./AddOrders";
+import AddCustomer from "./AddCustomer";
+import AddCategory from "./AddCategory";
+import AddInventory from "./AddInventory";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const { showAlert } = useAlert(); 
@@ -58,11 +62,15 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
   const [openProductModal, setOpenProductModal] = useState(false);
+  const [openOrderModal, setOpenOrderModal] = useState(false);
+  const [openCustomerModal, setOpenCustomerModal] = useState(false);
+  const [openCategoryModal, setOpenCategoryModal] = useState(false);
+  const [openInventoryModal, setOpenInventoryModal] = useState(false);
 
 
   useEffect(() => {
     fetchData();
-  }, [page, rowsPerPage, debouncedSearch]);
+  }, [page, rowsPerPage, debouncedSearch])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -109,19 +117,20 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setTotalRecords(response.totalUsers);
       }
     } 
-    else if (tableType === "Products") {
-  response = await fetchAllProductList(page, rowsPerPage, searchQuery);
+//     else if (tableType === "Products") {
+//   response = await fetchAllProductList(page, rowsPerPage, searchQuery);
 
-  if (response.status === 400) {
-    localStorage.removeItem("Token");
-    navigate("/login");
-    setIsLoading(false);
-  } else {
-    setIsLoading(false);
-    setData(response.products);        
-    setTotalRecords(response.totalProducts);
-  }
-} else {
+//   if (response.status === 400) {
+//     localStorage.removeItem("Token");
+//     navigate("/login");
+//     setIsLoading(false);
+//   } else {
+//     setIsLoading(false);
+//     setData(response.products);        
+//     setTotalRecords(response.totalProducts);
+//   }
+// } 
+else {
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -159,6 +168,26 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setModeltype("Update");
     } else if (tableType === "Products") {
       setOpenProductModal(true);
+      setModelData(category);
+      setModeltype("Update");
+    }
+    else if (tableType === "Orders") {
+      setOpenOrderModal(true);
+      setModelData(category);
+      setModeltype("Update");
+    }
+    else if (tableType === "Customer") {
+      setOpenCustomerModal(true);
+      setModelData(category);
+      setModeltype("Update");
+    }
+    else if (tableType === "Category") {  
+      setOpenCategoryModal(true);
+      setModelData(category);
+      setModeltype("Update");
+    }
+    else if (tableType === "Inventory") {
+      setOpenInventoryModal(true);
       setModelData(category);
       setModeltype("Update");
     }
@@ -204,6 +233,22 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenProductModal(true);
       setModeltype("Add");
       setModelData();
+    } else if (tableType === "Orders") {
+      setOpenOrderModal(true);
+      setModeltype("Add");
+      setModelData();
+    } else if (tableType === "Customer") {
+      setOpenCustomerModal(true);
+      setModeltype("Add");
+      setModelData();
+    } else if (tableType === "Category") {
+      setOpenCategoryModal(true);
+      setModeltype("Add");
+      setModelData();
+    } else if (tableType === "Inventory") {
+      setOpenInventoryModal(true);
+      setModeltype("Add");
+      setModelData();
     }
   };
 
@@ -223,15 +268,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleDeleteClick = () => {
     setOpenDeleteModal(true);
   };
-{openProductModal && (
-  <AddProduct
-    open={openProductModal}
-    setOpen={setOpenProductModal}
-    Modeltype={modeltype}
-    Modeldata={modelData}
-    onResponse={handleResponse}
-  />
-)}
 
   return {
     tableUI: (
@@ -254,7 +290,52 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             onResponse={handleResponse}
           />
         )}
+        {openProductModal && (
+  <AddProduct
+    open={openProductModal}
+    setOpen={setOpenProductModal}
+    Modeltype={modeltype}
+    Modeldata={modelData}
+    onResponse={handleResponse}
+  />
+)}
 
+        {openOrderModal && (
+          <AddOrders
+            open={openOrderModal} 
+            setOpen={setOpenOrderModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={handleResponse}
+          />
+        )}
+        {openCustomerModal && (
+          <AddCustomer
+            open={openCustomerModal}
+            setOpen={setOpenCustomerModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={handleResponse}
+          />
+        )}
+        {openCategoryModal && (
+          <AddCategory
+            open={openCategoryModal}
+            setOpen={setOpenCategoryModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={handleResponse}
+          />
+        )}
+        {openInventoryModal && (
+          <AddInventory
+            open={openInventoryModal}
+            setOpen={setOpenInventoryModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={handleResponse}
+          />
+        )}
         <DeleteModal
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
