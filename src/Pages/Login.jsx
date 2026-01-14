@@ -25,12 +25,10 @@ const Login = ({ onLoginSuccess }) => {
     password: "",
   });
 
-  // Autofill saved email only (password save nahi karni)
+  // Autofill saved email only
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
-    if (savedEmail) {
-      setEmail(savedEmail);
-    }
+    if (savedEmail) setEmail(savedEmail);
   }, []);
 
   const handleLogin = async (e) => {
@@ -63,23 +61,21 @@ const Login = ({ onLoginSuccess }) => {
 
       const response = await login(formData);
 
-      if (response.status !== 200) {
+      console.log("Login Response:", response); // Debug
+
+      // Check backend response
+      if (response.statusCode !== 200) {
         throw new Error(response.message || "Login failed");
       }
 
-      // Save token & user
-      localStorage.setItem("Token", response.token);
-      localStorage.setItem("userData", JSON.stringify(response.data));
-
-      // Remember email only
+      // Remember email only (no token saved)
       localStorage.setItem("email", email);
 
       showAlert("success", response.message || "Login successful");
 
-      if (onLoginSuccess) {
-        onLoginSuccess();
-      }
+      if (onLoginSuccess) onLoginSuccess();
 
+      // Navigate to dashboard
       navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Login error:", error);

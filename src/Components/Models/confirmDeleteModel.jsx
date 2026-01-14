@@ -19,7 +19,7 @@ export default function DeleteModal({ open, setOpen, onConfirm }) {
   };
 
   const handleConfirm = () => {
-    onConfirm(); // Sends delete confirmation to parent
+    onConfirm(); 
     setOpen(false);
   };
 

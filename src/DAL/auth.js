@@ -1,44 +1,32 @@
-export const login = async (formData) => {
+import { invokeApi } from "../Utils/InvokeApi";
 
-  const mockLoginResponse = {
-    status: 200,
-    message: "Login successful!",
-    token: "mock-token-" + Date.now(),
-    data: {
-      id: "user-001",
-      name: "Admin User",
+export const login = async (formData) => {
+  const reqObj = {
+    path: "/auth/admin/login", 
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    postData: {
       email: formData.get("email"),
-      role: {
-        _id: "role-001",
-        name: "Admin",
-        Modules: ["Dashboard", "Users", "Stock Management"]
-      },
+      password: formData.get("password")
     },
   };
 
-  try {
-    const reqObj = {
-      path: "/auth/admin/login", 
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      postData: {
-        email: formData.get("email"),
-        password: formData.get("password")
-      },
-    };
+  const response = await invokeApi(reqObj);
+  
+  console.log("Login Response:", response);
+  return response;
+};
 
-    return await invokeApi(reqObj);
-  } catch (error) {
-    console.warn(" Backend not available, using mock login");
-    // Return mock data
-    if (formData.get("email") && formData.get("password")) {
-      return mockLoginResponse;
-    }
-    return {
-      status: 400,
-      message: "Email and password required",
-    };
-  }
+export const logout = async () => {
+  const reqObj = {
+    path: "/auth/admin/logout", 
+    method: "GET",
+    // headers: {
+    //   Authorization: `Bearer ${localStorage.getItem("Token")}`,
+    // },
+  };
+
+  return invokeApi(reqObj);
 };
