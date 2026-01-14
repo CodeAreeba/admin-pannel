@@ -22,7 +22,7 @@ export const login = async (formData) => {
 export const logout = async () => {
   const reqObj = {
     path: "/auth/admin/logout", 
-    method: "GET",
+    method: "POST",
     // headers: {
     //   Authorization: `Bearer ${localStorage.getItem("Token")}`,
     // },

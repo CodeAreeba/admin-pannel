@@ -28,7 +28,9 @@ const Login = ({ onLoginSuccess }) => {
   // Autofill saved email only
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
-    if (savedEmail) setEmail(savedEmail);
+    if (savedEmail) {
+      setEmail(savedEmail);
+    }
   }, []);
 
   const handleLogin = async (e) => {
@@ -61,21 +63,22 @@ const Login = ({ onLoginSuccess }) => {
 
       const response = await login(formData);
 
-      console.log("Login Response:", response); // Debug
-
-      // Check backend response
+      // Backend response check
       if (response.statusCode !== 200) {
         throw new Error(response.message || "Login failed");
       }
 
-      // Remember email only (no token saved)
+      // ✅ IMPORTANT: LOGIN STATE
+      localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("email", email);
 
       showAlert("success", response.message || "Login successful");
 
-      if (onLoginSuccess) onLoginSuccess();
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
 
-      // Navigate to dashboard
+      // ✅ Correct redirect
       navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Login error:", error);

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import {
   Dialog,
   DialogActions,
@@ -11,48 +11,39 @@ import {
 
 import App from "./App";
 import Login from "./Pages/Login";
+import { logout } from "./DAL/auth";
 
 function AppWrapper() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem("Token");
-  });
-  
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [resetActive, setResetActive] = useState(false);
 
-  // ✅ ONE-TIME auth check on mount
-  useEffect(() => {
-    const token = localStorage.getItem("Token");
-    setIsAuthenticated(!!token);
-  }, []); // Empty array - runs only once
+  const navigate = useNavigate();
 
-  // ✅ Handle navigation based on auth state
-  useEffect(() => {
-    const token = localStorage.getItem("Token");
-    
-    if (!token && location.pathname !== "/login") {
-      navigate("/login", { replace: true });
-    } else if (token && (location.pathname === "/login" || location.pathname === "/")) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isAuthenticated, location.pathname, navigate]);
-
+  // ✅ login success
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
+    navigate("/dashboard", { replace: true });
   };
 
+  // open logout dialog
   const handleLogoutClick = () => {
     setOpenLogoutDialog(true);
   };
 
-  const confirmLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.clear();
-    setOpenLogoutDialog(false);
-    setResetActive(true);
-    navigate("/login", { replace: true });
+  // ✅ confirm logout → API hit
+  const confirmLogout = async () => {
+    try {
+      await logout(); // 🔥 BACKEND LOGOUT API
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      // ✅ frontend cleanup (always)
+      setIsAuthenticated(false);
+      setResetActive(true);
+      setOpenLogoutDialog(false);
+      navigate("/login", { replace: true });
+    }
   };
 
   const cancelLogout = () => {
@@ -87,29 +78,24 @@ function AppWrapper() {
         )}
       </Routes>
 
-      <Dialog
-        open={openLogoutDialog}
-        onClose={cancelLogout}
-        aria-labelledby="logout-dialog-title"
-        aria-describedby="logout-dialog-description"
-      >
-        <DialogTitle id="logout-dialog-title" sx={{ fontWeight: "bold" }}>
+      {/* Logout Confirmation Dialog */}
+      <Dialog open={openLogoutDialog} onClose={cancelLogout}>
+        <DialogTitle sx={{ fontWeight: "bold" }}>
           Confirm Logout
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="logout-dialog-description">
-            Are you sure you want to log out from your account?
+          <DialogContentText>
+            Are you sure you want to log out?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={cancelLogout} color="primary" variant="outlined">
+          <Button onClick={cancelLogout} variant="outlined">
             Cancel
           </Button>
           <Button
             onClick={confirmLogout}
             color="error"
             variant="contained"
-            autoFocus
           >
             Logout
           </Button>
