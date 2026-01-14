@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-// import CustomAlert from "./CustomAlert";
+import CustomAlert from "./CustomAlert"; // ✅ import added
 
 const AlertContext = createContext();
 

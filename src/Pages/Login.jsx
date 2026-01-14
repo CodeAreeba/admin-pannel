@@ -10,23 +10,26 @@ import {
 import { useNavigate } from "react-router-dom";
 import "./login.css";
 import { useAlert } from "../Components/Alert/AlertContext";
+import { login } from "../DAL/auth";
 
 const Login = ({ onLoginSuccess }) => {
   const { showAlert } = useAlert();
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
-  // Auto-fill from localStorage if saved
+  // Autofill saved email only (password save nahi karni)
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
-    const savedPassword = localStorage.getItem("password");
-    if (savedEmail && savedPassword) {
+    if (savedEmail) {
       setEmail(savedEmail);
-      setPassword(savedPassword);
     }
   }, []);
 
@@ -35,7 +38,6 @@ const Login = ({ onLoginSuccess }) => {
 
     setErrors({ email: "", password: "" });
 
-    // Front-end validation
     let hasError = false;
     const newErrors = { email: "", password: "" };
 
@@ -43,78 +45,48 @@ const Login = ({ onLoginSuccess }) => {
       newErrors.email = "Email is required.";
       hasError = true;
     }
+
     if (!password.trim()) {
       newErrors.password = "Password is required.";
       hasError = true;
     }
 
     setErrors(newErrors);
-
     if (hasError) return;
 
     setLoading(true);
 
-    // 🔥 FAKE LOGIN - Backend ke bagair
-    setTimeout(() => {
-      try {
-        // Fake token generate
-        const fakeToken = "fake-jwt-token-" + Date.now();
-        
-        // Fake user data with modules
-        const userData = {
-          id: "user123",
-          name: email.split("@")[0], // Email se naam bana diya
-          email: email,
-          role: {
-            _id: "role123",
-            name: "Admin",
-            description: "Full access to all modules",
-            Modules: [
-              "Dashboard",
-              "Roles",
-              "Users",
-              "Stock Management",
-              "Expense",
-              "Bill History",
-              "Reports",
-              "Sales Report",
-              "Pending Amount"
-            ]
-          }
-        };
+    try {
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("password", password);
 
-        console.log("💾 Saving fake userData to localStorage:", userData);
-        
-        // Save to localStorage
-        localStorage.setItem("Token", fakeToken);
-        localStorage.setItem("userData", JSON.stringify(userData));
-        
-        // Optional: Save email/password for next time
-        localStorage.setItem("email", email);
-        localStorage.setItem("password", password);
+      const response = await login(formData);
 
-        const saved = localStorage.getItem("userData");
-        console.log("✅ Verified saved userData:", saved);
-
-        showAlert("success", "Login successful! Welcome " + userData.name);
-
-        // Call onLoginSuccess callback
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        }
-
-        // Navigate to dashboard
-        setTimeout(() => {
-          navigate("/dashboard", { replace: true });
-        }, 100);
-
-      } catch (error) {
-        console.error("❌ Login Error:", error);
-        showAlert("error", "Something went wrong!");
-      } finally {
-        setLoading(false);
+      if (response.status !== 200) {
+        throw new Error(response.message || "Login failed");
       }
-    }, 1000); // 1 second delay for realistic feel
+
+      // Save token & user
+      localStorage.setItem("Token", response.token);
+      localStorage.setItem("userData", JSON.stringify(response.data));
+
+      // Remember email only
+      localStorage.setItem("email", email);
+
+      showAlert("success", response.message || "Login successful");
+
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+
+      navigate("/dashboard", { replace: true });
+    } catch (error) {
+      console.error("Login error:", error);
+      showAlert("error", error.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -134,10 +106,9 @@ const Login = ({ onLoginSuccess }) => {
           </Typography>
 
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Use any email and password to login
+            Admin Login
           </Typography>
 
-          {/* Email Field */}
           <TextField
             fullWidth
             type="email"
@@ -149,7 +120,6 @@ const Login = ({ onLoginSuccess }) => {
             helperText={errors.email}
           />
 
-          {/* Password Field */}
           <TextField
             fullWidth
             type="password"
@@ -161,7 +131,6 @@ const Login = ({ onLoginSuccess }) => {
             helperText={errors.password}
           />
 
-          {/* Submit Button with Loader */}
           <Button
             type="submit"
             fullWidth

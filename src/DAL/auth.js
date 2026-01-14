@@ -1,7 +1,5 @@
-import { invokeApi } from "../Utils/InvokeApi";
-
 export const login = async (formData) => {
-  // Static mock data for login when API is not available
+
   const mockLoginResponse = {
     status: 200,
     message: "Login successful!",
@@ -13,55 +11,34 @@ export const login = async (formData) => {
       role: {
         _id: "role-001",
         name: "Admin",
-        description: "Full access administrator",
-        Modules: [
-          "Dashboard",
-          "Roles",
-          "Users",
-          "Stock Management",
-          "Expense",
-          "Bill History",
-          "Reports",
-          "Sales Report",
-          "Pending Amount"
-        ]
-      }
-    }
+        Modules: ["Dashboard", "Users", "Stock Management"]
+      },
+    },
   };
 
   try {
     const reqObj = {
-      path: "/auth/login",
+      path: "/auth/admin/login", 
       method: "POST",
-      headers: {},
-      postData: formData,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      postData: {
+        email: formData.get("email"),
+        password: formData.get("password")
+      },
     };
+
     return await invokeApi(reqObj);
   } catch (error) {
-    console.warn("⚠️ API not available, using static login data");
-    console.log("📧 Email:", formData.get("email"));
-    
-    // Simple validation - accept any email/password for demo
-    // You can add specific credentials check here if needed
-    // Example: if (formData.get("email") === "admin@test.com" && formData.get("password") === "admin123")
-    
+    console.warn(" Backend not available, using mock login");
+    // Return mock data
     if (formData.get("email") && formData.get("password")) {
       return mockLoginResponse;
-    } else {
-      return {
-        status: 400,
-        message: "Email and password are required"
-      };
     }
+    return {
+      status: 400,
+      message: "Email and password required",
+    };
   }
-};
-export const logout = async () => {
-  const reqObj = {
-    path: "/api/admin/logout",
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
-  };
-  return invokeApi(reqObj);
 };
