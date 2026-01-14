@@ -1,14 +1,29 @@
-import React from "react";
-import { Snackbar, Alert } from "@mui/material";
+import { toast } from "react-toastify";
 
-const CustomAlert = ({ type, message }) => {
-  return (
-    <Snackbar open={!!message} autoHideDuration={3000}>
-      <Alert severity={type || "info"} sx={{ width: "100%" }}>
-        {message}
-      </Alert>
-    </Snackbar>
-  );
+const CustomAlert = {
+  success: (msg) =>
+    toast.success(msg, {
+      position: "top-right",
+      autoClose: 3000,
+    }),
+
+  error: (msg) =>
+    toast.error(msg, {
+      position: "top-right",
+      autoClose: 3000,
+    }),
+
+  warning: (msg) =>
+    toast.warning(msg, {
+      position: "top-right",
+      autoClose: 3000,
+    }),
+
+  info: (msg) =>
+    toast.info(msg, {
+      position: "top-right",
+      autoClose: 3000,
+    }),
 };
 
 export default CustomAlert;

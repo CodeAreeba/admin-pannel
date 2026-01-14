@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Dialog,
   DialogActions,
@@ -12,43 +14,61 @@ import {
 import App from "./App";
 import Login from "./Pages/Login";
 import { logout } from "./DAL/auth";
+import CustomAlert from "./Components/Alert/CustomAlert";
 
 function AppWrapper() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoaded, setAuthLoaded] = useState(false);
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [resetActive, setResetActive] = useState(false);
+  const [loginToast, setLoginToast] = useState(false); // ✅ trigger toast after route is ready
 
   const navigate = useNavigate();
 
-  // ✅ login success
+  // ✅ check localStorage on mount
+  useEffect(() => {
+    const auth = localStorage.getItem("auth") === "true";
+    setIsAuthenticated(auth);
+    setAuthLoaded(true);
+  }, []);
+
+  // ✅ show toast after login redirect
+  useEffect(() => {
+    if (loginToast) {
+      CustomAlert.success("Logged in successfully!");
+      setLoginToast(false); // reset
+    }
+  }, [loginToast]);
+
+  // login success
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
+    localStorage.setItem("auth", "true");
+    setLoginToast(true); // trigger toast
     navigate("/dashboard", { replace: true });
   };
 
-  // open logout dialog
-  const handleLogoutClick = () => {
-    setOpenLogoutDialog(true);
-  };
+  const handleLogoutClick = () => setOpenLogoutDialog(true);
 
-  // ✅ confirm logout → API hit
   const confirmLogout = async () => {
     try {
-      await logout(); // 🔥 BACKEND LOGOUT API
+      await logout();
+      CustomAlert.success("Logged out successfully!");
     } catch (error) {
       console.error("Logout API error:", error);
+      CustomAlert.error("Logout failed!");
     } finally {
-      // ✅ frontend cleanup (always)
       setIsAuthenticated(false);
+      localStorage.removeItem("auth");
       setResetActive(true);
       setOpenLogoutDialog(false);
       navigate("/login", { replace: true });
     }
   };
 
-  const cancelLogout = () => {
-    setOpenLogoutDialog(false);
-  };
+  const cancelLogout = () => setOpenLogoutDialog(false);
+
+  if (!authLoaded) return null; // ✅ render nothing until auth state is loaded
 
   return (
     <>
@@ -78,11 +98,9 @@ function AppWrapper() {
         )}
       </Routes>
 
-      {/* Logout Confirmation Dialog */}
+      {/* Logout Dialog */}
       <Dialog open={openLogoutDialog} onClose={cancelLogout}>
-        <DialogTitle sx={{ fontWeight: "bold" }}>
-          Confirm Logout
-        </DialogTitle>
+        <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Logout</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Are you sure you want to log out?
@@ -92,15 +110,22 @@ function AppWrapper() {
           <Button onClick={cancelLogout} variant="outlined">
             Cancel
           </Button>
-          <Button
-            onClick={confirmLogout}
-            color="error"
-            variant="contained"
-          >
+          <Button onClick={confirmLogout} color="error" variant="contained">
             Logout
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* ToastContainer always mounted */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
     </>
   );
 }

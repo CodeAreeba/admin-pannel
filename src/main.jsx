@@ -3,13 +3,16 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AlertProvider } from "./Components/Alert/AlertContext";
 import AppWrapper from "./Appwraper";
+import ErrorBoundary from "./Components/ErrorBoundary";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter >
+  <BrowserRouter>
     <AlertProvider>
-      <AppWrapper  />
+      <ErrorBoundary>
+        <AppWrapper />
+      </ErrorBoundary>
     </AlertProvider>
   </BrowserRouter>
 );
