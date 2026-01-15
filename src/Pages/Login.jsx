@@ -7,25 +7,19 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import "./login.css";
-import { useAlert } from "../Components/Alert/AlertContext";
+import CustomAlert from "../Components/Alert/CustomAlert";
 import { login } from "../DAL/auth";
 
 const Login = ({ onLoginSuccess }) => {
-  const { showAlert } = useAlert();
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
 
-  // Autofill saved email only
   useEffect(() => {
     const savedEmail = localStorage.getItem("email");
     if (savedEmail) {
@@ -61,28 +55,25 @@ const Login = ({ onLoginSuccess }) => {
       formData.append("email", email);
       formData.append("password", password);
 
+      console.log("Attempting login...");
       const response = await login(formData);
+      console.log("Login response:", response);
 
-      // Backend response check
       if (response.statusCode !== 200) {
         throw new Error(response.message || "Login failed");
       }
 
-      // ✅ IMPORTANT: LOGIN STATE
-      localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("email", email);
-
-      showAlert("success", response.message || "Login successful");
+      
+      CustomAlert.success(response.message || "Login successful");
 
       if (onLoginSuccess) {
         onLoginSuccess();
       }
 
-      // ✅ Correct redirect
-      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Login error:", error);
-      showAlert("error", error.message || "Invalid credentials");
+      CustomAlert.error(error.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
@@ -117,6 +108,7 @@ const Login = ({ onLoginSuccess }) => {
             margin="normal"
             error={!!errors.email}
             helperText={errors.email}
+            disabled={loading}
           />
 
           <TextField
@@ -128,6 +120,7 @@ const Login = ({ onLoginSuccess }) => {
             margin="normal"
             error={!!errors.password}
             helperText={errors.password}
+            disabled={loading}
           />
 
           <Button

@@ -31,7 +31,6 @@ import {
   deleteAllRoles,
   deleteAllUsers,
 } from "../../DAL/delete";
-import { useAlert } from "../Alert/AlertContext";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
 import AddRoles from "./AddRoles";
@@ -40,9 +39,11 @@ import AddOrders from "./AddOrders";
 import AddCustomer from "./AddCustomer";
 import AddCategory from "./AddCategory";
 import AddInventory from "./AddInventory";
+import CustomAlert from "../Alert/CustomAlert"; // ✅ ADDED
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
-  const { showAlert } = useAlert(); 
+  // ❌ REMOVED: const { showAlert } = useAlert();
+  
   const savedState =
     JSON.parse(localStorage.getItem(`${tableType}-tableState`)) || {};
   const [page, setPage] = useState(savedState.page || 1);
@@ -77,12 +78,13 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setPage(1)
       setDebouncedSearch(searchQuery);
       
-    }, 500); // delay in ms
+    }, 500);
 
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery]);
+  
   useEffect(() => {
     localStorage.setItem(
       `${tableType}-tableState`,
@@ -116,21 +118,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setData(response.users);
         setTotalRecords(response.totalUsers);
       }
-    } 
-//     else if (tableType === "Products") {
-//   response = await fetchAllProductList(page, rowsPerPage, searchQuery);
-
-//   if (response.status === 400) {
-//     localStorage.removeItem("Token");
-//     navigate("/login");
-//     setIsLoading(false);
-//   } else {
-//     setIsLoading(false);
-//     setData(response.products);        
-//     setTotalRecords(response.totalProducts);
-//   }
-// } 
-else {
+    } else {
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -146,7 +134,7 @@ else {
   const isSelected = (id) => selected.includes(id);
 
   const handleChangePage = (_, newPage) => {
-    const nextPage = newPage + 1; // Convert MUI’s 0-based to API’s 1-based
+    const nextPage = newPage + 1;
     if (nextPage < 1) return;
     setPage(nextPage);
   };
@@ -195,7 +183,7 @@ else {
 
   const handleDelete = async () => {
     if (selected.length === 0) {
-      showAlert("warning", "No items selected for deletion");
+      CustomAlert.warning("No items selected for deletion"); // ✅ CHANGED
       return;
     }
     try {
@@ -208,15 +196,15 @@ else {
       } 
 
       if (response && response.status === 200) {
-        showAlert("success", response.message || "Deleted successfully");
+        CustomAlert.success(response.message || "Deleted successfully"); // ✅ CHANGED
         fetchData();
         setSelected([]);
       } else if (response) {
-        showAlert("error", response.message || "Failed to delete items");
+        CustomAlert.error(response.message || "Failed to delete items"); // ✅ CHANGED
       }
     } catch (error) {
       console.error("Error in delete request:", error);
-      showAlert("error", "Something went wrong. Try again later.");
+      CustomAlert.error("Something went wrong. Try again later."); // ✅ CHANGED
     }
   };
 
@@ -262,11 +250,17 @@ else {
   };
 
   const handleResponse = (response) => {
-    showAlert(response.messageType, response.message);
+    CustomAlert[response.messageType](response.message); // ✅ CHANGED - dynamic call
     fetchData();
   };
+  
   const handleDeleteClick = () => {
     setOpenDeleteModal(true);
+  };
+
+  const truncateText = (text, maxLength) => {
+    if (!text) return "N/A";
+    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
   return {
@@ -291,15 +285,14 @@ else {
           />
         )}
         {openProductModal && (
-  <AddProduct
-    open={openProductModal}
-    setOpen={setOpenProductModal}
-    Modeltype={modeltype}
-    Modeldata={modelData}
-    onResponse={handleResponse}
-  />
-)}
-
+          <AddProduct
+            open={openProductModal}
+            setOpen={setOpenProductModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={handleResponse}
+          />
+        )}
         {openOrderModal && (
           <AddOrders
             open={openOrderModal} 
@@ -428,16 +421,13 @@ else {
                       minWidth: "1200px",
 
                       "& th:first-of-type, & td:first-of-type": {
-                        minWidth: "60px", // checkbox column
+                        minWidth: "60px",
                       },
 
-                      // Default width for most columns
                       "& th, & td": {
                         minWidth: "80px",
                         whiteSpace: "nowrap",
                       },
-
-                      //  Custom widths for columns 3,
 
                       "& th:nth-of-type(3), & td:nth-of-type(3)": {
                         minWidth: "160px",
@@ -469,7 +459,7 @@ else {
                   </TableRow>
                 </TableHead>
 
-                <TableBody >
+                <TableBody>
                   {isLoading ? (
                     <TableRow>
                       <TableCell
@@ -505,10 +495,9 @@ else {
                       </TableCell>
                     </TableRow>
                   ) : data.length === 0 ? (
-                    // No Data Found State
                     <TableRow>
                       <TableCell
-                        colSpan={attributes.length + 2} // +2 for checkbox and Action columns
+                        colSpan={attributes.length + 2}
                         align="center"
                         sx={{ py: 3 }}
                       >
@@ -527,7 +516,6 @@ else {
                           key={row._id || row.id || row.id}
                           selected={isItemSelected}
                         >
-                          {/* Checkbox column */}
                           <TableCell padding="checkbox">
                             <Checkbox
                               sx={{ color: "var(--primary-color)" }}
@@ -544,7 +532,6 @@ else {
                             />
                           </TableCell>
 
-                          {/* Dynamic columns */}
                           {attributes.map((attr) => (
                             <TableCell
                               key={attr.id}
@@ -691,9 +678,9 @@ else {
             <TablePagination
               rowsPerPageOptions={[25, 50, 100]}
               component="div"
-              count={totalRecords} //  Correct count from API or localStorage
+              count={totalRecords}
               rowsPerPage={rowsPerPage}
-              page={page - 1} //  Convert to 0-based index for Material-UI
+              page={page - 1}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />

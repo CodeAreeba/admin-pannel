@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import {
   Dialog,
   DialogActions,
@@ -17,35 +15,16 @@ import { logout } from "./DAL/auth";
 import CustomAlert from "./Components/Alert/CustomAlert";
 
 function AppWrapper() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authLoaded, setAuthLoaded] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem("isLoggedIn") === "true";
+  });
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
   const [resetActive, setResetActive] = useState(false);
-  const [loginToast, setLoginToast] = useState(false); // ✅ trigger toast after route is ready
 
-  const navigate = useNavigate();
-
-  // ✅ check localStorage on mount
-  useEffect(() => {
-    const auth = localStorage.getItem("auth") === "true";
-    setIsAuthenticated(auth);
-    setAuthLoaded(true);
-  }, []);
-
-  // ✅ show toast after login redirect
-  useEffect(() => {
-    if (loginToast) {
-      CustomAlert.success("Logged in successfully!");
-      setLoginToast(false); // reset
-    }
-  }, [loginToast]);
-
-  // login success
   const handleLoginSuccess = () => {
+    localStorage.setItem("isLoggedIn", "true");
     setIsAuthenticated(true);
-    localStorage.setItem("auth", "true");
-    setLoginToast(true); // trigger toast
-    navigate("/dashboard", { replace: true });
+    // CustomAlert.success("Logged in successfully!");
   };
 
   const handleLogoutClick = () => setOpenLogoutDialog(true);
@@ -58,47 +37,45 @@ function AppWrapper() {
       console.error("Logout API error:", error);
       CustomAlert.error("Logout failed!");
     } finally {
-      setIsAuthenticated(false);
+      localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("auth");
+      setIsAuthenticated(false);
       setResetActive(true);
       setOpenLogoutDialog(false);
-      navigate("/login", { replace: true });
     }
   };
 
   const cancelLogout = () => setOpenLogoutDialog(false);
 
-  if (!authLoaded) return null; // ✅ render nothing until auth state is loaded
-
   return (
     <>
       <Routes>
-        {isAuthenticated ? (
-          <Route
-            path="/*"
-            element={
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            isAuthenticated ? (
               <App
                 onLogout={handleLogoutClick}
                 resetActive={resetActive}
                 setResetActive={setResetActive}
               />
-            }
-          />
-        ) : (
-          <>
-            <Route
-              path="/login"
-              element={<Login onLoginSuccess={handleLoginSuccess} />}
-            />
-            <Route
-              path="*"
-              element={<Login onLoginSuccess={handleLoginSuccess} />}
-            />
-          </>
-        )}
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
       </Routes>
 
-      {/* Logout Dialog */}
       <Dialog open={openLogoutDialog} onClose={cancelLogout}>
         <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Logout</DialogTitle>
         <DialogContent>
@@ -115,17 +92,6 @@ function AppWrapper() {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* ToastContainer always mounted */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="light"
-      />
     </>
   );
 }
