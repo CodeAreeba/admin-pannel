@@ -73,7 +73,7 @@ function AppWrapper() {
           }
         />
         <Route
-          path="/reset-password/:token"
+          path="/reset-password"
           element={
             isAuthenticated ? (
               <Navigate to="/dashboard" replace />

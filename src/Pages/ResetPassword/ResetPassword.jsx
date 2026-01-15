@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -9,7 +9,7 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import CustomAlert from "../../Components/Alert/CustomAlert";
 import { resetPassword } from "../../DAL/auth";
@@ -17,7 +17,10 @@ import "./ResetPassword.css";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
-  const { token } = useParams();
+
+  // 🔹 TOKEN URL SE GET HO RAHA HAI
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,41 +32,30 @@ const ResetPassword = () => {
     confirmPassword: "",
   });
 
-  console.log("🔄 Component Rendered - Token:", token?.substring(0, 10) + "...");
-
-  useEffect(() => {
-    // Check if token exists
-    if (!token) {
-      CustomAlert.error("Invalid reset link");
-      navigate("/login");
-    }
-  }, [token, navigate]);
-
   const validatePassword = (password) => {
-    if (password.length < 6) {
+    if (password.length < 6)
       return "Password must be at least 6 characters long";
-    }
-    if (!/[A-Z]/.test(password)) {
+    if (!/[A-Z]/.test(password))
       return "Password must contain at least one uppercase letter";
-    }
-    if (!/[a-z]/.test(password)) {
+    if (!/[a-z]/.test(password))
       return "Password must contain at least one lowercase letter";
-    }
-    if (!/[0-9]/.test(password)) {
+    if (!/[0-9]/.test(password))
       return "Password must contain at least one number";
-    }
     return "";
   };
 
   const handleSubmit = async () => {
-    console.log("🔵 Handle Submit Called");
+    // 🔴 TOKEN CHECK (PAGE OPEN PAR KOI EFFECT NAHI)
+    if (!token) {
+      CustomAlert.error("Invalid or expired reset link");
+      return;
+    }
 
-    // Reset errors
     setErrors({ newPassword: "", confirmPassword: "" });
+
     let hasError = false;
     const newErrors = { newPassword: "", confirmPassword: "" };
 
-    // Validation
     if (!newPassword.trim()) {
       newErrors.newPassword = "New password is required";
       hasError = true;
@@ -84,109 +76,72 @@ const ResetPassword = () => {
     }
 
     setErrors(newErrors);
+    if (hasError) return;
 
-    if (hasError) {
-      console.log("❌ Validation failed");
-      return;
-    }
-
-    console.log("✅ Validation passed, calling API...");
     setLoading(true);
 
     try {
-      console.log("🚀 Calling resetPassword API...");
-      const response = await resetPassword(token, newPassword);
+      // ✅ PASSWORD + TOKEN PAYLOAD MA JAA RAHA HAI
+      const response = await resetPassword({
+        password: newPassword,
+        token: token,
+      });
 
-      console.log("✅ Reset Password Response:", response);
-
-      // Check multiple possible success indicators
-      const isSuccess =
-        response.statusCode === 200 ||
-        response.status === 200 ||
-        response.success === true ||
-        (response.message && response.message.toLowerCase().includes("success"));
-
-      if (isSuccess) {
+      if (
+        response?.status === 200 ||
+        response?.success === true ||
+        response?.message?.toLowerCase().includes("success")
+      ) {
         CustomAlert.success(
-          response.message || "Password reset successful! You can now login."
+          response?.message || "Password reset successful!"
         );
 
-        // Clear form
         setNewPassword("");
         setConfirmPassword("");
 
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        setTimeout(() => navigate("/login"), 2000);
       } else {
-        throw new Error(response.message || "Failed to reset password");
+        throw new Error(response?.message || "Reset failed");
       }
     } catch (error) {
-      console.error("Reset Password Error:", error);
-
-      // Handle specific error messages
-      let errorMessage = "Failed to reset password. Please try again.";
-
-      if (error.message?.toLowerCase().includes("expired")) {
-        errorMessage = "Reset link has expired. Please request a new one.";
-      } else if (error.message?.toLowerCase().includes("invalid")) {
-        errorMessage = "Invalid reset link. Please request a new one.";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      CustomAlert.error(errorMessage);
+      CustomAlert.error(
+        error.message || "Failed to reset password. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSubmit();
-    }
-  };
-
   return (
     <Box className="reset-password-page">
-      <Paper
-        elevation={6}
-        sx={{
-          width: 380,
-          p: 3,
-          borderRadius: 2,
-          textAlign: "center",
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
+      <Paper elevation={6} sx={{ width: 380, p: 3, borderRadius: 2 }}>
+        <Typography variant="h5" textAlign="center">
           Boss Leathers
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          textAlign="center"
+          sx={{ mb: 2 }}
+        >
           Reset Your Password
         </Typography>
 
         <TextField
           fullWidth
-          type={showPassword ? "text" : "password"}
           label="New Password"
+          type={showPassword ? "text" : "password"}
           value={newPassword}
-          onChange={(e) => {
-            setNewPassword(e.target.value);
-            setErrors({ ...errors, newPassword: "" });
-          }}
-          onKeyPress={handleKeyPress}
-          margin="normal"
-          disabled={loading}
+          onChange={(e) => setNewPassword(e.target.value)}
           error={!!errors.newPassword}
           helperText={errors.newPassword}
+          margin="normal"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
                   onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                  disabled={loading}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
@@ -197,58 +152,36 @@ const ResetPassword = () => {
 
         <TextField
           fullWidth
-          type={showConfirmPassword ? "text" : "password"}
           label="Confirm Password"
+          type={showConfirmPassword ? "text" : "password"}
           value={confirmPassword}
-          onChange={(e) => {
-            setConfirmPassword(e.target.value);
-            setErrors({ ...errors, confirmPassword: "" });
-          }}
-          onKeyPress={handleKeyPress}
-          margin="normal"
-          disabled={loading}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           error={!!errors.confirmPassword}
           helperText={errors.confirmPassword}
+          margin="normal"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  edge="end"
-                  disabled={loading}
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                 >
-                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  {showConfirmPassword ? (
+                    <VisibilityOff />
+                  ) : (
+                    <Visibility />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
 
-        <Box sx={{ mt: 2, mb: 1, textAlign: "left" }}>
-          <Typography variant="caption" color="text.secondary">
-            Password requirements:
-          </Typography>
-          <Typography variant="caption" display="block" color="text.secondary">
-            • At least 6 characters
-          </Typography>
-          <Typography variant="caption" display="block" color="text.secondary">
-            • One uppercase & one lowercase letter
-          </Typography>
-          <Typography variant="caption" display="block" color="text.secondary">
-            • At least one number
-          </Typography>
-        </Box>
-
         <Button
           fullWidth
           variant="contained"
-          sx={{
-            mt: 2,
-            py: 1.2,
-            borderRadius: "6px",
-            backgroundColor: "brown",
-            "&:hover": { backgroundColor: "brown", opacity: 0.9 },
-          }}
+          sx={{ mt: 2, backgroundColor: "brown" }}
           onClick={handleSubmit}
           disabled={loading}
         >
@@ -261,9 +194,8 @@ const ResetPassword = () => {
 
         <Button
           fullWidth
-          sx={{ mt: 1, textTransform: "none", color: "brown" }}
+          sx={{ mt: 1, color: "brown" }}
           onClick={() => navigate("/login")}
-          disabled={loading}
         >
           Back to Login
         </Button>
