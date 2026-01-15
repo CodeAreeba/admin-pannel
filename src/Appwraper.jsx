@@ -11,6 +11,8 @@ import {
 
 import App from "./App";
 import Login from "./Pages/Login";
+import Forgot from "./Pages/ForgotPassword/Forgot";
+import ResetPassword from "./Pages/ResetPassword/ResetPassword";
 import { logout } from "./DAL/auth";
 import CustomAlert from "./Components/Alert/CustomAlert";
 
@@ -24,7 +26,7 @@ function AppWrapper() {
   const handleLoginSuccess = () => {
     localStorage.setItem("isLoggedIn", "true");
     setIsAuthenticated(true);
-    // CustomAlert.success("Logged in successfully!");
+    CustomAlert.success("Logged in successfully!");
   };
 
   const handleLogoutClick = () => setOpenLogoutDialog(true);
@@ -57,6 +59,26 @@ function AppWrapper() {
               <Navigate to="/dashboard" replace />
             ) : (
               <Login onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Forgot />
+            )
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <ResetPassword />
             )
           }
         />

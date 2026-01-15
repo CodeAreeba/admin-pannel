@@ -18,6 +18,42 @@ export const login = async (formData) => {
   console.log("Login Response:", response);
   return response;
 };
+export const forgotPassword = async (email) => {
+  const reqObj = {
+    path: "/auth/admin/forgot-password",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    postData: {
+      email: email
+    },
+  };
+
+  const response = await invokeApi(reqObj);
+  
+  console.log("Forgot Password Response:", response);
+  return response;
+};
+
+export const resetPassword = async (token, newPassword) => {
+  const reqObj = {
+    path: "/auth/admin/reset-password",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    postData: {
+      token: token,
+      newPassword: newPassword
+    },
+  };
+
+  const response = await invokeApi(reqObj);
+  
+  console.log("Reset Password Response:", response);
+  return response;
+};
 
 export const logout = async () => {
   const reqObj = {

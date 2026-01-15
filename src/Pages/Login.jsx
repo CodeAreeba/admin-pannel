@@ -7,11 +7,13 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 import CustomAlert from "../Components/Alert/CustomAlert";
 import { login } from "../DAL/auth";
 
 const Login = ({ onLoginSuccess }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -65,8 +67,7 @@ const Login = ({ onLoginSuccess }) => {
 
       localStorage.setItem("email", email);
       
-      CustomAlert.success(response.message || "Login successful");
-
+      // ✅ Toast parent (AppWrapper) mein show hoga
       if (onLoginSuccess) {
         onLoginSuccess();
       }
@@ -145,6 +146,12 @@ const Login = ({ onLoginSuccess }) => {
               "Login"
             )}
           </Button>
+            <Button
+              sx={{ mt: 1, textTransform: "none" }}
+              onClick={() => navigate("/forgot-password")}
+            >
+              Forgot Password?
+            </Button>
         </Box>
       </Paper>
     </Box>
