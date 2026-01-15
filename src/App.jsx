@@ -29,6 +29,7 @@ import Customer from "./Pages/Customer/Customer";
 import Inventory from "./Pages/Inventory/Inventory";
 import Category from "./Pages/Category/Category";
 import Roles from "./Pages/Roles/Roles";
+import Users from "./Pages/Users/Users";
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
@@ -55,7 +56,7 @@ const App = ({ onLogout }) => {
     { name: "Category Management", route: "/categories", icon: <FaTags /> },
     { name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
     { name: "Settings", route: "/settings", icon: <FaCog /> },
-    { name: "User Role Management", route: "/roles", icon: <FaUserShield /> },
+    { name: "User Management", route: "/users", icon: <FaUserShield /> },
   ];
 
   //////////////////////////// Filter sidebar based on permissions ////////////////////////////
@@ -187,10 +188,10 @@ const App = ({ onLogout }) => {
           />
 
           <Route
-            path="/roles"
+            path="/users"
             element={
-              <ProtectedRoute path="/roles">
-                <Roles />
+              <ProtectedRoute path="/user">
+                <Users />
               </ProtectedRoute>
             }
           />

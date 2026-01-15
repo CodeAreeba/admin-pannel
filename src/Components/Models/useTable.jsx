@@ -98,19 +98,19 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setIsLoading(false);
         setData(response.data);
         setTotalRecords(response.totalRoles);
-      }
-    } else if (tableType === "Users") {
-      response = await fetchalluserlist(page, rowsPerPage, searchQuery);
-      if (response.status === 400) {
-        localStorage.removeItem("Token");
-        navigate("/login");
-        setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        setData(response.users);
-        setTotalRecords(response.totalUsers);
-      }
-    }
+      }}
+    // } else if (tableType === "Users") {
+    //   response = await fetchalluserlist(page, rowsPerPage, searchQuery);
+    //   if (response.status === 400) {
+    //     localStorage.removeItem("Token");
+    //     navigate("/login");
+    //     setIsLoading(false);
+    //   } else {
+    //     setIsLoading(false);
+    //     setData(response.users);
+    //     setTotalRecords(response.totalUsers);
+    //   }
+    // }
     //     else if (tableType === "Products") {
     //   response = await fetchAllProductList(page, rowsPerPage, searchQuery);
 
