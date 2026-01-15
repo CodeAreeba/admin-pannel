@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import CustomAlert from "../../Components/Alert/CustomAlert";
 import { resetPassword } from "../../DAL/auth";
 import "./ResetPassword.css";
 
@@ -47,7 +46,7 @@ const ResetPassword = () => {
   const handleSubmit = async () => {
     // 🔴 TOKEN CHECK (PAGE OPEN PAR KOI EFFECT NAHI)
     if (!token) {
-      CustomAlert.error("Invalid or expired reset link");
+      toast.error("Invalid or expired reset link");
       return;
     }
 
@@ -83,7 +82,7 @@ const ResetPassword = () => {
     try {
       // ✅ PASSWORD + TOKEN PAYLOAD MA JAA RAHA HAI
       const response = await resetPassword({
-        password: newPassword,
+        newPassword: newPassword,
         token: token,
       });
 
@@ -92,7 +91,7 @@ const ResetPassword = () => {
         response?.success === true ||
         response?.message?.toLowerCase().includes("success")
       ) {
-        CustomAlert.success(
+        toast.success(
           response?.message || "Password reset successful!"
         );
 
@@ -104,7 +103,7 @@ const ResetPassword = () => {
         throw new Error(response?.message || "Reset failed");
       }
     } catch (error) {
-      CustomAlert.error(
+      toast.error(
         error.message || "Failed to reset password. Please try again."
       );
     } finally {

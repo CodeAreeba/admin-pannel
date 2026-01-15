@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Box, Paper, Typography, TextField, Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import CustomAlert from "../../Components/Alert/CustomAlert";
 import { forgotPassword } from "../../DAL/auth";
 import "./Forgot.css";
+import { toast } from "react-toastify";
 
 const Forgot = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const Forgot = () => {
     if (!email.trim()) {
       console.log("❌ Email is empty");
       setError("Please enter your email address");
-      CustomAlert.warning("Please enter your email address");
+      toast.warning("Please enter your email address");
       return;
     }
 
@@ -30,7 +30,7 @@ const Forgot = () => {
     if (!emailRegex.test(email)) {
       console.log("❌ Invalid email format");
       setError("Please enter a valid email address");
-      CustomAlert.warning("Please enter a valid email address");
+      toast.warning("Please enter a valid email address");
       return;
     }
 
@@ -52,7 +52,7 @@ const Forgot = () => {
         (response.message && response.message.toLowerCase().includes("sent"));
 
       if (isSuccess) {
-        CustomAlert.success(response.message || "Reset link sent to your email successfully!");
+        toast.success(response.message || "Reset link sent to your email successfully!");
         setEmail("");
         
         // Redirect to login after 2 seconds
@@ -64,7 +64,7 @@ const Forgot = () => {
       }
     } catch (error) {
       console.error("Forgot Password Error:", error);
-      CustomAlert.error(error.message || "Failed to send reset link. Please try again.");
+      toast.error(error.message || "Failed to send reset link. Please try again.");
       setError(error.message || "Something went wrong");
     } finally {
       setLoading(false);

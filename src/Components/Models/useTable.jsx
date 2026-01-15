@@ -27,10 +27,7 @@ import {
 } from "../../DAL/fetch";
 import { formatDate } from "../../Utils/Formatedate";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteAllRoles,
-  deleteAllUsers,
-} from "../../DAL/delete";
+import { deleteAllRoles, deleteAllUsers } from "../../DAL/delete";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
 import AddRoles from "./AddRoles";
@@ -39,11 +36,9 @@ import AddOrders from "./AddOrders";
 import AddCustomer from "./AddCustomer";
 import AddCategory from "./AddCategory";
 import AddInventory from "./AddInventory";
-import CustomAlert from "../Alert/CustomAlert"; // ✅ ADDED
+import { toast } from "react-toastify";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
-  // ❌ REMOVED: const { showAlert } = useAlert();
-  
   const savedState =
     JSON.parse(localStorage.getItem(`${tableType}-tableState`)) || {};
   const [page, setPage] = useState(savedState.page || 1);
@@ -68,23 +63,20 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [openCategoryModal, setOpenCategoryModal] = useState(false);
   const [openInventoryModal, setOpenInventoryModal] = useState(false);
 
-
   useEffect(() => {
     fetchData();
-  }, [page, rowsPerPage, debouncedSearch])
+  }, [page, rowsPerPage, debouncedSearch]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setPage(1)
+      setPage(1);
       setDebouncedSearch(searchQuery);
-      
-    }, 500);
+    }, 500); // delay in ms
 
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery]);
-  
   useEffect(() => {
     localStorage.setItem(
       `${tableType}-tableState`,
@@ -118,7 +110,21 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         setData(response.users);
         setTotalRecords(response.totalUsers);
       }
-    } else {
+    }
+    //     else if (tableType === "Products") {
+    //   response = await fetchAllProductList(page, rowsPerPage, searchQuery);
+
+    //   if (response.status === 400) {
+    //     localStorage.removeItem("Token");
+    //     navigate("/login");
+    //     setIsLoading(false);
+    //   } else {
+    //     setIsLoading(false);
+    //     setData(response.products);
+    //     setTotalRecords(response.totalProducts);
+    //   }
+    // }
+    else {
       setIsLoading(false);
       setData([]);
       setTotalRecords(0);
@@ -134,7 +140,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const isSelected = (id) => selected.includes(id);
 
   const handleChangePage = (_, newPage) => {
-    const nextPage = newPage + 1;
+    const nextPage = newPage + 1; // Convert MUI’s 0-based to API’s 1-based
     if (nextPage < 1) return;
     setPage(nextPage);
   };
@@ -142,7 +148,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const handleChangeRowsPerPage = (event) => {
     const newLimit = parseInt(event.target.value, 10);
     setRowsPerPage(newLimit);
-    setPage(1); 
+    setPage(1);
   };
 
   const handleviewClick = (category) => {
@@ -158,23 +164,19 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenProductModal(true);
       setModelData(category);
       setModeltype("Update");
-    }
-    else if (tableType === "Orders") {
+    } else if (tableType === "Orders") {
       setOpenOrderModal(true);
       setModelData(category);
       setModeltype("Update");
-    }
-    else if (tableType === "Customer") {
+    } else if (tableType === "Customer") {
       setOpenCustomerModal(true);
       setModelData(category);
       setModeltype("Update");
-    }
-    else if (tableType === "Category") {  
+    } else if (tableType === "Category") {
       setOpenCategoryModal(true);
       setModelData(category);
       setModeltype("Update");
-    }
-    else if (tableType === "Inventory") {
+    } else if (tableType === "Inventory") {
       setOpenInventoryModal(true);
       setModelData(category);
       setModeltype("Update");
@@ -183,7 +185,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const handleDelete = async () => {
     if (selected.length === 0) {
-      CustomAlert.warning("No items selected for deletion"); // ✅ CHANGED
+      toast.warning("warning", "No items selected for deletion");
       return;
     }
     try {
@@ -193,18 +195,18 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         response = await deleteAllRoles({ ids: selected });
       } else if (tableType === "Users") {
         response = await deleteAllUsers({ ids: selected });
-      } 
+      }
 
       if (response && response.status === 200) {
-        CustomAlert.success(response.message || "Deleted successfully"); // ✅ CHANGED
+        toast.success(response.message || "Deleted successfully");
         fetchData();
         setSelected([]);
       } else if (response) {
-        CustomAlert.error(response.message || "Failed to delete items"); // ✅ CHANGED
+        toast.error(response.message || "Failed to delete items");
       }
     } catch (error) {
       console.error("Error in delete request:", error);
-      CustomAlert.error("Something went wrong. Try again later."); // ✅ CHANGED
+      toast.error("Something went wrong. Try again later.");
     }
   };
 
@@ -250,17 +252,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   };
 
   const handleResponse = (response) => {
-    CustomAlert[response.messageType](response.message); // ✅ CHANGED - dynamic call
     fetchData();
   };
-  
   const handleDeleteClick = () => {
     setOpenDeleteModal(true);
-  };
-
-  const truncateText = (text, maxLength) => {
-    if (!text) return "N/A";
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
   };
 
   return {
@@ -293,9 +288,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             onResponse={handleResponse}
           />
         )}
+
         {openOrderModal && (
           <AddOrders
-            open={openOrderModal} 
+            open={openOrderModal}
             setOpen={setOpenOrderModal}
             Modeltype={modeltype}
             Modeldata={modelData}
@@ -380,7 +376,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     ),
                   }}
                 />
- 
+
                 {selected.length > 0 ? (
                   <IconButton onClick={handleDeleteClick} sx={{ color: "red" }}>
                     <DeleteIcon />
@@ -406,7 +402,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                 )}
               </Box>
             </Toolbar>
-            <TableContainer sx={{ maxHeight: "76vh" }}> 
+            <TableContainer sx={{ maxHeight: "76vh" }}>
               <Table stickyHeader>
                 <TableHead>
                   <TableRow
@@ -421,13 +417,16 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                       minWidth: "1200px",
 
                       "& th:first-of-type, & td:first-of-type": {
-                        minWidth: "60px",
+                        minWidth: "60px", // checkbox column
                       },
 
+                      // Default width for most columns
                       "& th, & td": {
                         minWidth: "80px",
                         whiteSpace: "nowrap",
                       },
+
+                      //  Custom widths for columns 3,
 
                       "& th:nth-of-type(3), & td:nth-of-type(3)": {
                         minWidth: "160px",
@@ -455,7 +454,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     ))}
 
                     <TableCell>Action</TableCell>
-                  
                   </TableRow>
                 </TableHead>
 
@@ -495,9 +493,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                       </TableCell>
                     </TableRow>
                   ) : data.length === 0 ? (
+                    // No Data Found State
                     <TableRow>
                       <TableCell
-                        colSpan={attributes.length + 2}
+                        colSpan={attributes.length + 2} // +2 for checkbox and Action columns
                         align="center"
                         sx={{ py: 3 }}
                       >
@@ -516,6 +515,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                           key={row._id || row.id || row.id}
                           selected={isItemSelected}
                         >
+                          {/* Checkbox column */}
                           <TableCell padding="checkbox">
                             <Checkbox
                               sx={{ color: "var(--primary-color)" }}
@@ -532,6 +532,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             />
                           </TableCell>
 
+                          {/* Dynamic columns */}
                           {attributes.map((attr) => (
                             <TableCell
                               key={attr.id}
@@ -577,11 +578,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                   {row[attr.id] === 0 ? (
                                     <>
                                       {row[attr.id]}
-                                      <br /> 
+                                      <br />
                                     </>
                                   ) : row[attr.id] < 10 ? (
                                     <>
-                                      {row[attr.id]} <br /> 
+                                      {row[attr.id]} <br />
                                     </>
                                   ) : (
                                     row[attr.id]
@@ -667,7 +668,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                               View
                             </Button>
                           </TableCell>
-
                         </TableRow>
                       );
                     })
@@ -678,9 +678,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             <TablePagination
               rowsPerPageOptions={[25, 50, 100]}
               component="div"
-              count={totalRecords}
+              count={totalRecords} //  Correct count from API or localStorage
               rowsPerPage={rowsPerPage}
-              page={page - 1}
+              page={page - 1} //  Convert to 0-based index for Material-UI
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />

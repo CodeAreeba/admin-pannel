@@ -122,7 +122,17 @@ export const fetchAllProductList = async (
   return invokeApi(reqObj);
 };
 
- 
+  ////////////////////////////////////
+ export const fetchMe = async () => {
+  const reqObj = {
+    path: `/auth/admin/me`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
  
  
 

@@ -9,8 +9,6 @@ import {
   FaUsers,
   FaWarehouse,
   FaTags,
-  FaBullhorn,
-  FaStar,
   FaChartBar,
   FaCog,
   FaUserShield,
@@ -19,52 +17,61 @@ import { Tooltip } from "@mui/material";
 
 import "./App.css";
 import logo from "./assets/shoe.svg";
+import useAuth from "./auth/useAuth";
+import pagePermissions from "./config/pagePermissions";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
-import Products from "./Pages/Products/Product"
-/* Existing Pages */
+/////////////////////// Pages ////////////////////////////
+import Dashboard from "./Pages/Dashboard/Dashboard";
+import Products from "./Pages/Products/Product";
 import Orders from "./Pages/Orders/Orders";
 import Customer from "./Pages/Customer/Customer";
-import Category from "./Pages/Category/Category";
 import Inventory from "./Pages/Inventory/Inventory";
-import Dashboard from "./Pages/Dashboard/Dashboard";
-import Users from "./Pages/Users/Users";
+import Category from "./Pages/Category/Category";
 import Roles from "./Pages/Roles/Roles";
 
-// const ContentManagement = () => <h1>Content Management</h1>;
-// const DiscountManagement = () => <h1>Discount & Promotions</h1>;
-// const ReviewsRatings = () => <h1>Reviews & Ratings</h1>;
+//////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
 
 const App = ({ onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { admin } = useAuth();
 
-  const [activeItem, setActiveItem] = useState(1);
   const [isOpen, setIsOpen] = useState(true);
+  const [activeRoute, setActiveRoute] = useState("/dashboard");
 
-  const allItems = [
-    { id: 1, name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
-    { id: 2, name: "Product Management", route: "/products", icon: <FaBoxOpen /> },
-    { id: 3, name: "Order Management", route: "/orders", icon: <FaShoppingCart /> },
-    { id: 4, name: "Customer Management", route: "/customers", icon: <FaUsers /> },
-    { id: 5, name: "Inventory Management", route: "/inventory", icon: <FaWarehouse /> },
-    { id: 6, name: "Category Management", route: "/categories", icon: <FaTags /> },
-    // { id: 7, name: "Content Management", route: "/content", icon: <FaBullhorn /> },
-    // { id: 8, name: "Discount & Promotions", route: "/discounts", icon: <FaBullhorn /> },
-    // { id: 9, name: "Reviews & Ratings", route: "/reviews", icon: <FaStar /> },
-    { id: 10, name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
-    { id: 11, name: "Settings", route: "/settings", icon: <FaCog /> },
-    { id: 12, name: "User Role Management", route: "/roles", icon: <FaUserShield /> },
+  //////////////////////////// Sidebar items ////////////////////////////
+  const sidebarItems = [
+    { name: "Dashboard", route: "/dashboard", icon: <FaTachometerAlt /> },
+    { name: "Product Management", route: "/products", icon: <FaBoxOpen /> },
+    { name: "Order Management", route: "/orders", icon: <FaShoppingCart /> },
+    { name: "Customer Management", route: "/customers", icon: <FaUsers /> },
+    {
+      name: "Inventory Management",
+      route: "/inventory",
+      icon: <FaWarehouse />,
+    },
+    { name: "Category Management", route: "/categories", icon: <FaTags /> },
+    { name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
+    { name: "Settings", route: "/settings", icon: <FaCog /> },
+    { name: "User Role Management", route: "/roles", icon: <FaUserShield /> },
   ];
 
+  //////////////////////////// Filter sidebar based on permissions ////////////////////////////
+  const filteredItems = sidebarItems.filter((item) => {
+    const permission = pagePermissions[item.route];
+    return !permission || admin?.permissions?.includes(permission);
+  });
+
+  //////////////////////////// Track active route ////////////////////////////
   useEffect(() => {
-    const current = allItems.find(i => i.route === location.pathname);
-    if (current) setActiveItem(current.id);
+    setActiveRoute(location.pathname);
   }, [location.pathname]);
 
-  const handleItemClick = (item) => {
-    setActiveItem(item.id);
-    navigate(item.route);
+  const handleNavigate = (route) => {
+    setActiveRoute(route);
+    navigate(route);
   };
 
   return (
@@ -78,12 +85,14 @@ const App = ({ onLogout }) => {
         <img src={logo} className="logo" alt="Logo" />
 
         <ul>
-          {allItems.map(item => {
+          {filteredItems.map((item) => {
             const li = (
               <li
-                key={item.id}
-                className={activeItem === item.id ? "selected-item" : "unselected"}
-                onClick={() => handleItemClick(item)}
+                key={item.route}
+                className={
+                  activeRoute === item.route ? "selected-item" : "unselected"
+                }
+                onClick={() => handleNavigate(item.route)}
               >
                 {item.icon}
                 {isOpen && <span>{item.name}</span>}
@@ -91,12 +100,20 @@ const App = ({ onLogout }) => {
             );
 
             return !isOpen ? (
-              <Tooltip title={item.name} placement="right" arrow key={item.id}>
+              <Tooltip
+                title={item.name}
+                placement="right"
+                arrow
+                key={item.route}
+              >
                 {li}
               </Tooltip>
-            ) : li;
+            ) : (
+              li
+            );
           })}
 
+          {/* Logout */}
           {!isOpen ? (
             <Tooltip title="Logout" placement="right" arrow>
               <li className="unselected" onClick={onLogout}>
@@ -112,25 +129,82 @@ const App = ({ onLogout }) => {
         </ul>
       </div>
 
-      {/* Routes */}
+      {/* Main Content */}
       <div className="app-right">
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/customers" element={<Customer />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/categories" element={<Category />} />
-          {/* <Route path="/content" element={<ContentManagement />} />
-          <Route path="/discounts" element={<DiscountManagement />} />
-          <Route path="/reviews" element={<ReviewsRatings />} /> */}
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/roles" element={<Roles />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute path="/dashboard">
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Extra existing routes */}
-          <Route path="/usersData" element={<Users />} />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute path="/products">
+                <Products />
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute path="/orders">
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
 
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute path="/customers">
+                <Customer />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute path="/inventory">
+                <Inventory />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute path="/categories">
+                <Category />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/roles"
+            element={
+              <ProtectedRoute path="/roles">
+                <Roles />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute path="/settings">
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback */}
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </div>

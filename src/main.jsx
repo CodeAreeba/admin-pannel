@@ -5,22 +5,15 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AppWrapper from "./Appwraper";
 import ErrorBoundary from "./Components/ErrorBoundary";
+import AuthProvider from "./auth/authProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-
 root.render(
   <BrowserRouter>
-    <ErrorBoundary>
-      <AppWrapper />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        closeOnClick
-        pauseOnHover
-        draggable
-        theme="light"
-      />
-    </ErrorBoundary>
+    <AuthProvider>
+      <ErrorBoundary>
+        <AppWrapper />
+      </ErrorBoundary>
+    </AuthProvider>
   </BrowserRouter>
 );

@@ -15,6 +15,7 @@ export async function invokeApi({
     url: baseUrl + path, 
     headers,
     params: queryParams,
+    withCredentials: true,
   };
 
   if (["POST", "PUT", "DELETE"].includes(method)) {

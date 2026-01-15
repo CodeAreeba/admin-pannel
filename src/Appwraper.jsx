@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Dialog,
   DialogActions,
@@ -11,39 +13,42 @@ import {
 
 import App from "./App";
 import Login from "./Pages/Login";
-import Forgot from "./Pages/ForgotPassword/Forgot";
+import useAuth from "./auth/useAuth";
 import ResetPassword from "./Pages/ResetPassword/ResetPassword";
-import { logout } from "./DAL/auth";
-import CustomAlert from "./Components/Alert/CustomAlert";
+import Forgot from "./Pages/ForgotPassword/Forgot";
 
 function AppWrapper() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("isLoggedIn") === "true";
-  });
-  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
-  const [resetActive, setResetActive] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated, login, logout } = useAuth();
 
-  const handleLoginSuccess = () => {
-    localStorage.setItem("isLoggedIn", "true");
-    setIsAuthenticated(true);
-    CustomAlert.success("Logged in successfully!");
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+
+  ///////////////////////////// Login success callback /////////////////////////////
+  const handleLoginSuccess = async (email, password) => {
+    try {
+      const success = await login(email, password); // useAuth login
+      if (success) {
+        toast.success("Logged in successfully!");
+        navigate("/dashboard", { replace: true });
+      }
+    } catch (err) {
+      toast.error(err.message || "Login failed");
+    }
   };
 
+  ///////////////////////////// Logout handlers /////////////////////////////
   const handleLogoutClick = () => setOpenLogoutDialog(true);
 
   const confirmLogout = async () => {
     try {
-      await logout();
-      CustomAlert.success("Logged out successfully!");
-    } catch (error) {
-      console.error("Logout API error:", error);
-      CustomAlert.error("Logout failed!");
+      await logout(); // useAuth logout
+      toast.success("Logged out successfully!");
+    } catch (err) {
+      toast.error("Logout failed");
+      console.error(err);
     } finally {
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("auth");
-      setIsAuthenticated(false);
-      setResetActive(true);
       setOpenLogoutDialog(false);
+      navigate("/login", { replace: true });
     }
   };
 
@@ -51,53 +56,30 @@ function AppWrapper() {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={1500}
+        pauseOnHover={false}
+        newestOnTop
+      />
+
       <Routes>
-        <Route
-          path="/login"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            )
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Forgot />
-            )
-          }
-        />
-        <Route
-          path="/reset-password"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <ResetPassword />
-            )
-          }
-        />
-        <Route
-          path="/*"
-          element={
-            isAuthenticated ? (
-              <App
-                onLogout={handleLogoutClick}
-                resetActive={resetActive}
-                setResetActive={setResetActive}
-              />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
+        {isAuthenticated ? (
+          <Route path="/*" element={<App onLogout={handleLogoutClick} />} />
+        ) : (
+          <>
+            <Route
+              path="/login"
+              element={<Login onLoginSuccess={handleLoginSuccess} />}
+            />
+            <Route path="/forgot-password" element={<Forgot />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        )}
       </Routes>
 
+      {/* Logout Confirmation Dialog */}
       <Dialog open={openLogoutDialog} onClose={cancelLogout}>
         <DialogTitle sx={{ fontWeight: "bold" }}>Confirm Logout</DialogTitle>
         <DialogContent>

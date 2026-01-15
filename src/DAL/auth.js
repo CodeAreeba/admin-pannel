@@ -2,22 +2,22 @@ import { invokeApi } from "../Utils/InvokeApi";
 
 export const login = async (formData) => {
   const reqObj = {
-    path: "/auth/admin/login", 
+    path: "/auth/admin/login",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    postData: {
-      email: formData.get("email"),
-      password: formData.get("password")
-    },
+    headers: {},
+    postData: formData,
   };
-
-  const response = await invokeApi(reqObj);
-  
-  console.log("Login Response:", response);
-  return response;
+  return invokeApi(reqObj);
 };
+export const logout = async () => {
+  const reqObj = {
+    path: "/auth/admin/logout",
+    method: "POST",
+    headers: {},
+  };
+  return invokeApi(reqObj);
+};
+
 export const forgotPassword = async (email) => {
   const reqObj = {
     path: "/auth/admin/forgot-password",
@@ -36,16 +36,14 @@ export const forgotPassword = async (email) => {
   return response;
 };
 
-export const resetPassword = async (token, newPassword) => {
+export const resetPassword = async ({token, newPassword}) => { 
   const reqObj = {
     path: "/auth/admin/reset-password",
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: {}, 
     postData: {
-      token: token,
-      newPassword: newPassword
+      token,
+      newPassword,
     },
   };
 
@@ -55,14 +53,4 @@ export const resetPassword = async (token, newPassword) => {
   return response;
 };
 
-export const logout = async () => {
-  const reqObj = {
-    path: "/auth/admin/logout", 
-    method: "POST",
-    // headers: {
-    //   Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    // },
-  };
 
-  return invokeApi(reqObj);
-};
