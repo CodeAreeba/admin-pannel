@@ -13,28 +13,31 @@ export const updateProduct = async (id, productData) => {
   return invokeApi(reqObj);
 };
 
-
-export const updateRole = async (id,data) => {
- 
+export const updateRole = async (id, data) => {
   const reqObj = {
     path: `/roles/update/${id}`,
     method: "PUT",
-    headers: {      Authorization: `Bearer ${localStorage.getItem("Token")}`,},
+    headers: { Authorization: `Bearer ${localStorage.getItem("Token")}` },
     postData: data,
   };
   return invokeApi(reqObj);
 };
-
-export const updateUser = async (id,data) => {
- 
+///////////////////////////////////////////
+export const updateAdmin = async (id, data) => {
   const reqObj = {
-    path: `/user/update/${id}`,
+    path: `/admin/${id}`,
     method: "PUT",
-    headers: {      Authorization: `Bearer ${localStorage.getItem("Token")}`,},
+    headers: {},
     postData: data,
   };
   return invokeApi(reqObj);
 };
-
- 
- 
+export const updateCategory = async (id, data) => {
+  const reqObj = {
+    path: `/admin//category${id}`,
+    method: "PUT",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};

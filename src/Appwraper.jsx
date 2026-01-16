@@ -19,9 +19,13 @@ import Forgot from "./Pages/ForgotPassword/Forgot";
 
 function AppWrapper() {
   const navigate = useNavigate();
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, loading, login, logout } = useAuth();
 
   const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+
+  if (loading) {
+    return <div>Loading...</div>; // or spinner
+  }
 
   ///////////////////////////// Login success callback /////////////////////////////
   const handleLoginSuccess = async (email, password) => {

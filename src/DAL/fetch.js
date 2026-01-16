@@ -21,7 +21,7 @@ export const fetchDashboard = async () => {
       today: { quantity: 5, sale: 95000 },
       yesterday: { quantity: 8, sale: 145000 },
       thisWeek: { quantity: 32, sale: 580000 },
-      thisMonth: { quantity: 85, sale: 1800000 }
+      thisMonth: { quantity: 85, sale: 1800000 },
     },
     pendingAmount: 350000,
     expense: {
@@ -29,7 +29,7 @@ export const fetchDashboard = async () => {
       today: 15000,
       yesterday: 22000,
       thisWeek: 95000,
-      thisMonth: 450000
+      thisMonth: 450000,
     },
     labourCost: {
       totalLabourCost: 280000,
@@ -37,8 +37,8 @@ export const fetchDashboard = async () => {
       yesterday: 12000,
       thisWeek: 45000,
       thisMonth: 180000,
-      lastMonth: 165000
-    }
+      lastMonth: 165000,
+    },
   };
 
   try {
@@ -81,7 +81,11 @@ export const fetchallroleslist = async (page, rowsPerPages, searchQuery) => {
   return invokeApi(reqObj);
 };
 
-export const fetchallActiveroleslist = async (page, rowsPerPages, searchQuery) => {
+export const fetchallActiveroleslist = async (
+  page,
+  rowsPerPages,
+  searchQuery
+) => {
   const reqObj = {
     path: `/roles/activeList?limit=${rowsPerPages}&page=${page}&keyword=${searchQuery}`,
     method: "GET",
@@ -122,8 +126,8 @@ export const fetchAllProductList = async (
   return invokeApi(reqObj);
 };
 
-  ////////////////////////////////////
- export const fetchMe = async () => {
+////////////////////////////////////
+export const fetchMe = async () => {
   const reqObj = {
     path: `/auth/admin/me`,
     method: "GET",
@@ -133,12 +137,54 @@ export const fetchAllProductList = async (
 
   return invokeApi(reqObj);
 };
- 
- 
+export const getAllAdmins = async (page = 1, limit = 25, search = "") => {
+  const reqObj = {
+    path: `/admin?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
 
- 
+  return invokeApi(reqObj);
+};
 
- 
- 
- 
- 
+export const getAllPermissions = async () => {
+  const reqObj = {
+    path: `/admin/permissions`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getAllCategories = async () => {
+  const reqObj = {
+    path: `/admin/categories`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getCategoryById = async () => {
+  const reqObj = {
+    path: `/admin/categories/:id`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getAllSubCategories = async () => {
+  const reqObj = {
+    ath: `/admin/subcategories?categoryId=${categoryId}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};

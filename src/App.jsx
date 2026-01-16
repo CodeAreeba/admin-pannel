@@ -16,7 +16,6 @@ import {
 import { Tooltip } from "@mui/material";
 
 import "./App.css";
-import logo from "./assets/shoe.svg";
 import useAuth from "./auth/useAuth";
 import pagePermissions from "./config/pagePermissions";
 import ProtectedRoute from "./auth/ProtectedRoute";
@@ -28,8 +27,8 @@ import Orders from "./Pages/Orders/Orders";
 import Customer from "./Pages/Customer/Customer";
 import Inventory from "./Pages/Inventory/Inventory";
 import Category from "./Pages/Category/Category";
-import Roles from "./Pages/Roles/Roles";
 import Users from "./Pages/Users/Users";
+import AddCategory from "./Pages/Category/AddCategory";
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
@@ -40,7 +39,11 @@ const App = ({ onLogout }) => {
   const { admin } = useAuth();
 
   const [isOpen, setIsOpen] = useState(true);
-  const [activeRoute, setActiveRoute] = useState("/dashboard");
+  const activeRoute = location.pathname;
+
+  const handleNavigate = (route) => {
+    navigate(route);
+  };
 
   //////////////////////////// Sidebar items ////////////////////////////
   const sidebarItems = [
@@ -65,16 +68,6 @@ const App = ({ onLogout }) => {
     return !permission || admin?.permissions?.includes(permission);
   });
 
-  //////////////////////////// Track active route ////////////////////////////
-  useEffect(() => {
-    setActiveRoute(location.pathname);
-  }, [location.pathname]);
-
-  const handleNavigate = (route) => {
-    setActiveRoute(route);
-    navigate(route);
-  };
-
   return (
     <div className="App">
       {/* Sidebar */}
@@ -83,7 +76,7 @@ const App = ({ onLogout }) => {
           <MdOutlineDoubleArrow className={isOpen ? "rotated" : ""} />
         </div>
 
-        <img src={logo} className="logo" alt="Logo" />
+        <img src="/shoeman-logo.svg" className="logo" alt="Shoeman Logo" />
 
         <ul>
           {filteredItems.map((item) => {
@@ -181,8 +174,24 @@ const App = ({ onLogout }) => {
           <Route
             path="/categories"
             element={
-              <ProtectedRoute path="/categories">
+              <ProtectedRoute>
                 <Category />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories/add"
+            element={
+              <ProtectedRoute>
+                <AddCategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AddCategory />
               </ProtectedRoute>
             }
           />
@@ -190,7 +199,7 @@ const App = ({ onLogout }) => {
           <Route
             path="/users"
             element={
-              <ProtectedRoute path="/user">
+              <ProtectedRoute path="/users">
                 <Users />
               </ProtectedRoute>
             }

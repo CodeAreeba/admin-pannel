@@ -13,9 +13,7 @@ export const createProduct = async (productData) => {
   return invokeApi(reqObj);
 };
 
-
 export const createnewuser = async (data) => {
-
   const reqObj = {
     path: "/user/create",
     method: "POST",
@@ -27,9 +25,7 @@ export const createnewuser = async (data) => {
   return invokeApi(reqObj);
 };
 
-
 export const createRole = async (data) => {
-
   const reqObj = {
     path: "/roles/add",
     method: "POST",
@@ -41,22 +37,23 @@ export const createRole = async (data) => {
   return invokeApi(reqObj);
 };
 
+///////////////////////////////////////////////////////////
 
-export const createUser = async (data) => {
-
+export const createAdmin = async (data) => {
   const reqObj = {
-    path: "/user/create",
+    path: "/admin",
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
+    headers: {},
     postData: data,
   };
   return invokeApi(reqObj);
 };
- 
- 
-
- 
-
- 
+export const createCategory = async (data) => {
+  const reqObj = {
+    path: "/admin/category",
+    method: "POST",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};

@@ -1,25 +1,18 @@
-import React from 'react'
-import { useTable } from '../../Components/Models/useTable'
+import React from "react";
+import { useTable } from "../../Components/Models/useTable";
 
 const Users = () => {
-
   const attributes = [
-    // { id: "_id", label: "User Id" },
-    { id: "name", label: "Name" },
-     { id: "userId", label: "User Id" },
+    { id: "name", label: "Admin Name" },
     { id: "email", label: "Email" },
-    // { id: "password", label: "Password" },
-    { id: "role.name", label: "Role" },
-    { id: "status", label: "Status" },
+    { id: "role", label: "Role" },
+    { id: "isActive", label: "Status" },
+    { id: "createdAt", label: "Created At" },
   ];
 
-  const { tableUI } = useTable({
-    attributes,
-    // pageData: userData,
-    tableType: "Users"
-  });
+  const { tableUI } = useTable({ attributes, tableType: "Users" });
 
-  return <div>{tableUI}</div>;
+  return <>{tableUI}</>;
 };
 
 export default Users;

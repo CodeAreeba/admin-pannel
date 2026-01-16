@@ -28,7 +28,6 @@ export const deleteMultipleProducts = async (ids) => {
   return invokeApi(reqObj);
 };
 
-
 export const deleteAllRoles = async (data) => {
   const reqObj = {
     path: `/roles/multipleDelete`,
@@ -39,27 +38,37 @@ export const deleteAllRoles = async (data) => {
     },
     postData: data,
   };
-  
+
   return invokeApi(reqObj);
 };
-
-export const deleteAllUsers = async (data) => {
+//////////////////////////////////////////////
+export const deleteAdmins = async (data) => {
   const reqObj = {
-    path: `/user/multipleDelete`,
-    method: "DELETE", // Ensure correct capitalization
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("Token")}`,
-    },
+    path: `/admin`,
+    method: "DELETE", 
+    headers: {},
     postData: data,
   };
-  
+
   return invokeApi(reqObj);
 };
+export const deleteCategories = async (data) => {
+  const reqObj = {
+   path: `/admin/categories`,
+    method: "DELETE", 
+    headers: {},
+    postData: data,
+  };
 
- 
+  return invokeApi(reqObj);
+};
+export const deleteSubCategories = async (data) => {
+  const reqObj = {
+    path: `/admin/subcategories`,
+    method: "DELETE", 
+    headers: {},
+    postData: data,
+  };
 
- 
-
-
-
+  return invokeApi(reqObj);
+};

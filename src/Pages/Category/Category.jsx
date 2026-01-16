@@ -2,21 +2,16 @@ import React from "react";
 import { useTable } from "../../Components/Models/useTable";
 
 const Category = () => {
-  // 🔹 Table Columns / Attributes
   const attributes = [
-    { id: "productName", label: "Product Name" },
-    { id: "productId", label: "Product ID" },
-    { id: "category", label: "Category" },
-    { id: "status", label: "Status" },
-    { id: "description", label: "Description" },
+    { id: "name", label: "Name" },
+    { id: "metaTitle", label: "Meta Title" },
+    { id: "published", label: "Status" },
+    { id: "createdAt", label: "Created At" },
   ];
 
-  const { tableUI } = useTable({
-    attributes,
-    tableType: "Category",
-  });
+  const { tableUI } = useTable({ attributes, tableType: "Categories" });
 
-  return <div>{tableUI}</div>;
+  return tableUI;
 };
 
 export default Category;
