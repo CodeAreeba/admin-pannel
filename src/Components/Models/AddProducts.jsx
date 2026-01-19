@@ -26,7 +26,7 @@ export default function ProductForm() {
 
   return (
     <div className="container">
-      <header className="header">
+      {/* <header className="header">
         <div className="logo">OverView</div>
         <div className="search-bar">
           <FiSearch className="search-icon" />
@@ -55,7 +55,7 @@ export default function ProductForm() {
             <option>Sales</option>
           </select>
         </div>
-      </header>
+      </header> */}
 
       <div className="page-header">
         <div className="page-title">
