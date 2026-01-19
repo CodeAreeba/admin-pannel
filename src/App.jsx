@@ -29,6 +29,8 @@ import Inventory from "./Pages/Inventory/Inventory";
 import Category from "./Pages/Category/Category";
 import Users from "./Pages/Users/Users";
 import AddCategory from "./Pages/Category/AddCategory";
+// import AddProduct from "./Components/Models/AddCustomer";
+
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
