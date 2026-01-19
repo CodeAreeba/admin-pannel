@@ -115,7 +115,16 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
             <TableContainer>
               <Table stickyHeader>
                 <TableHead>
-                  <TableRow>
+                  <TableRow 
+                   sx={{
+                      "& th": {
+                        backgroundColor: "var(--primary-color)",
+                        color: "white",
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      },
+                    }}>
                     <TableCell padding="checkbox">
                       <Checkbox
                         sx={{
@@ -170,6 +179,7 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
                                   borderRadius: "var(--default-border-radius)",
                                   display: "inline-block",
                                   textAlign: "center",
+                                  fontWeight:"600",
                                 }}
                               >
                                 {row[attr.id] ? "Public" : "Draft"}
