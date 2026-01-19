@@ -58,7 +58,7 @@ export const createCategory = async (data) => {
   return invokeApi(reqObj);
 };
 
-export const createSubcategory = async (data) => {
+export const createSubCategory = async (data) => {
   const reqObj = {
     path: "/admin/subcategories",
     method: "POST",

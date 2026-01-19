@@ -1,90 +1,77 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Box,
   Button,
+  Typography,
   TextField,
   Switch,
   FormControlLabel,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import { getSubcategoryById } from "../../DAL/fetch";
-import { updateSubcategory } from "../../DAL/edit";
-import { createSubcategory } from "../../DAL/create";
 
-const AddSubcategoryModal = ({ open, onClose, subcategoryId, categoryId, onSuccess }) => {
+import { getSubCategoryById } from "../../DAL/fetch";
+import { createSubCategory } from "../../DAL/create";
+import { updateSubCategory } from "../../DAL/edit";
+
+const AddSubCategory = () => {
+  const { id: categoryId, subId } = useParams(); // id = categoryId
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [published, setPublished] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  /* ---------------- FETCH SUBCATEGORY (EDIT MODE) ---------------- */
-  const fetchSubcategory = async () => {
-    if (!subcategoryId) return;
-
+  // ================= FETCH SUBCATEGORY =================
+  const fetchSubCategory = async () => {
+    if (!subId) return;
     try {
-      const res = await getSubcategoryById(subcategoryId);
+      const res = await getSubCategoryById(subId);
       if (res?.statusCode === 200) {
-        const sub = res.data;
-        setName(sub.name || "");
-        setMetaTitle(sub.metaTitle || "");
-        setShortDescription(sub.shortDescription || "");
-        setPublished(sub.published ?? true);
+        const s = res.data;
+        setName(s.name);
+        setMetaTitle(s.metaTitle || "");
+        setShortDescription(s.shortDescription || "");
+        setPublished(s.published ?? true);
+      } else {
+        toast.error(res.message || "Failed to fetch subcategory");
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load subcategory");
+      toast.error("Something went wrong while fetching subcategory");
     }
   };
 
   useEffect(() => {
-    if (open && subcategoryId) {
-      fetchSubcategory();
-    } else if (open && !subcategoryId) {
-      // Reset form for add mode
-      setName("");
-      setMetaTitle("");
-      setShortDescription("");
-      setPublished(true);
-    }
-  }, [open, subcategoryId]);
+    fetchSubCategory();
+  }, [subId]);
 
-  /* ---------------- SUBMIT ---------------- */
+  // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!name.trim()) {
-      toast.warning("Name is required");
-      return;
-    }
-
+    if (!name.trim()) return toast.warning("Name is required");
     setLoading(true);
 
+    const payload = {
+      name,
+      metaTitle,
+      shortDescription,
+      published,
+      categoryId,
+    };
+
     try {
-      const payload = {
-        categoryId: categoryId,
-        name,
-        metaTitle,
-        shortDescription,
-        published,
-      };
+      const res = subId
+        ? await updateSubCategory(subId, payload)
+        : await createSubCategory(payload);
 
-      const res = subcategoryId
-        ? await updateSubcategory(subcategoryId, payload)
-        : await createSubcategory(payload);
-
-      if (res?.statusCode === 200 || res?.statusCode === 201) {
+      if (res?.statusCode === 200) {
         toast.success(res.message || "Subcategory saved successfully");
-        onSuccess && onSuccess(); // Refresh category data
-        onClose(); // Close modal
+        navigate(`/categories/${categoryId}/edit`);
       } else {
-        toast.error(res?.message || "Something went wrong");
+        toast.error(res.message || "Failed to save subcategory");
       }
     } catch (err) {
       console.error(err);
@@ -94,112 +81,82 @@ const AddSubcategoryModal = ({ open, onClose, subcategoryId, categoryId, onSucce
     }
   };
 
-  /* ---------------- UI ---------------- */
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: "12px",
-        }
-      }}
-    >
-      <DialogTitle sx={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center",
-        borderBottom: "1px solid #e0e0e0",
-        pb: 2
-      }}>
-        {subcategoryId ? "Edit Subcategory" : "Add Subcategory"}
-        <IconButton onClick={onClose} size="small">
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+    <Box sx={{ p: 3 , backgroundColor:"#fff"}}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        {subId ? "Edit Subcategory" : "Add Subcategory"}
+      </Typography>
 
-      <DialogContent sx={{ mt: 2 }}>
-        <form onSubmit={handleSubmit} id="subcategory-form">
-          <TextField
-            label="Name"
-            fullWidth
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+        <TextField
+          label="Name"
+          fullWidth
+          required
+          sx={{ mb: 2 }}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
 
-          <TextField
-            label="Meta Title"
-            fullWidth
-            value={metaTitle}
-            onChange={(e) => setMetaTitle(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+        <TextField
+          label="Meta Title"
+          fullWidth
+          sx={{ mb: 2 }}
+          value={metaTitle}
+          onChange={(e) => setMetaTitle(e.target.value)}
+        />
 
-          <TextField
-            label="Short Description"
-            multiline
-            rows={3}
-            fullWidth
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+        <TextField
+          label="Short Description"
+          multiline
+          rows={3}
+          fullWidth
+          sx={{ mb: 2 }}
+          value={shortDescription}
+          onChange={(e) => setShortDescription(e.target.value)}
+        />
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={published}
-                onChange={() => setPublished(!published)}
-              />
-            }
-            label={published ? "Published" : "Draft"}
-          />
-        </form>
-      </DialogContent>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={published}
+              onChange={() => setPublished(!published)}
+            />
+          }
+          label={published ? "Published" : "Draft"}
+        />
 
-      <DialogActions sx={{ 
-        borderTop: "1px solid #e0e0e0", 
-        pt: 2, 
-        px: 3, 
-        pb: 2 
-      }}>
-        <Button
-          onClick={onClose}
+        <Box
           sx={{
-            padding: "8px 24px",
-            textTransform: "none",
-            color: "black",
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
+            mt: 3,
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 2,
           }}
         >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          form="subcategory-form"
-          variant="contained"
-          disabled={loading}
-          sx={{
-            padding: "8px 24px",
-            textTransform: "none",
-            backgroundColor: "var(--primary-color)",
-            color: "var(--white-color)",
-            "&:hover": {
-              backgroundColor: "var(--primary-color)",
-            },
-          }}
-        >
-          {loading ? "Saving..." : "Save"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#B1B1B1" }}
+            onClick={() => navigate(-1)}
+          >
+            Cancel
+          </Button>
+          
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading}
+            sx={{
+              background: "var(--horizontal-gradient)",
+              color: "#fff",
+              "&:hover": { background: "var(--vertical-gradient)" },
+            }}
+          >
+            {subId ? "Update" : "Save"}
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
-export default AddSubcategoryModal;
+export default AddSubCategory;
