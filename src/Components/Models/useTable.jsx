@@ -95,6 +95,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
     if (tableType === "Users") setOpenUserModal(true);
     if (tableType === "Roles") setOpenRolesModal(true);
+    if (tableType === "Products") navigate("/products/add");
 
     setModeltype("Add");
     setModelData({});

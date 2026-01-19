@@ -50,7 +50,7 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
 
   const handleDelete = async () => {
     if (!selected.length) {
-      toast.warning( "No items selected for deletion");
+      toast.warning("No items selected for deletion");
       return;
     }
     if (!deleteFn) return;
@@ -58,11 +58,12 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
     try {
       const response = await deleteFn({ ids: selected });
       if (response.status === 200) {
-        toast.success( response.message || "Deleted successfully");
+        toast.success(response.message || "Deleted successfully");
         reFetch && reFetch();
         setSelected([]);
+        setOpenDeleteModal(false);
       } else {
-        toast.error( response.message || "Failed to delete items");
+        toast.error(response.message || "Failed to delete items");
       }
     } catch (err) {
       console.error(err);
@@ -97,13 +98,13 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
                 </IconButton>
               ) : (
                 <Button
-                   sx={{
-                      background: "var(--horizontal-gradient)",
-                      color: "var(--white-color)",
-                      borderRadius: "var(--border-radius-secondary)",
-                      "&:hover": { background: "var(--vertical-gradient)" },
-                      textTransform: "none",
-                    }}
+                  sx={{
+                    background: "var(--horizontal-gradient)",
+                    color: "var(--white-color)",
+                    borderRadius: "var(--border-radius-secondary)",
+                    "&:hover": { background: "var(--vertical-gradient)" },
+                    textTransform: "none",
+                  }}
                   onClick={handleAddButton}
                 >
                   Add {tableType}
@@ -142,7 +143,10 @@ export function useTable3({ attributes3, reFetch, tableType, data = [], addPath,
                       <TableRow key={row._id} selected={isItemSelected}>
                         <TableCell padding="checkbox">
                           <Checkbox
-                            sx={{ color: "var(--background-color)", "&.Mui-checked": { color: "var(--background-color)" } }}
+                            sx={{
+                              color: "var(--background-color)",
+                              "&.Mui-checked": { color: "var(--background-color)" },
+                            }}
                             checked={isItemSelected}
                             onChange={() =>
                               setSelected((prev) =>

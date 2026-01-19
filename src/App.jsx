@@ -30,6 +30,7 @@ import Category from "./Pages/Category/Category";
 import Users from "./Pages/Users/Users";
 import AddCategory from "./Pages/Category/AddCategory";
 // import AddProduct from "./Components/Models/AddCustomer";
+import AddProducts from "./Components/Models/AddProducts";
 
 
 //////////////////////////// Auth & Permissions ////////////////////////////
@@ -213,6 +214,13 @@ const App = ({ onLogout }) => {
               <ProtectedRoute path="/settings">
                 <Settings />
               </ProtectedRoute>
+            }
+          />
+          <Route path ="/products/add"
+            element={ 
+              <ProtectedRoute>
+                <AddProducts />
+              </ProtectedRoute> 
             }
           />
 

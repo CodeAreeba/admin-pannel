@@ -41,3 +41,13 @@ export const updateCategory = async (id, data) => {
   };
   return invokeApi(reqObj);
 };
+
+export const updateSubcategory = async (id, data) => {
+  const reqObj = {
+    path: `/admin/subcategories/${id}`,
+    method: "PUT",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};

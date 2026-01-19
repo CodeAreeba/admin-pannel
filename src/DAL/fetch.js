@@ -178,9 +178,21 @@ export const getCategoryById = async () => {
 
   return invokeApi(reqObj);
 };
-export const getAllSubCategories = async () => {
+
+export const getAllSubCategories = async (categoryId) => {
   const reqObj = {
-    ath: `/admin/subcategories?categoryId=${categoryId}`,
+    path: `/admin/subcategories?categoryId=${categoryId}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+
+export const getSubcategoryById = async (id) => {
+  const reqObj = {
+    path: `/admin/subcategories/${id}`,
     method: "GET",
     headers: {},
     postData: {},

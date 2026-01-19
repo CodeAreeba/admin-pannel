@@ -61,6 +61,7 @@
    --accent-bgcolor: #f78f0856;
   --success-color: rgb(0, 101, 0);
   --success-bgcolor: rgba(2, 216, 2, 0.512);
+  --background: #9d5f0f52;
 }
 
 body {
@@ -70,7 +71,7 @@ body {
   scrollbar-width: none; 
   -ms-overflow-style: none; 
 }
-
+ #ac7633
 body::-webkit-scrollbar,
 .app-right::-webkit-scrollbar,
 .app-side-bar ul::-webkit-scrollbar,

@@ -186,7 +186,7 @@ body {
 }
 
 .btn-add {
-  background: #86efac;
+  background: var(--background);
   color: #333;
 }
 
@@ -329,8 +329,8 @@ body {
 }
 
 .size-btn.active {
-  background: #86efac;
-  border-color: #86efac;
+  background: var(--background);
+  border-color: #8e7652;
   color: #333;
   font-weight: 500;
 }
@@ -364,8 +364,8 @@ body {
 }
 
 .gender-btn.active {
-  background: #86efac;
-  border-color: #86efac;
+  background: var(--background);
+  border-color: #9c7f59;
   color: #333;
 }
 
@@ -431,13 +431,13 @@ body {
   justify-content: center;
   cursor: pointer;
   outline: none;
-  color: #86efac;
+  color: #a28a5c;
   font-size: 24px;
   transition: all 0.2s;
 }
 
 .add-thumbnail:hover {
-  border-color: #86efac;
+  border-color: var(--background);
   background: #f0fdf4;
 }
 
@@ -445,7 +445,7 @@ body {
 .btn-add-category {
   width: 35%;
   padding: 12px;
-  background: #86efac;
+  background:var(--background);
   border: none;
   border-radius: 16px;
   font-size: 14px;

@@ -57,3 +57,13 @@ export const createCategory = async (data) => {
   };
   return invokeApi(reqObj);
 };
+
+export const createSubcategory = async (data) => {
+  const reqObj = {
+    path: "/admin/subcategories",
+    method: "POST",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};
