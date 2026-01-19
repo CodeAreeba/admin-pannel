@@ -88,7 +88,9 @@ const App = ({ onLogout }) => {
               <li
                 key={item.route}
                 className={
-                  activeRoute === item.route ? "selected-item" : "unselected"
+                    activeRoute.startsWith(item.route)
+                    ? "selected-item"
+                    : "unselected"
                 }
                 onClick={() => handleNavigate(item.route)}
               >
