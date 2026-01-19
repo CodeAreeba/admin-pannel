@@ -10,6 +10,20 @@ export default function ProductForm() {
   const [selectedSize, setSelectedSize] = useState('9');
   const [selectedGender, setSelectedGender] = useState('Woman');
 
+  const [productName, setProductName] = useState(
+    'Air Max Running Shoes Premium Edition'
+  );
+  const [description, setDescription] = useState(
+    'Premium running shoes featuring advanced cushioning technology. Breathable mesh upper with synthetic overlays for support. Air Max unit in the heel for superior impact absorption. Rubber outsole with flex grooves for natural motion. Padded collar and tongue for comfort. Lace-up closure for secure fit.'
+  );
+  const [price, setPrice] = useState('$47.55');
+  const [stock, setStock] = useState('77');
+  const [discount, setDiscount] = useState('10%');
+  const [discountType, setDiscountType] = useState(
+    'Chinese New Year Discount'
+  );
+  const [category, setCategory] = useState('Jacket');
+
   return (
     <div className="container">
       <header className="header">
@@ -40,14 +54,6 @@ export default function ProductForm() {
           <select className="dropdown">
             <option>Sales</option>
           </select>
-          {/* <div className="user-info">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kamisato" alt="User" className="avatar" />
-            <div className="user-details">
-              <div className="user-name">Kamisato Aya</div>
-              <div className="user-role">Manager</div>
-            </div>
-            <div className="status-indicator"></div>
-          </div> */}
         </div>
       </header>
 
@@ -72,21 +78,23 @@ export default function ProductForm() {
         <div className="left-column">
           <div className="card">
             <h2 className="card-title">General Information</h2>
-            
+
             <div className="input-group">
               <label>Name Product</label>
-              <input 
-                type="text" 
-                value="Air Max Running Shoes Premium Edition" 
+              <input
+                type="text"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
                 className="input-field"
               />
             </div>
 
             <div className="input-group">
               <label>Description Product</label>
-              <textarea 
+              <textarea
                 className="textarea-field"
-                value="Premium running shoes featuring advanced cushioning technology. Breathable mesh upper with synthetic overlays for support. Air Max unit in the heel for superior impact absorption. Rubber outsole with flex grooves for natural motion. Padded collar and tongue for comfort. Lace-up closure for secure fit."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           </div>
@@ -97,10 +105,12 @@ export default function ProductForm() {
                 <h3 className="section-title">Size</h3>
                 <p className="section-subtitle">Pick Available Size</p>
                 <div className="size-buttons">
-                  {['7', '8', '9', '10', '11'].map(size => (
+                  {['7', '8', '9', '10', '11'].map((size) => (
                     <button
                       key={size}
-                      className={`size-btn ${selectedSize === size ? 'active' : ''}`}
+                      className={`size-btn ${
+                        selectedSize === size ? 'active' : ''
+                      }`}
                       onClick={() => setSelectedSize(size)}
                     >
                       {size}
@@ -111,29 +121,26 @@ export default function ProductForm() {
 
               <div className="gender-section">
                 <h3 className="section-title">Gender</h3>
-                <p className="section-subtitle">Pick Available Gender</p>
+                <p className="section-subtitle">
+                  Pick Available Gender
+                </p>
                 <div className="gender-buttons">
-                  <button
-                    className={`gender-btn ${selectedGender === 'Men' ? 'active' : ''}`}
-                    onClick={() => setSelectedGender('Men')}
-                  >
-                    {selectedGender === 'Men' ? <MdRadioButtonChecked /> : <BiCircle />}
-                    <span>Men</span>
-                  </button>
-                  <button
-                    className={`gender-btn ${selectedGender === 'Woman' ? 'active' : ''}`}
-                    onClick={() => setSelectedGender('Woman')}
-                  >
-                    {selectedGender === 'Woman' ? <MdRadioButtonChecked /> : <BiCircle />}
-                    <span>Woman</span>
-                  </button>
-                  <button
-                    className={`gender-btn ${selectedGender === 'Unisex' ? 'active' : ''}`}
-                    onClick={() => setSelectedGender('Unisex')}
-                  >
-                    {selectedGender === 'Unisex' ? <MdRadioButtonChecked /> : <BiCircle />}
-                    <span>Unisex</span>
-                  </button>
+                  {['Men', 'Woman', 'Unisex'].map((gender) => (
+                    <button
+                      key={gender}
+                      className={`gender-btn ${
+                        selectedGender === gender ? 'active' : ''
+                      }`}
+                      onClick={() => setSelectedGender(gender)}
+                    >
+                      {selectedGender === gender ? (
+                        <MdRadioButtonChecked />
+                      ) : (
+                        <BiCircle />
+                      )}
+                      <span>{gender}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -141,31 +148,34 @@ export default function ProductForm() {
 
           <div className="card">
             <h2 className="card-title">Pricing And Stock</h2>
-            
+
             <div className="pricing-grid">
               <div className="input-group">
                 <label>Base Pricing</label>
-                <input 
-                  type="text" 
-                  value="$47.55" 
+                <input
+                  type="text"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                   className="input-field"
                 />
               </div>
 
               <div className="input-group">
                 <label>Stock</label>
-                <input 
-                  type="text" 
-                  value="77" 
+                <input
+                  type="text"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
                   className="input-field"
                 />
               </div>
 
               <div className="input-group">
                 <label>Discount</label>
-                <input 
-                  type="text" 
-                  value="10%" 
+                <input
+                  type="text"
+                  value={discount}
+                  onChange={(e) => setDiscount(e.target.value)}
                   className="input-field"
                 />
               </div>
@@ -173,9 +183,12 @@ export default function ProductForm() {
               <div className="input-group">
                 <label>Discount Type</label>
                 <div className="select-field">
-                  <input 
-                    type="text" 
-                    value="Chinese New Year Discount" 
+                  <input
+                    type="text"
+                    value={discountType}
+                    onChange={(e) =>
+                      setDiscountType(e.target.value)
+                    }
                     className="input-field"
                   />
                   <div className="select-indicator"></div>
@@ -189,20 +202,29 @@ export default function ProductForm() {
           <div className="card">
             <h2 className="card-title">Upload Img</h2>
             <div className="image-preview">
-              <img 
-                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop" 
-                alt="Product" 
+              <img
+                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop"
+                alt="Product"
               />
             </div>
             <div className="thumbnail-grid">
               <div className="thumbnail active">
-                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop" alt="Thumb 1" />
+                <img
+                  src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop"
+                  alt="Thumb 1"
+                />
               </div>
               <div className="thumbnail">
-                <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=100&h=100&fit=crop" alt="Thumb 2" />
+                <img
+                  src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=100&h=100&fit=crop"
+                  alt="Thumb 2"
+                />
               </div>
               <div className="thumbnail">
-                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=100&h=100&fit=crop" alt="Thumb 3" />
+                <img
+                  src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=100&h=100&fit=crop"
+                  alt="Thumb 3"
+                />
               </div>
               <button className="add-thumbnail">
                 <IoAddOutline />
@@ -215,15 +237,20 @@ export default function ProductForm() {
             <div className="input-group">
               <label>Product Category</label>
               <div className="select-field">
-                <input 
-                  type="text" 
-                  value="Jacket" 
+                <input
+                  type="text"
+                  value={category}
+                  onChange={(e) =>
+                    setCategory(e.target.value)
+                  }
                   className="input-field"
                 />
                 <div className="select-indicator"></div>
               </div>
             </div>
-            <button className="btn-add-category">Add Category</button>
+            <button className="btn-add-category">
+              Add Category
+            </button>
           </div>
         </div>
       </div>
