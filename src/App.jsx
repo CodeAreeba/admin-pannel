@@ -29,6 +29,7 @@ import Inventory from "./Pages/Inventory/Inventory";
 import Category from "./Pages/Category/Category";
 import Users from "./Pages/Users/Users";
 import AddCategory from "./Pages/Category/AddCategory";
+import AddSubcategory from "./Pages/Category/AddSubcategory";
 // import AddProduct from "./Components/Models/AddCustomer";
 import AddProducts from "./Components/Models/AddProducts";
 
@@ -195,6 +196,24 @@ const App = ({ onLogout }) => {
             element={
               <ProtectedRoute>
                 <AddCategory />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ SUBCATEGORY ROUTES */}
+          <Route
+            path="/categories/:id/add-subcategory"
+            element={
+              <ProtectedRoute>
+                <AddSubcategory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories/:id/edit-subcategory/:subId"
+            element={
+              <ProtectedRoute>
+                <AddSubcategory />
               </ProtectedRoute>
             }
           />

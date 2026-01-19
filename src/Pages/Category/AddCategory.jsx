@@ -11,50 +11,89 @@ import {
 import { toast } from "react-toastify";
 
 import { useTable3 } from "../../Components/Models/useTable3";
-import { getCategoryById } from "../../DAL/fetch";
+import { getCategoryById, getAllSubCategories } from "../../DAL/fetch";
 import { updateCategory } from "../../DAL/edit";
 import { createCategory } from "../../DAL/create";
+import AddSubcategoryModal from "./AddSubcategory";
 
 const AddCategory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  /* ---------------- CATEGORY STATE ---------------- */
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [published, setPublished] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  /* ---------------- SUBCATEGORY STATE ---------------- */
   const [subcategories, setSubcategories] = useState({
     published: true,
     items: [],
   });
 
-  /* ---------------- FETCH CATEGORY (EDIT) ---------------- */
+  /* ---------------- MODAL STATE ---------------- */
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
+
+  /* ---------------- FETCH CATEGORY (EDIT MODE) ---------------- */
   const fetchCategory = async () => {
     if (!id) return;
 
     try {
       const res = await getCategoryById(id);
+
       if (res?.statusCode === 200) {
         const c = res.data;
+
         setName(c.name || "");
         setMetaTitle(c.metaTitle || "");
         setMetaDescription(c.metaDescription || "");
         setPublished(c.published ?? true);
-        setSubcategories(c.subcategories || { published: true, items: [] });
       }
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load category");
     }
   };
 
+  /* ---------------- FETCH ALL SUBCATEGORIES ---------------- */
+  const fetchSubcategories = async () => {
+    if (!id) return; // only fetch in edit mode
+
+    try {
+      const res = await getAllSubCategories(id);
+
+      if (res?.statusCode === 200) {
+        setSubcategories((prev) => ({
+          ...prev,
+          items: res.data || [],
+        }));
+      } else {
+        toast.error(res?.message || "Failed to fetch subcategories");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong while fetching subcategories");
+    }
+  };
+
+  /* ---------------- INIT ---------------- */
   useEffect(() => {
-    fetchCategory();
+    if (id) {
+      // Edit category → fetch category and subcategories
+      fetchCategory();
+      fetchSubcategories();
+    } else {
+      // Add category → empty subcategory table
+      setSubcategories({
+        published: true,
+        items: [],
+      });
+    }
   }, [id]);
 
-  /* ---------------- SUBMIT ---------------- */
+  /* ---------------- SAVE CATEGORY ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -79,14 +118,35 @@ const AddCategory = () => {
         toast.error(res?.message || "Something went wrong");
       }
     } catch (err) {
-      console.error(err);
       toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ---------------- SUBCATEGORY TABLE ---------------- */
+  /* ---------------- SUBCATEGORY MODAL ---------------- */
+  const handleAddSubcategory = () => {
+    setSelectedSubcategoryId(null);
+    setOpenModal(true);
+  };
+
+  const handleEditSubcategory = (subId) => {
+    setSelectedSubcategoryId(subId);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedSubcategoryId(null);
+  };
+
+  const handleModalSuccess = () => {
+    if (id) {
+      fetchSubcategories(); // refresh subcategories after add/edit
+    }
+  };
+
+  /* ---------------- TABLE ---------------- */
   const subcategoryAttributes = [
     { id: "name", label: "Name" },
     { id: "metaTitle", label: "Meta Title" },
@@ -98,9 +158,7 @@ const AddCategory = () => {
     attributes3: subcategoryAttributes,
     tableType: "Subcategories",
     data: subcategories.items,
-    reFetch: fetchCategory,
-    addPath: `/categories/${id}/add-subcategory`,
-    viewPath: `/categories/${id}/edit-subcategory/:subId`,
+    reFetch: fetchSubcategories,
   });
 
   /* ---------------- UI ---------------- */
@@ -148,31 +206,49 @@ const AddCategory = () => {
           label={published ? "Published" : "Draft"}
         />
 
-        <Typography variant="h5" sx={{ mt: 3 }}>
-          Subcategories
-        </Typography>
-
-        {tableUI3}
-
+        {/* ---------------- SUBCATEGORY TABLE ---------------- */}
         <Box
-          sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}
+          onClick={(e) => {
+            const target = e.target;
+
+            // Add Subcategory (toolbar button)
+            if (
+              target.closest("button") &&
+              target.textContent?.toLowerCase().includes("add")
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              handleAddSubcategory();
+              return;
+            }
+
+            // View / Edit Subcategory
+            if (target.textContent === "View") {
+              e.preventDefault();
+              const row = target.closest("tr");
+              const index = [...row.parentNode.children].indexOf(row);
+              const sub = subcategories.items[index];
+              if (sub?._id) handleEditSubcategory(sub._id);
+            }
+          }}
         >
+          {tableUI3}
+        </Box>
+
+        {/* ---------------- ACTION BUTTONS ---------------- */}
+        <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <Button
             onClick={() => navigate("/categories")}
             sx={{
               padding: "8px 28px",
               textTransform: "none",
-              borderColor: "var(--primary-color)",
               backgroundColor: "var(--grey-color)",
               color: "black",
-              transition: "0.3s ease",
-              "&:hover": {
-                color: "var(--primary-color)",
-              },
             }}
           >
             Cancel
           </Button>
+
           <Button
             type="submit"
             variant="contained"
@@ -180,19 +256,23 @@ const AddCategory = () => {
             sx={{
               padding: "8px 28px",
               textTransform: "none",
-              borderColor: "var(--primary-color)",
               backgroundColor: "var(--primary-color)",
               color: "var(--white-color)",
-              "&:hover": {
-                backgroundColor: "var(--primary-color)",
-                color: "var(--white-color)",
-              },
             }}
           >
             {loading ? "Saving..." : "Save"}
           </Button>
         </Box>
       </Box>
+
+      {/* ---------------- SUBCATEGORY MODAL ---------------- */}
+      <AddSubcategoryModal
+        open={openModal}
+        onClose={handleCloseModal}
+        subcategoryId={selectedSubcategoryId}
+        categoryId={id}
+        onSuccess={handleModalSuccess}
+      />
     </Box>
   );
 };
