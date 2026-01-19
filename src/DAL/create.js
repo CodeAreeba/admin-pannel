@@ -50,7 +50,7 @@ export const createAdmin = async (data) => {
 };
 export const createCategory = async (data) => {
   const reqObj = {
-    path: "/admin/category",
+    path: "/admin/categories",
     method: "POST",
     headers: {},
     postData: data,

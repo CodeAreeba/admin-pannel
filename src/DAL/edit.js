@@ -34,7 +34,7 @@ export const updateAdmin = async (id, data) => {
 };
 export const updateCategory = async (id, data) => {
   const reqObj = {
-    path: `/admin//category${id}`,
+    path: `/admin//categories/${id}`,
     method: "PUT",
     headers: {},
     postData: data,

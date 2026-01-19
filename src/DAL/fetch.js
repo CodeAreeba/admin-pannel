@@ -168,9 +168,9 @@ export const getAllCategories = async () => {
 
   return invokeApi(reqObj);
 };
-export const getCategoryById = async () => {
+export const getCategoryById = async (id) => {
   const reqObj = {
-    path: `/admin/categories/:id`,
+    path: `/admin/categories/${id}`,
     method: "GET",
     headers: {},
     postData: {},
