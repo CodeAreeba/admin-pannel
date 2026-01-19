@@ -158,9 +158,9 @@ export const getAllPermissions = async () => {
 
   return invokeApi(reqObj);
 };
-export const getAllCategories = async () => {
+export const getAllCategories = async (page = 1, limit = 25, search = "") => {
   const reqObj = {
-    path: `/admin/categories`,
+   path: `/admin/categories?page=${page}&limit=${limit}&search=${search}`,
     method: "GET",
     headers: {},
     postData: {},
@@ -170,7 +170,7 @@ export const getAllCategories = async () => {
 };
 export const getCategoryById = async (id) => {
   const reqObj = {
-    path: `/admin/categories/${id}`,
+  path: `/admin/categories/${id}`,
     method: "GET",
     headers: {},
     postData: {},
@@ -178,10 +178,9 @@ export const getCategoryById = async (id) => {
 
   return invokeApi(reqObj);
 };
-
-export const getAllSubCategories = async (categoryId) => {
+export const getAllSubCategories = async (categoryId,page = 1, limit = 25, search = "") => {
   const reqObj = {
-    path: `/admin/subcategories/category/${categoryId}`,
+    path: `/admin/subcategories/category/${categoryId}?page=${page}&limit=${limit}&search=${search}`,
     method: "GET",
     headers: {},
     postData: {},
@@ -189,10 +188,9 @@ export const getAllSubCategories = async (categoryId) => {
 
   return invokeApi(reqObj);
 };
-
-export const getSubcategoryById = async (id) => {
+export const getSubCategoryById = async (id) => {
   const reqObj = {
-    path: `/admin/subcategories/${id}`,
+       path: `/admin/subcategories/${id}`,
     method: "GET",
     headers: {},
     postData: {},
