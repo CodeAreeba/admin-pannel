@@ -46,7 +46,6 @@ const AddCategory = () => {
 
       if (res?.statusCode === 200) {
         const c = res.data;
-
         setName(c.name || "");
         setMetaTitle(c.metaTitle || "");
         setMetaDescription(c.metaDescription || "");
@@ -57,39 +56,28 @@ const AddCategory = () => {
     }
   };
 
-  /* ---------------- FETCH ALL SUBCATEGORIES ---------------- */
+  /* ---------------- FETCH SUBCATEGORIES ---------------- */
   const fetchSubcategories = async () => {
-    if (!id) return; // only fetch in edit mode
+    if (!id) return;
 
     try {
       const res = await getAllSubCategories(id);
-
       if (res?.statusCode === 200) {
-        setSubcategories((prev) => ({
-          ...prev,
+        setSubcategories({
+          published: true,
           items: res.data || [],
-        }));
-      } else {
-        toast.error(res?.message || "Failed to fetch subcategories");
+        });
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while fetching subcategories");
+      toast.error("Failed to fetch subcategories");
     }
   };
 
   /* ---------------- INIT ---------------- */
   useEffect(() => {
     if (id) {
-      // Edit category → fetch category and subcategories
       fetchCategory();
       fetchSubcategories();
-    } else {
-      // Add category → empty subcategory table
-      setSubcategories({
-        published: true,
-        items: [],
-      });
     }
   }, [id]);
 
@@ -104,7 +92,6 @@ const AddCategory = () => {
         metaTitle,
         metaDescription,
         published,
-        subcategories,
       };
 
       const res = id
@@ -124,7 +111,7 @@ const AddCategory = () => {
     }
   };
 
-  /* ---------------- SUBCATEGORY MODAL ---------------- */
+  /* ---------------- MODAL HANDLERS ---------------- */
   const handleAddSubcategory = () => {
     setSelectedSubcategoryId(null);
     setOpenModal(true);
@@ -141,9 +128,7 @@ const AddCategory = () => {
   };
 
   const handleModalSuccess = () => {
-    if (id) {
-      fetchSubcategories(); // refresh subcategories after add/edit
-    }
+    fetchSubcategories();
   };
 
   /* ---------------- TABLE ---------------- */
@@ -206,34 +191,37 @@ const AddCategory = () => {
           label={published ? "Published" : "Draft"}
         />
 
-        {/* ---------------- SUBCATEGORY TABLE ---------------- */}
-        <Box
-          onClick={(e) => {
-            const target = e.target;
+        {/* ---------------- SUBCATEGORY TABLE (EDIT MODE ONLY) ---------------- */}
+        {id && (
+          <Box
+            sx={{ mt: 3 }}
+            onClick={(e) => {
+              const target = e.target;
 
-            // Add Subcategory (toolbar button)
-            if (
-              target.closest("button") &&
-              target.textContent?.toLowerCase().includes("add")
-            ) {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddSubcategory();
-              return;
-            }
+              // Add Subcategory
+              if (
+                target.closest("button") &&
+                target.textContent?.toLowerCase().includes("add")
+              ) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAddSubcategory();
+                return;
+              }
 
-            // View / Edit Subcategory
-            if (target.textContent === "View") {
-              e.preventDefault();
-              const row = target.closest("tr");
-              const index = [...row.parentNode.children].indexOf(row);
-              const sub = subcategories.items[index];
-              if (sub?._id) handleEditSubcategory(sub._id);
-            }
-          }}
-        >
-          {tableUI3}
-        </Box>
+              // Edit Subcategory
+              if (target.textContent === "View") {
+                const row = target.closest("tr");
+                const index = [...row.parentNode.children].indexOf(row);
+                const sub = subcategories.items[index];
+                if (sub?._id) handleEditSubcategory(sub._id);
+              }
+            }}
+          >
+            <Typography variant="h5">Subcategories</Typography>
+            {tableUI3}
+          </Box>
+        )}
 
         {/* ---------------- ACTION BUTTONS ---------------- */}
         <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}>
@@ -266,13 +254,15 @@ const AddCategory = () => {
       </Box>
 
       {/* ---------------- SUBCATEGORY MODAL ---------------- */}
-      <AddSubcategoryModal
-        open={openModal}
-        onClose={handleCloseModal}
-        subcategoryId={selectedSubcategoryId}
-        categoryId={id}
-        onSuccess={handleModalSuccess}
-      />
+      {id && (
+        <AddSubcategoryModal
+          open={openModal}
+          onClose={handleCloseModal}
+          subcategoryId={selectedSubcategoryId}
+          categoryId={id}
+          onSuccess={handleModalSuccess}
+        />
+      )}
     </Box>
   );
 };

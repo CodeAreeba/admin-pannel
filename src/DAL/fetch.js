@@ -181,7 +181,7 @@ export const getCategoryById = async (id) => {
 
 export const getAllSubCategories = async (categoryId) => {
   const reqObj = {
-    path: `/admin/subcategories?categoryId=${categoryId}`,
+    path: `/admin/subcategories/category/${categoryId}`,
     method: "GET",
     headers: {},
     postData: {},
