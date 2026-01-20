@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Box,
   Paper,
@@ -24,6 +24,12 @@ import { baseUrl } from "../../Config/Config";
 import truncateText from "../../Utils/truncateText";
 import { formatDate } from "../../Utils/Formatedate";
 import { toast } from "react-toastify";
+import AuthContext from "../../auth/AuthContext";
+import PermissionGate from "../../Config/PermissionGate";
+import { 
+  CREATE_PERMISSION_BY_TABLE, 
+  VIEW_PERMISSION_BY_TABLE 
+} from "../../Config/Permission";
 
 export function useTable3({
   attributes3,
@@ -33,7 +39,7 @@ export function useTable3({
   addPath,
   viewPath,
   deleteFn,
-  onSearch, // Add this prop
+  onSearch,
 }) {
   const [selected, setSelected] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -41,6 +47,7 @@ export function useTable3({
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
+  const { can } = useContext(AuthContext);
 
   // Debounce search input
   useEffect(() => {
@@ -69,6 +76,12 @@ export function useTable3({
 
   // --- Navigate to View/Edit ---
   const handleViewClick = (row) => {
+    // Permission check
+    if (!can(VIEW_PERMISSION_BY_TABLE[tableType])) {
+      toast.warning("You don't have permission to view this");
+      return;
+    }
+
     if (viewPath)
       navigate(viewPath.replace(":id", id).replace(":subId", row._id));
   };
@@ -82,27 +95,27 @@ export function useTable3({
   const handleDeleteClick = () => setOpenDeleteModal(true);
 
   const handleDelete = async () => {
-  if (!selected.length) {
-    toast.warning("No items selected for deletion");
-    return;
-  }
-  if (!deleteFn) return;
-
-  try {
-    const response = await deleteFn({ ids: selected });
-    if (response.statusCode === 200) { 
-      toast.success(response.message || "Deleted successfully");
-      reFetch && reFetch();
-      setSelected([]);
-      setOpenDeleteModal(false);
-    } else {
-      toast.error(response.message || "Failed to delete items");
+    if (!selected.length) {
+      toast.warning("No items selected for deletion");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Something went wrong. Try again later.");
-  }
-};
+    if (!deleteFn) return;
+
+    try {
+      const response = await deleteFn({ ids: selected });
+      if (response.statusCode === 200) {
+        toast.success(response.message || "Deleted successfully");
+        reFetch && reFetch();
+        setSelected([]);
+        setOpenDeleteModal(false);
+      } else {
+        toast.error(response.message || "Failed to delete items");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong. Try again later.");
+    }
+  };
 
   // --- Helper to access nested values ---
   const getNestedValue = (obj, path) =>
@@ -110,7 +123,7 @@ export function useTable3({
       .split(".")
       .reduce(
         (acc, key) => (acc && acc[key] !== undefined ? acc[key] : "N/A"),
-        obj,
+        obj
       );
 
   // --- Table UI ---
@@ -161,18 +174,36 @@ export function useTable3({
                     <DeleteIcon />
                   </IconButton>
                 ) : (
-                  <Button
-                    sx={{
-                      background: "var(--horizontal-gradient)",
-                      color: "var(--white-color)",
-                      borderRadius: "var(--border-radius-secondary)",
-                      "&:hover": { background: "var(--vertical-gradient)" },
-                      textTransform: "none",
-                    }}
-                    onClick={handleAddButton}
+                  <PermissionGate
+                    permission={CREATE_PERMISSION_BY_TABLE[tableType]}
+                    fallback={
+                      <Button
+                        disabled
+                        sx={{
+                          background: "#e0e0e0",
+                          color: "#777",
+                          borderRadius: "var(--border-radius-secondary)",
+                          textTransform: "none",
+                          cursor: "not-allowed",
+                        }}
+                      >
+                        Add {tableType}
+                      </Button>
+                    }
                   >
-                    Add {tableType}
-                  </Button>
+                    <Button
+                      sx={{
+                        background: "var(--horizontal-gradient)",
+                        color: "var(--white-color)",
+                        borderRadius: "var(--border-radius-secondary)",
+                        "&:hover": { background: "var(--vertical-gradient)" },
+                        textTransform: "none",
+                      }}
+                      onClick={handleAddButton}
+                    >
+                      Add {tableType}
+                    </Button>
+                  </PermissionGate>
                 )}
               </Box>
             </Toolbar>
@@ -247,7 +278,7 @@ export function useTable3({
                                 setSelected((prev) =>
                                   isItemSelected
                                     ? prev.filter((id) => id !== row._id)
-                                    : [...prev, row._id],
+                                    : [...prev, row._id]
                                 )
                               }
                             />
@@ -304,23 +335,44 @@ export function useTable3({
                           ))}
 
                           <TableCell>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() => handleViewClick(row)}
-                              sx={{
-                                textTransform: "none",
-                                borderColor: "var(--primary-color)",
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor: "var(--primary-color)",
-                                  color: "#fff",
-                                },
-                              }}
+                            <PermissionGate
+                              permission={VIEW_PERMISSION_BY_TABLE[tableType]}
+                              fallback={
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  disabled
+                                  sx={{
+                                    textTransform: "none",
+                                    borderColor: "#ccc",
+                                    color: "#999",
+                                    cursor: "not-allowed",
+                                    "&:hover": {
+                                      borderColor: "#ccc",
+                                    },
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              }
                             >
-                              {" "}
-                              View{" "}
-                            </Button>{" "}
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleViewClick(row)}
+                                sx={{
+                                  textTransform: "none",
+                                  borderColor: "var(--primary-color)",
+                                  color: "var(--primary-color)",
+                                  "&:hover": {
+                                    backgroundColor: "var(--primary-color)",
+                                    color: "#fff",
+                                  },
+                                }}
+                              >
+                                View
+                              </Button>
+                            </PermissionGate>
                           </TableCell>
                         </TableRow>
                       );

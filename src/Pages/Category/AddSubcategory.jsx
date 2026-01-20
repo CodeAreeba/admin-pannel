@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -13,16 +13,26 @@ import { toast } from "react-toastify";
 import { getSubCategoryById } from "../../DAL/fetch";
 import { createSubCategory } from "../../DAL/create";
 import { updateSubCategory } from "../../DAL/edit";
+import AuthContext from "../../auth/AuthContext";
+import { UPDATE_PERMISSION_BY_TABLE, CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
 
 const AddSubCategory = () => {
-  const { id: categoryId, subId } = useParams(); // id = categoryId
+  const { id: categoryId, subId } = useParams();
   const navigate = useNavigate();
+  const { can } = useContext(AuthContext);
 
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
   const [published, setPublished] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  // Check permissions
+  const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Subcategory);
+  const canCreate = can(CREATE_PERMISSION_BY_TABLE.Subcategory);
+  
+  // Determine if save button should be disabled
+  const isSaveDisabled = subId ? !canUpdate : !canCreate;
 
   // ================= FETCH SUBCATEGORY =================
   const fetchSubCategory = async () => {
@@ -51,6 +61,13 @@ const AddSubCategory = () => {
   // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Permission check on submit
+    if (isSaveDisabled) {
+      toast.warning("You don't have permission to perform this action");
+      return;
+    }
+
     if (!name.trim()) return toast.warning("Name is required");
     setLoading(true);
 
@@ -82,7 +99,7 @@ const AddSubCategory = () => {
   };
 
   return (
-    <Box sx={{ p: 3 , backgroundColor:"#fff"}}>
+    <Box sx={{ p: 3, backgroundColor: "#fff" }}>
       <Typography variant="h4" sx={{ mb: 2 }}>
         {subId ? "Edit Subcategory" : "Add Subcategory"}
       </Typography>
@@ -95,6 +112,7 @@ const AddSubCategory = () => {
           sx={{ mb: 2 }}
           value={name}
           onChange={(e) => setName(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <TextField
@@ -103,6 +121,7 @@ const AddSubCategory = () => {
           sx={{ mb: 2 }}
           value={metaTitle}
           onChange={(e) => setMetaTitle(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <TextField
@@ -113,6 +132,7 @@ const AddSubCategory = () => {
           sx={{ mb: 2 }}
           value={shortDescription}
           onChange={(e) => setShortDescription(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <FormControlLabel
@@ -120,6 +140,7 @@ const AddSubCategory = () => {
             <Switch
               checked={published}
               onChange={() => setPublished(!published)}
+              disabled={isSaveDisabled}
             />
           }
           label={published ? "Published" : "Draft"}
@@ -140,15 +161,18 @@ const AddSubCategory = () => {
           >
             Cancel
           </Button>
-          
+
           <Button
             type="submit"
             variant="contained"
-            disabled={loading}
+            disabled={loading || isSaveDisabled}
             sx={{
-              background: "var(--horizontal-gradient)",
-              color: "#fff",
-              "&:hover": { background: "var(--vertical-gradient)" },
+              background: isSaveDisabled ? "#e0e0e0" : "var(--horizontal-gradient)",
+              color: isSaveDisabled ? "#999" : "#fff",
+              cursor: isSaveDisabled ? "not-allowed" : "pointer",
+              "&:hover": {
+                background: isSaveDisabled ? "#e0e0e0" : "var(--vertical-gradient)",
+              },
             }}
           >
             {subId ? "Update" : "Save"}

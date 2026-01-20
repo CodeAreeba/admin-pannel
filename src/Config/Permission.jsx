@@ -5,20 +5,23 @@ export const CREATE_PERMISSION_BY_TABLE = {
   Categories: "category:create",
   Products: "product:create",
   Roles: "role:create",
+  Subcategory: "subcategory:create",
 };
 
 export const VIEW_PERMISSION_BY_TABLE = {
-  Users: "user:read",        // Changed from user:view
-  Categories: "category:read", // Changed from category:view
-  Products: "product:read",   // Changed from product:view
-  Roles: "role:read",         // Changed from role:view
+  Users: "user:read",
+  Categories: "category:read",
+  Products: "product:read",
+  Roles: "role:read",
+  Subcategory: "subcategory:read",
 };
 
 export const UPDATE_PERMISSION_BY_TABLE = {
-  Users: "admin:manage",      // admin:manage covers user updates
+  Users: "admin:manage",
   Categories: "category:update",
   Products: "product:update",
   Roles: "role:update",
+  Subcategory: "subcategory:update",
 };
 
 export const DELETE_PERMISSION_BY_TABLE = {
@@ -26,4 +29,5 @@ export const DELETE_PERMISSION_BY_TABLE = {
   Categories: "category:delete",
   Products: "product:delete",
   Roles: "role:delete",
+  Subcategory: "subcategory:delete",
 };
