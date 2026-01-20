@@ -33,12 +33,14 @@ import {
   deleteCategories,
 } from "../../DAL/delete";
 import { toast } from "react-toastify";
-import PermissionGate from "../../Config/PermissionGate"
-import { CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
-
+import PermissionGate from "../../Config/PermissionGate";
+import { CREATE_PERMISSION_BY_TABLE, VIEW_PERMISSION_BY_TABLE } from "../../Config/Permission";
+import { useContext } from "react";
+import AuthContext from "../../auth/AuthContext";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
+  const { can } = useContext(AuthContext);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(limitPerPage);
@@ -106,6 +108,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   /* ---------------- VIEW / EDIT ---------------- */
   const handleViewClick = (row) => {
+    // Permission check: agar user ko read permission nahi hai tou function execute nahi hoga
+    if (!can(VIEW_PERMISSION_BY_TABLE[tableType])) {
+      toast.warning("You don't have permission to view this");
+      return;
+    }
+
     if (tableType === "Categories") {
       navigate(`/categories/${row._id}/edit`);
       return;
@@ -114,7 +122,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     if (tableType === "Users") setOpenUserModal(true);
     if (tableType === "Roles") setOpenRolesModal(true);
 
-    setModeltype("Update");
+    // View mode set kar rahe hain agar update permission nahi hai
+    setModeltype("View");
     setModelData(row);
   };
 
@@ -149,7 +158,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const getNestedValue = (obj, path) =>
     path.split(".").reduce((acc, key) => acc?.[key] ?? "N/A", obj);
-   const handleSelectAllClick = (event) => {
+
+  const handleSelectAllClick = (event) => {
     setSelected(event.target.checked ? data.map((row) => row._id) : []);
   };
 
@@ -161,7 +171,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPage(1);
   };
 
   /* ---------------- UI ---------------- */
@@ -191,19 +201,14 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
           setOpen={setOpenDeleteModal}
           onConfirm={handleDelete}
         />
-        {/* Table */}{" "}
+
         <Box sx={{ width: "100%" }}>
-          {" "}
           <Paper sx={{ width: "100%", maxHeight: "95vh", boxShadow: "none" }}>
-            {" "}
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-              {" "}
               <Typography variant="h5" sx={{ color: "var(--primary-color)" }}>
-                {" "}
-                {tableType} List{" "}
-              </Typography>{" "}
+                {tableType} List
+              </Typography>
               <Box sx={{ display: "flex", gap: "10px" }}>
-                {" "}
                 <TextField
                   size="small"
                   placeholder="Search..."
@@ -218,74 +223,56 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        {" "}
-                        <SearchIcon sx={{ cursor: "pointer" }} />{" "}
+                        <SearchIcon sx={{ cursor: "pointer" }} />
                       </InputAdornment>
                     ),
                   }}
-                />{" "}
+                />
                 {selected.length > 0 ? (
                   <IconButton
                     onClick={() => setOpenDeleteModal(true)}
                     sx={{ color: "red" }}
                   >
-                    {" "}
-                    <DeleteIcon />{" "}
+                    <DeleteIcon />
                   </IconButton>
                 ) : (
-                  // <Button
-                  //   sx={{
-                  //     background: "var(--horizontal-gradient)",
-                  //     color: "var(--white-color)",
-                  //     borderRadius: "var(--border-radius-secondary)",
-                  //     "&:hover": { background: "var(--vertical-gradient)" },
-                  //     textTransform: "none",
-                  //   }}
-                  //   onClick={handleAddButton}
-                  // >
-                  //   {" "}
-                  //   Add New {tableType}{" "}
-                  // </Button>
                   <PermissionGate
-  permission={CREATE_PERMISSION_BY_TABLE[tableType]}
-  fallback={
-    <Button
-      disabled
-      sx={{
-        background: "#e0e0e0",
-        color: "#777",
-        borderRadius: "var(--border-radius-secondary)",
-        textTransform: "none",
-        cursor: "not-allowed",
-      }}
-    >
-      Add New {tableType}
-    </Button>
-  }
->
-  <Button
-    sx={{
-      background: "var(--horizontal-gradient)",
-      color: "var(--white-color)",
-      borderRadius: "var(--border-radius-secondary)",
-      "&:hover": { background: "var(--vertical-gradient)" },
-      textTransform: "none",
-    }}
-    onClick={handleAddButton}
-  >
-    Add New {tableType}
-  </Button>
-</PermissionGate>
+                    permission={CREATE_PERMISSION_BY_TABLE[tableType]}
+                    fallback={
+                      <Button
+                        disabled
+                        sx={{
+                          background: "#e0e0e0",
+                          color: "#777",
+                          borderRadius: "var(--border-radius-secondary)",
+                          textTransform: "none",
+                          cursor: "not-allowed",
+                        }}
+                      >
+                        Add New {tableType}
+                      </Button>
+                    }
+                  >
+                    <Button
+                      sx={{
+                        background: "var(--horizontal-gradient)",
+                        color: "var(--white-color)",
+                        borderRadius: "var(--border-radius-secondary)",
+                        "&:hover": { background: "var(--vertical-gradient)" },
+                        textTransform: "none",
+                      }}
+                      onClick={handleAddButton}
+                    >
+                      Add New {tableType}
+                    </Button>
+                  </PermissionGate>
+                )}
+              </Box>
+            </Toolbar>
 
-                )}{" "}
-              </Box>{" "}
-            </Toolbar>{" "}
             <TableContainer sx={{ maxHeight: "76vh" }}>
-              {" "}
               <Table stickyHeader>
-                {" "}
                 <TableHead>
-                  {" "}
                   <TableRow
                     sx={{
                       "& th": {
@@ -297,9 +284,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                       },
                     }}
                   >
-                    {" "}
                     <TableCell padding="checkbox">
-                      {" "}
                       <Checkbox
                         sx={{
                           color: "var(--white-color)",
@@ -315,25 +300,23 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                           data.length > 0 && selected.length === data.length
                         }
                         onChange={handleSelectAllClick}
-                      />{" "}
-                    </TableCell>{" "}
+                      />
+                    </TableCell>
                     {attributes.map((attr) => (
                       <TableCell key={attr._id}>{attr.label}</TableCell>
-                    ))}{" "}
-                    <TableCell>Action</TableCell>{" "}
-                  </TableRow>{" "}
-                </TableHead>{" "}
+                    ))}
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+
                 <TableBody>
-                  {" "}
                   {isLoading ? (
                     <TableRow>
-                      {" "}
                       <TableCell
                         colSpan={attributes.length + 2}
                         align="center"
                         sx={{ py: 8 }}
                       >
-                        {" "}
                         <Box
                           sx={{
                             display: "flex",
@@ -342,23 +325,20 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             gap: 2,
                           }}
                         >
-                          {" "}
                           <CircularProgress
                             size={45}
                             thickness={4}
                             sx={{ color: "var(--primary-color)" }}
-                          />{" "}
-                          <Typography>Loading {tableType}...</Typography>{" "}
-                        </Box>{" "}
-                      </TableCell>{" "}
+                          />
+                          <Typography>Loading {tableType}...</Typography>
+                        </Box>
+                      </TableCell>
                     </TableRow>
                   ) : data.length === 0 ? (
                     <TableRow>
-                      {" "}
                       <TableCell colSpan={attributes.length + 2} align="center">
-                        {" "}
-                        No results found{" "}
-                      </TableCell>{" "}
+                        No results found
+                      </TableCell>
                     </TableRow>
                   ) : (
                     data.map((row) => {
@@ -368,9 +348,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                           key={row._id || row.id}
                           selected={isItemSelected}
                         >
-                          {" "}
                           <TableCell padding="checkbox">
-                            {" "}
                             <Checkbox
                               sx={{
                                 color: "var(--primary-color)",
@@ -388,11 +366,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                     : [...prev, row._id || row.id]
                                 )
                               }
-                            />{" "}
-                          </TableCell>{" "}
+                            />
+                          </TableCell>
                           {attributes.map((attr) => (
                             <TableCell key={attr.id}>
-                              {" "}
                               {attr.id === "createdAt"
                                 ? formatDate(row[attr.id])
                                 : STATUS_FIELDS.includes(attr.id)
@@ -420,8 +397,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                           fontWeight: 600,
                                         }}
                                       >
-                                        {" "}
-                                        {value}{" "}
+                                        {value}
                                       </span>
                                     );
                                   })()
@@ -430,36 +406,57 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                 : typeof getNestedValue(row, attr.id) ===
                                   "string"
                                 ? truncateText(getNestedValue(row, attr.id), 30)
-                                : getNestedValue(row, attr.id)}{" "}
+                                : getNestedValue(row, attr.id)}
                             </TableCell>
-                          ))}{" "}
+                          ))}
                           <TableCell>
-                            {" "}
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() => handleViewClick(row)}
-                              sx={{
-                                textTransform: "none",
-                                borderColor: "var(--primary-color)",
-                                color: "var(--primary-color)",
-                                "&:hover": {
-                                  backgroundColor: "var(--primary-color)",
-                                  color: "#fff",
-                                },
-                              }}
+                            <PermissionGate
+                              permission={VIEW_PERMISSION_BY_TABLE[tableType]}
+                              fallback={
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  disabled
+                                  sx={{
+                                    textTransform: "none",
+                                    borderColor: "#ccc",
+                                    color: "#999",
+                                    cursor: "not-allowed",
+                                    "&:hover": {
+                                      borderColor: "#ccc",
+                                    },
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              }
                             >
-                              {" "}
-                              View{" "}
-                            </Button>{" "}
-                          </TableCell>{" "}
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleViewClick(row)}
+                                sx={{
+                                  textTransform: "none",
+                                  borderColor: "var(--primary-color)",
+                                  color: "var(--primary-color)",
+                                  "&:hover": {
+                                    backgroundColor: "var(--primary-color)",
+                                    color: "#fff",
+                                  },
+                                }}
+                              >
+                                View
+                              </Button>
+                            </PermissionGate>
+                          </TableCell>
                         </TableRow>
                       );
                     })
-                  )}{" "}
-                </TableBody>{" "}
-              </Table>{" "}
-            </TableContainer>{" "}
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
             <TablePagination
               rowsPerPageOptions={[25, 50, 100]}
               component="div"
@@ -468,9 +465,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
               page={page - 1}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
-            />{" "}
-          </Paper>{" "}
-        </Box>{" "}
+            />
+          </Paper>
+        </Box>
       </>
     ),
   };

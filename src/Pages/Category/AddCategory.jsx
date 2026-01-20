@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -15,10 +15,13 @@ import { createCategory } from "../../DAL/create";
 import { useTable3 } from "../../Components/Models/useTable3";
 import { updateCategory } from "../../DAL/edit";
 import { deleteSubCategories } from "../../DAL/delete";
+import AuthContext from "../../auth/AuthContext";
+import { UPDATE_PERMISSION_BY_TABLE, CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
 
 const AddCategory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { can } = useContext(AuthContext);
 
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
@@ -27,6 +30,13 @@ const AddCategory = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [subcategories, setSubcategories] = useState([]);
+
+  // Check permissions
+  const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Categories);
+  const canCreate = can(CREATE_PERMISSION_BY_TABLE.Categories);
+  
+  // Determine if save button should be disabled
+  const isSaveDisabled = id ? !canUpdate : !canCreate;
 
   // ================= FETCH CATEGORY =================
   const fetchCategory = async () => {
@@ -45,7 +55,7 @@ const AddCategory = () => {
   const fetchSubcategories = async () => {
     if (!id) return;
     try {
-      const res = await getAllSubCategories(id, 1, 25, searchTerm); // Pass search term
+      const res = await getAllSubCategories(id, 1, 25, searchTerm);
       if (res?.statusCode === 200) {
         setSubcategories(res.data || []);
       }
@@ -59,7 +69,6 @@ const AddCategory = () => {
     fetchCategory();
   }, [id]);
 
-  // Fetch subcategories when search term changes
   useEffect(() => {
     fetchSubcategories();
   }, [id, searchTerm]);
@@ -68,20 +77,29 @@ const AddCategory = () => {
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
   };
+
   // ================= HANDLE DELETE =================
   const handleDeleteSubcategories = async ({ ids }) => {
     try {
       const response = await deleteSubCategories({ ids });
-      console.log("Delete response:", response); // Debug
+      console.log("Delete response:", response);
       return response;
     } catch (error) {
       console.error("Delete error:", error);
       throw error;
     }
   };
+
   // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Permission check on submit
+    if (isSaveDisabled) {
+      toast.warning("You don't have permission to perform this action");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -120,9 +138,10 @@ const AddCategory = () => {
     reFetch: fetchSubcategories,
     addPath: `/categories/${id}/add-subcategory`,
     viewPath: `/categories/${id}/edit-subcategory/:subId`,
-    onSearch: handleSearch, // Add search handler
-    deleteFn: handleDeleteSubcategories, 
+    onSearch: handleSearch,
+    deleteFn: handleDeleteSubcategories,
   });
+
   return (
     <Box sx={{ p: 3, backgroundColor: "#fff" }}>
       <Typography variant="h4">
@@ -137,6 +156,7 @@ const AddCategory = () => {
           sx={{ mb: 2 }}
           value={name}
           onChange={(e) => setName(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <TextField
@@ -145,6 +165,7 @@ const AddCategory = () => {
           sx={{ mb: 2 }}
           value={metaTitle}
           onChange={(e) => setMetaTitle(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <TextField
@@ -155,6 +176,7 @@ const AddCategory = () => {
           sx={{ mb: 2 }}
           value={metaDescription}
           onChange={(e) => setMetaDescription(e.target.value)}
+          disabled={isSaveDisabled}
         />
 
         <FormControlLabel
@@ -162,6 +184,7 @@ const AddCategory = () => {
             <Switch
               checked={published}
               onChange={() => setPublished(!published)}
+              disabled={isSaveDisabled}
             />
           }
           label={published ? "Published" : "Draft"}
@@ -194,11 +217,14 @@ const AddCategory = () => {
           <Button
             type="submit"
             variant="contained"
-            disabled={loading}
+            disabled={loading || isSaveDisabled}
             sx={{
-              background: "var(--horizontal-gradient)",
-              color: "#fff",
-              "&:hover": { background: "var(--vertical-gradient)" },
+              background: isSaveDisabled ? "#e0e0e0" : "var(--horizontal-gradient)",
+              color: isSaveDisabled ? "#999" : "#fff",
+              cursor: isSaveDisabled ? "not-allowed" : "pointer",
+              "&:hover": { 
+                background: isSaveDisabled ? "#e0e0e0" : "var(--vertical-gradient)" 
+              },
             }}
           >
             Save
