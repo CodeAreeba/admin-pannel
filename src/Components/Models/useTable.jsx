@@ -33,6 +33,9 @@ import {
   deleteCategories,
 } from "../../DAL/delete";
 import { toast } from "react-toastify";
+import PermissionGate from "../../Config/PermissionGate"
+import { CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
+
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
@@ -230,19 +233,50 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     <DeleteIcon />{" "}
                   </IconButton>
                 ) : (
-                  <Button
-                    sx={{
-                      background: "var(--horizontal-gradient)",
-                      color: "var(--white-color)",
-                      borderRadius: "var(--border-radius-secondary)",
-                      "&:hover": { background: "var(--vertical-gradient)" },
-                      textTransform: "none",
-                    }}
-                    onClick={handleAddButton}
-                  >
-                    {" "}
-                    Add New {tableType}{" "}
-                  </Button>
+                  // <Button
+                  //   sx={{
+                  //     background: "var(--horizontal-gradient)",
+                  //     color: "var(--white-color)",
+                  //     borderRadius: "var(--border-radius-secondary)",
+                  //     "&:hover": { background: "var(--vertical-gradient)" },
+                  //     textTransform: "none",
+                  //   }}
+                  //   onClick={handleAddButton}
+                  // >
+                  //   {" "}
+                  //   Add New {tableType}{" "}
+                  // </Button>
+                  <PermissionGate
+  permission={CREATE_PERMISSION_BY_TABLE[tableType]}
+  fallback={
+    <Button
+      disabled
+      sx={{
+        background: "#e0e0e0",
+        color: "#777",
+        borderRadius: "var(--border-radius-secondary)",
+        textTransform: "none",
+        cursor: "not-allowed",
+      }}
+    >
+      Add New {tableType}
+    </Button>
+  }
+>
+  <Button
+    sx={{
+      background: "var(--horizontal-gradient)",
+      color: "var(--white-color)",
+      borderRadius: "var(--border-radius-secondary)",
+      "&:hover": { background: "var(--vertical-gradient)" },
+      textTransform: "none",
+    }}
+    onClick={handleAddButton}
+  >
+    Add New {tableType}
+  </Button>
+</PermissionGate>
+
                 )}{" "}
               </Box>{" "}
             </Toolbar>{" "}
