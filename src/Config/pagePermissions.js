@@ -11,7 +11,7 @@ const pagePermissions = {
   "/reports": "report:read",
 
 
-  "/roles": "admin:manage",
+  "/users": "admin:manage",
   "/settings": "admin:manage",
 };
 

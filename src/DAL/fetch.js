@@ -198,3 +198,44 @@ export const getSubCategoryById = async (id) => {
 
   return invokeApi(reqObj);
 };
+
+export const getAllProducts= async (page = 1, limit = 25, search = "") => {
+  const reqObj = {
+   path: `/admin/products?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getProductById = async (id) => {
+  const reqObj = {
+  path: `/admin/products/${id}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getAllProductVariants = async (productId,page = 1, limit = 25, search = "") => {
+  const reqObj = {
+    path: `/admin/variants/product/${productId}?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getVariantById = async (id) => {
+  const reqObj = {
+       path: `/admin/variants/${id}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};

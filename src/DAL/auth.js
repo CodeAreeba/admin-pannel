@@ -31,8 +31,6 @@ export const forgotPassword = async (email) => {
   };
 
   const response = await invokeApi(reqObj);
-  
-  console.log("Forgot Password Response:", response);
   return response;
 };
 
@@ -48,8 +46,6 @@ export const resetPassword = async ({token, newPassword}) => {
   };
 
   const response = await invokeApi(reqObj);
-  
-  console.log("Reset Password Response:", response);
   return response;
 };
 

@@ -17,6 +17,7 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -25,18 +26,25 @@ import { formatDate } from "../../Utils/Formatedate";
 import truncateText from "../../Utils/truncateText";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
-import AddRoles from "./AddRoles";
-import { getAllAdmins, getAllCategories } from "../../DAL/fetch";
+import {
+  getAllAdmins,
+  getAllCategories,
+  getAllProducts,
+} from "../../DAL/fetch";
 import {
   deleteAdmins,
-  deleteAllRoles,
   deleteCategories,
+  deleteProducts,
 } from "../../DAL/delete";
 import { toast } from "react-toastify";
 import PermissionGate from "../../Config/PermissionGate";
-import { CREATE_PERMISSION_BY_TABLE, VIEW_PERMISSION_BY_TABLE } from "../../Config/Permission";
+import {
+  CREATE_PERMISSION_BY_TABLE,
+  VIEW_PERMISSION_BY_TABLE,
+} from "../../Config/Permission";
 import { useContext } from "react";
 import AuthContext from "../../auth/AuthContext";
+import { fileUrl } from "../../Config/Config";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
@@ -52,7 +60,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [openUserModal, setOpenUserModal] = useState(false);
-  const [openRolesModal, setOpenRolesModal] = useState(false);
   const [modelData, setModelData] = useState({});
   const [modeltype, setModeltype] = useState("Add");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -81,6 +88,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       if (tableType === "Categories") {
         res = await getAllCategories(page, rowsPerPage, debouncedSearch);
       }
+      if (tableType === "Products") {
+        res = await getAllProducts(page, rowsPerPage, debouncedSearch);
+      }
 
       setData(res?.data || []);
       setTotalRecords(res?.meta?.total || 0);
@@ -97,9 +107,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       navigate("/categories/add");
       return;
     }
+    if (tableType === "Products") {
+      navigate("/products/add");
+      return;
+    }
 
     if (tableType === "Users") setOpenUserModal(true);
-    if (tableType === "Roles") setOpenRolesModal(true);
     if (tableType === "Products") navigate("/products/add");
 
     setModeltype("Add");
@@ -118,9 +131,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       navigate(`/categories/${row._id}/edit`);
       return;
     }
+    if (tableType === "Products") {
+      navigate(`/products/${row._id}/edit`);
+      return;
+    }
 
     if (tableType === "Users") setOpenUserModal(true);
-    if (tableType === "Roles") setOpenRolesModal(true);
 
     // View mode set kar rahe hain agar update permission nahi hai
     setModeltype("View");
@@ -140,7 +156,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       if (tableType === "Users") res = await deleteAdmins({ ids: selected });
       if (tableType === "Categories")
         res = await deleteCategories({ ids: selected });
-      if (tableType === "Roles") res = await deleteAllRoles({ ids: selected });
+      if (tableType === "Products")
+        res = await deleteProducts({ ids: selected });
 
       if (res?.statusCode === 200) {
         toast.success(res.message || "Deleted successfully");
@@ -187,15 +204,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             onResponse={fetchData}
           />
         )}
-        {openRolesModal && (
-          <AddRoles
-            open={openRolesModal}
-            setOpen={setOpenRolesModal}
-            Modeltype={modeltype}
-            Modeldata={modelData}
-            onResponse={fetchData}
-          />
-        )}
+
         <DeleteModal
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
@@ -361,54 +370,70 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                 setSelected((prev) =>
                                   isItemSelected
                                     ? prev.filter(
-                                        (id) => id !== (row._id || row.id)
+                                        (id) => id !== (row._id || row.id),
                                       )
-                                    : [...prev, row._id || row.id]
+                                    : [...prev, row._id || row.id],
                                 )
                               }
                             />
                           </TableCell>
                           {attributes.map((attr) => (
                             <TableCell key={attr.id}>
-                              {attr.id === "createdAt"
-                                ? formatDate(row[attr.id])
-                                : STATUS_FIELDS.includes(attr.id)
-                                ? (() => {
-                                    let value = row[attr.id];
-                                    if (value === true) value = "Active";
-                                    if (value === false) value = "Inactive";
-                                    const styles = {
-                                      Active: {
-                                        bg: "#d4edda",
-                                        color: "#155724",
-                                      },
-                                      Inactive: {
-                                        bg: "#f8d7da",
-                                        color: "#721c24",
-                                      },
-                                    };
-                                    return (
-                                      <span
-                                        style={{
-                                          background: styles[value]?.bg,
-                                          color: styles[value]?.color,
-                                          padding: "5px 10px",
-                                          borderRadius: "6px",
-                                          fontWeight: 600,
-                                        }}
-                                      >
-                                        {value}
-                                      </span>
-                                    );
-                                  })()
-                                : row[attr.id] === 0
-                                ? 0
-                                : typeof getNestedValue(row, attr.id) ===
-                                  "string"
-                                ? truncateText(getNestedValue(row, attr.id), 30)
-                                : getNestedValue(row, attr.id)}
+                              {attr.id === "createdAt" ? (
+                                formatDate(row[attr.id])
+                              ) : attr.id === "image" ||
+                                attr.id === "thumbnail" ? (
+                                row[attr.id] ? (
+                                  <img
+                                    src={fileUrl + row[attr.id]}
+                                    alt=""
+                                    style={{
+                                      height: "50px",
+                                      maxWidth: "200px",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  <Avatar sx={{ width: 40, height: 40 }} />
+                                )
+                              ) : STATUS_FIELDS.includes(attr.id) ? (
+                                (() => {
+                                  let value = row[attr.id];
+                                  if (value === true) value = "Active";
+                                  if (value === false) value = "Inactive";
+
+                                  const styles = {
+                                    Active: { bg: "#d4edda", color: "#155724" },
+                                    Inactive: {
+                                      bg: "#f8d7da",
+                                      color: "#721c24",
+                                    },
+                                  };
+
+                                  return (
+                                    <span
+                                      style={{
+                                        background: styles[value]?.bg,
+                                        color: styles[value]?.color,
+                                        padding: "5px 10px",
+                                        borderRadius: "6px",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {value}
+                                    </span>
+                                  );
+                                })()
+                              ) : row[attr.id] === 0 ? (
+                                0
+                              ) : typeof getNestedValue(row, attr.id) ===
+                                "string" ? (
+                                truncateText(getNestedValue(row, attr.id), 30)
+                              ) : (
+                                getNestedValue(row, attr.id)
+                              )}
                             </TableCell>
-                          ))}
+                          ))}{" "}
                           <TableCell>
                             <PermissionGate
                               permission={VIEW_PERMISSION_BY_TABLE[tableType]}

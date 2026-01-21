@@ -22,7 +22,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 
 /////////////////////// Pages ////////////////////////////
 import Dashboard from "./Pages/Dashboard/Dashboard";
-import Products from "./Pages/Products/Product";
+import Product from "./Pages/Product/Product";
 import Orders from "./Pages/Orders/Orders";
 import Customer from "./Pages/Customer/Customer";
 import Inventory from "./Pages/Inventory/Inventory";
@@ -30,9 +30,9 @@ import Category from "./Pages/Category/Category";
 import Users from "./Pages/Users/Users";
 import AddCategory from "./Pages/Category/AddCategory";
 import AddSubcategory from "./Pages/Category/AddSubcategory";
-// import AddProduct from "./Components/Models/AddCustomer";
 import AddProducts from "./Components/Models/AddProducts";
-
+import AddProduct from "./Pages/Product/AddProduct";
+import AddVariant from "./Pages/Product/AddVariant";
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
@@ -88,7 +88,7 @@ const App = ({ onLogout }) => {
               <li
                 key={item.route}
                 className={
-                    activeRoute.startsWith(item.route)
+                  activeRoute.startsWith(item.route)
                     ? "selected-item"
                     : "unselected"
                 }
@@ -144,12 +144,45 @@ const App = ({ onLogout }) => {
           <Route
             path="/products"
             element={
-              <ProtectedRoute path="/products">
-                <Products />
+              <ProtectedRoute>
+                <Product />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/add"
+            element={
+              <ProtectedRoute>
+                <AddProduct />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AddProduct />
               </ProtectedRoute>
             }
           />
 
+          {/* VARIANT ROUTES */}
+          <Route
+            path="/products/:id/add-variant"
+            element={
+              <ProtectedRoute>
+                <AddVariant />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:id/edit-variant/:variantId"
+            element={
+              <ProtectedRoute>
+                <AddVariant />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/orders"
             element={
@@ -237,11 +270,12 @@ const App = ({ onLogout }) => {
               </ProtectedRoute>
             }
           />
-          <Route path ="/products/add"
-            element={ 
+          <Route
+            path="/products/add"
+            element={
               <ProtectedRoute>
                 <AddProducts />
-              </ProtectedRoute> 
+              </ProtectedRoute>
             }
           />
 

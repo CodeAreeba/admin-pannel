@@ -3,6 +3,7 @@ import { useTable } from "../../Components/Models/useTable";
 
 const Category = () => {
   const attributes = [
+    { id: "image", label: "Image" },
     { id: "name", label: "Name" },
     { id: "metaTitle", label: "Meta Title" },
     { id: "published", label: "Status" },

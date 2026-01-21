@@ -20,15 +20,15 @@ import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteModal from "./confirmDeleteModel";
 import { useParams, useNavigate } from "react-router-dom";
-import { baseUrl } from "../../Config/Config";
+import { baseUrl, fileUrl } from "../../Config/Config";
 import truncateText from "../../Utils/truncateText";
 import { formatDate } from "../../Utils/Formatedate";
 import { toast } from "react-toastify";
 import AuthContext from "../../auth/AuthContext";
 import PermissionGate from "../../Config/PermissionGate";
-import { 
-  CREATE_PERMISSION_BY_TABLE, 
-  VIEW_PERMISSION_BY_TABLE 
+import {
+  CREATE_PERMISSION_BY_TABLE,
+  VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
 
 export function useTable3({
@@ -40,6 +40,7 @@ export function useTable3({
   viewPath,
   deleteFn,
   onSearch,
+  navigationState,
 }) {
   const [selected, setSelected] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -88,7 +89,14 @@ export function useTable3({
 
   // --- Navigate to Add ---
   const handleAddButton = () => {
-    if (addPath) navigate(addPath.replace(":id", id));
+    if (addPath) {
+      // Pass navigationState if provided
+      if (navigationState) {
+        navigate(addPath.replace(":id", id), { state: navigationState });
+      } else {
+        navigate(addPath.replace(":id", id));
+      }
+    }
   };
 
   // --- Delete modal ---
@@ -123,7 +131,7 @@ export function useTable3({
       .split(".")
       .reduce(
         (acc, key) => (acc && acc[key] !== undefined ? acc[key] : "N/A"),
-        obj
+        obj,
       );
 
   // --- Table UI ---
@@ -278,7 +286,7 @@ export function useTable3({
                                 setSelected((prev) =>
                                   isItemSelected
                                     ? prev.filter((id) => id !== row._id)
-                                    : [...prev, row._id]
+                                    : [...prev, row._id],
                                 )
                               }
                             />
@@ -315,7 +323,7 @@ export function useTable3({
                                 row[attr.id] ? (
                                   <img
                                     alt=""
-                                    src={baseUrl + row[attr.id]}
+                                    src={fileUrl + row[attr.id]}
                                     style={{
                                       height: "50px",
                                       maxWidth: "200px",

@@ -7,6 +7,7 @@ import {
   TextField,
   Switch,
   FormControlLabel,
+  Paper,
 } from "@mui/material";
 import { toast } from "react-toastify";
 
@@ -16,7 +17,11 @@ import { useTable3 } from "../../Components/Models/useTable3";
 import { updateCategory } from "../../DAL/edit";
 import { deleteSubCategories } from "../../DAL/delete";
 import AuthContext from "../../auth/AuthContext";
-import { UPDATE_PERMISSION_BY_TABLE, CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
+import {
+  UPDATE_PERMISSION_BY_TABLE,
+  CREATE_PERMISSION_BY_TABLE,
+} from "../../Config/Permission";
+import UploadFile from "../../Components/UploadFile";
 
 const AddCategory = () => {
   const { id } = useParams();
@@ -26,6 +31,7 @@ const AddCategory = () => {
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
+  const [image, setImage] = useState("");
   const [published, setPublished] = useState(true);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,11 +40,11 @@ const AddCategory = () => {
   // Check permissions
   const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Categories);
   const canCreate = can(CREATE_PERMISSION_BY_TABLE.Categories);
-  
+
   // Determine if save button should be disabled
   const isSaveDisabled = id ? !canUpdate : !canCreate;
 
-  // ================= FETCH CATEGORY =================
+  /////////////////// Fetc Category //////////////////////
   const fetchCategory = async () => {
     if (!id) return;
     const res = await getCategoryById(id);
@@ -47,11 +53,12 @@ const AddCategory = () => {
       setName(c.name);
       setMetaTitle(c.metaTitle || "");
       setMetaDescription(c.metaDescription || "");
+      setImage(c.image || "");
       setPublished(c.published);
     }
   };
 
-  // ================= FETCH SUBCATEGORIES =================
+  /////////////////// Fetch Subcategories //////////////////////
   const fetchSubcategories = async () => {
     if (!id) return;
     try {
@@ -73,12 +80,12 @@ const AddCategory = () => {
     fetchSubcategories();
   }, [id, searchTerm]);
 
-  // ================= HANDLE SEARCH =================
+  /////////////////// Handle Search //////////////////////
   const handleSearch = (searchValue) => {
     setSearchTerm(searchValue);
   };
 
-  // ================= HANDLE DELETE =================
+  /////////////////// Handle Delete Subcaetgories //////////////////////
   const handleDeleteSubcategories = async ({ ids }) => {
     try {
       const response = await deleteSubCategories({ ids });
@@ -90,7 +97,7 @@ const AddCategory = () => {
     }
   };
 
-  // ================= SUBMIT =================
+  /////////////////// Handle Submit //////////////////////
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -107,6 +114,7 @@ const AddCategory = () => {
         name,
         metaTitle,
         metaDescription,
+        image,
         published,
       };
 
@@ -123,8 +131,9 @@ const AddCategory = () => {
     }
   };
 
-  // ================= SUBCATEGORY TABLE =================
+  /////////////////// subcategories table config //////////////////////
   const subcategoryAttributes = [
+    { id: "image", label: "Image" },
     { id: "name", label: "Name" },
     { id: "metaTitle", label: "Meta Title" },
     { id: "shortDescription", label: "Short Description" },
@@ -178,16 +187,15 @@ const AddCategory = () => {
           onChange={(e) => setMetaDescription(e.target.value)}
           disabled={isSaveDisabled}
         />
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={published}
-              onChange={() => setPublished(!published)}
-              disabled={isSaveDisabled}
-            />
-          }
-          label={published ? "Published" : "Draft"}
+        <Typography variant="h6" mt={1} mb={1}>
+          Upload Image
+        </Typography>
+        <UploadFile
+          multiple={false}
+          accept="image/*"
+          initialFile={image}
+          onUploadComplete={(path) => setImage(path)}
+          disabled={isSaveDisabled}
         />
 
         {id && (
@@ -199,37 +207,57 @@ const AddCategory = () => {
           </>
         )}
 
-        <Box
+        {/* /////////////////// footer ////////////////////// */}
+        <Paper
           sx={{
             mt: 3,
+            p: 2,
             display: "flex",
-            justifyContent: "flex-end",
-            gap: 2,
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 0,
+            boxShadow: "none",
           }}
         >
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "#B1B1B1" }}
-            onClick={() => navigate("/categories")}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={loading || isSaveDisabled}
-            sx={{
-              background: isSaveDisabled ? "#e0e0e0" : "var(--horizontal-gradient)",
-              color: isSaveDisabled ? "#999" : "#fff",
-              cursor: isSaveDisabled ? "not-allowed" : "pointer",
-              "&:hover": { 
-                background: isSaveDisabled ? "#e0e0e0" : "var(--vertical-gradient)" 
-              },
-            }}
-          >
-            Save
-          </Button>
-        </Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={published}
+                onChange={() => setPublished(!published)}
+                disabled={isSaveDisabled}
+              />
+            }
+            label={published ? "Published" : "Draft"}
+          />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#B1B1B1" }}
+              onClick={() => navigate("/categories")}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading || isSaveDisabled}
+              sx={{
+                background: isSaveDisabled
+                  ? "#e0e0e0"
+                  : "var(--horizontal-gradient)",
+                color: isSaveDisabled ? "#999" : "#fff",
+                cursor: isSaveDisabled ? "not-allowed" : "pointer",
+                "&:hover": {
+                  background: isSaveDisabled
+                    ? "#e0e0e0"
+                    : "var(--vertical-gradient)",
+                },
+              }}
+            >
+              {id ? "Update" : "Save"}
+            </Button>
+          </Box>
+        </Paper>
       </Box>
     </Box>
   );

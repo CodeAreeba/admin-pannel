@@ -7,6 +7,7 @@ import {
   TextField,
   Switch,
   FormControlLabel,
+  Paper,
 } from "@mui/material";
 import { toast } from "react-toastify";
 
@@ -14,7 +15,11 @@ import { getSubCategoryById } from "../../DAL/fetch";
 import { createSubCategory } from "../../DAL/create";
 import { updateSubCategory } from "../../DAL/edit";
 import AuthContext from "../../auth/AuthContext";
-import { UPDATE_PERMISSION_BY_TABLE, CREATE_PERMISSION_BY_TABLE } from "../../Config/Permission";
+import {
+  UPDATE_PERMISSION_BY_TABLE,
+  CREATE_PERMISSION_BY_TABLE,
+} from "../../Config/Permission";
+import UploadFile from "../../Components/UploadFile";
 
 const AddSubCategory = () => {
   const { id: categoryId, subId } = useParams();
@@ -24,17 +29,18 @@ const AddSubCategory = () => {
   const [name, setName] = useState("");
   const [metaTitle, setMetaTitle] = useState("");
   const [shortDescription, setShortDescription] = useState("");
+  const [image, setImage] = useState("");
   const [published, setPublished] = useState(true);
   const [loading, setLoading] = useState(false);
 
   // Check permissions
   const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Subcategory);
   const canCreate = can(CREATE_PERMISSION_BY_TABLE.Subcategory);
-  
+
   // Determine if save button should be disabled
   const isSaveDisabled = subId ? !canUpdate : !canCreate;
 
-  // ================= FETCH SUBCATEGORY =================
+  /////////////////// Fetch SubCategory //////////////////////
   const fetchSubCategory = async () => {
     if (!subId) return;
     try {
@@ -44,6 +50,7 @@ const AddSubCategory = () => {
         setName(s.name);
         setMetaTitle(s.metaTitle || "");
         setShortDescription(s.shortDescription || "");
+        setImage(s.image || "");
         setPublished(s.published ?? true);
       } else {
         toast.error(res.message || "Failed to fetch subcategory");
@@ -58,7 +65,7 @@ const AddSubCategory = () => {
     fetchSubCategory();
   }, [subId]);
 
-  // ================= SUBMIT =================
+   /////////////////// Handle Submit //////////////////////
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -75,6 +82,7 @@ const AddSubCategory = () => {
       name,
       metaTitle,
       shortDescription,
+      image,
       published,
       categoryId,
     };
@@ -134,50 +142,68 @@ const AddSubCategory = () => {
           onChange={(e) => setShortDescription(e.target.value)}
           disabled={isSaveDisabled}
         />
-
-        <FormControlLabel
-          control={
-            <Switch
-              checked={published}
-              onChange={() => setPublished(!published)}
-              disabled={isSaveDisabled}
-            />
-          }
-          label={published ? "Published" : "Draft"}
+        <Typography variant="h6" mt={1} mb={1}>
+          Upload Image
+        </Typography>
+        <UploadFile
+          multiple={false}
+          accept="image/*"
+          initialFile={image}
+          onUploadComplete={(path) => setImage(path)}
+          disabled={isSaveDisabled}
         />
 
-        <Box
+        {/* /////////////////// footer ////////////////////// */}
+        <Paper
           sx={{
             mt: 3,
+            p: 2,
             display: "flex",
-            justifyContent: "flex-end",
-            gap: 2,
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 0,
+            boxShadow: "none",
           }}
         >
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "#B1B1B1" }}
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={loading || isSaveDisabled}
-            sx={{
-              background: isSaveDisabled ? "#e0e0e0" : "var(--horizontal-gradient)",
-              color: isSaveDisabled ? "#999" : "#fff",
-              cursor: isSaveDisabled ? "not-allowed" : "pointer",
-              "&:hover": {
-                background: isSaveDisabled ? "#e0e0e0" : "var(--vertical-gradient)",
-              },
-            }}
-          >
-            {subId ? "Update" : "Save"}
-          </Button>
-        </Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={published}
+                onChange={() => setPublished(!published)}
+                disabled={isSaveDisabled}
+              />
+            }
+            label={published ? "Published" : "Draft"}
+          />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: "#B1B1B1" }}
+               onClick={() => navigate(-1)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading || isSaveDisabled}
+              sx={{
+                background: isSaveDisabled
+                  ? "#e0e0e0"
+                  : "var(--horizontal-gradient)",
+                color: isSaveDisabled ? "#999" : "#fff",
+                cursor: isSaveDisabled ? "not-allowed" : "pointer",
+                "&:hover": {
+                  background: isSaveDisabled
+                    ? "#e0e0e0"
+                    : "var(--vertical-gradient)",
+                },
+              }}
+            >
+              {subId ? "Update" : "Save"}
+            </Button>
+          </Box>
+        </Paper>
       </Box>
     </Box>
   );
