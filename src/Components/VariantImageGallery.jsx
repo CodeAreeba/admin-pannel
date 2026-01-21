@@ -103,7 +103,7 @@ const VariantImageGallery = ({ images, setImages }) => {
               alt=""
               style={{
                 width: "100%",
-                height: "100%",
+                height: "auto",
                 objectFit: "cover",
                 borderRadius: "12px",
               }}

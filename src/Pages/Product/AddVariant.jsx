@@ -176,31 +176,12 @@ const AddVariant = () => {
               value={colorCode}
               onChange={(e) => setColorCode(e.target.value.toUpperCase())}
             />
-            <TextField
-              label="SKU (auto-generated)"
-              fullWidth
-              required
-              sx={{ mb: 2 }}
-              value={sku}
-              InputProps={{ readOnly: true }}
-              helperText={
-                !variantId && sizes.length > 1
-                  ? `${sizes.length} SKUs will be generated (one per size)`
-                  : ""
-              }
-            />
-            <TextField
-              label="Weight (grams)"
-              fullWidth
-              sx={{ mb: 2 }}
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-            />
 
+         
             <Typography sx={{ mb: 1, fontWeight: 600 }}>
               Select Sizes
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" ,mb: 3}}>
               {AVAILABLE_SIZES.map((size) => {
                 const active = sizes.includes(size);
                 return (
@@ -224,6 +205,27 @@ const AddVariant = () => {
                 );
               })}
             </Box>
+               <TextField
+              label="Weight (grams)"
+              fullWidth
+              sx={{ mb: 2 }}
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+            />
+
+            <TextField
+              label="SKU (auto-generated)"
+              fullWidth
+              required
+              sx={{ mb: 2 }}
+              value={sku}
+              InputProps={{ readOnly: true }}
+              helperText={
+                !variantId && sizes.length > 1
+                  ? `${sizes.length} SKUs will be generated (one per size)`
+                  : ""
+              }
+            />
           </Paper>
 
           <Paper sx={{ p: 3, boxShadow: "none" }}>
@@ -270,7 +272,7 @@ const AddVariant = () => {
 
           <Paper
             sx={{
-              mt: 3,
+              mt: 6,
               p: 2,
               display: "flex",
               justifyContent: "space-between",

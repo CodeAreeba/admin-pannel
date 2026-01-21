@@ -92,7 +92,7 @@ const AddSubCategory = () => {
         ? await updateSubCategory(subId, payload)
         : await createSubCategory(payload);
 
-      if (res?.statusCode === 200) {
+      if (res?.statusCode === 201) {
         toast.success(res.message || "Subcategory saved successfully");
         navigate(`/categories/${categoryId}/edit`);
       } else {
