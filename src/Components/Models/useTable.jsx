@@ -36,6 +36,7 @@ import {
 import {
   deleteAdmins,
   deleteCategories,
+  deleteCustomers,
   deleteProducts,
 } from "../../DAL/delete";
 import { toast } from "react-toastify";
@@ -167,7 +168,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
         res = await deleteCategories({ ids: selected });
       if (tableType === "Products")
         res = await deleteProducts({ ids: selected });
-
+      if (tableType === "Customers")
+        res = await deleteCustomers({ ids: selected });
       if (res?.statusCode === 200) {
         toast.success(res.message || "Deleted successfully");
         fetchData();

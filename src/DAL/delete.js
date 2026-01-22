@@ -51,4 +51,14 @@ export const deleteVariants = async (data) => {
 
   return invokeApi(reqObj);
 };
+export const deleteCustomers = async (data) => {
+  const reqObj = {
+    path: `/admin/customers`,
+    method: "DELETE", 
+    headers: {},
+    postData: data,
+  };
+
+  return invokeApi(reqObj);
+};
 
