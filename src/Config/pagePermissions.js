@@ -5,7 +5,7 @@ const pagePermissions = {
   "/dashboard": null, 
   "/products": "product:read",
   "/orders": "order:read",
-  "/customers": "user:read",
+  "/customers": "customer:read",
   "/inventory": "inventory:read",
   "/categories": "category:read",
   "/reports": "report:read",

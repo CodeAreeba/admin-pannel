@@ -62,6 +62,16 @@
   --success-color:#155724;
   --success-bgcolor:#d4edda;
   --background: #9d5f0f52;
+  --status-success-bg: #e6f4ea;
+  --status-success-text: #137333;
+  --status-warning-bg: #fff4e5;
+  --status-warning-text: #8a5200;
+  --status-info-bg: #e8f0fe;
+  --status-info-text: #1a73e8;
+  --status-error-bg: #fce8e6;
+  --status-error-text: #b3261e;
+  --status-neutral-bg: #f1f3f4;
+  --status-neutral-text: #3c4043;
 }
 
 body {

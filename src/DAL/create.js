@@ -46,3 +46,12 @@ export const createVariant = async (data) => {
   };
   return invokeApi(reqObj);
 };
+export const createCustomers = async (data) => {
+  const reqObj = {
+    path: "/admin/variants",
+    method: "POST",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};

@@ -1,15 +1,17 @@
 import React from "react";
 import { useTable } from "../../Components/Models/useTable";
 
-const Orders = () => {
-  // 🔹 Table Columns / Attributes
+const Orders = () => { 
   const attributes = [
-    { id: "productName", label: "Product Name" },
-    { id: "productId", label: "Product ID" },
-    { id: "category", label: "Category" },
-    { id: "status", label: "Status" },
-    { id: "description", label: "Description" },
-  ];
+  // { id: "_id", label: "Order ID" },
+  { id: "user.email", label: "Customer Email" },
+  // { id: "itemsCount", label: "Total Items" },
+  { id: "totalAmount", label: "Total Amount" },
+  { id: "status", label: "Order Status" },
+  { id: "paymentStatus", label: "Payment Status" },
+  { id: "paymentMethod", label: "Payment Method" },
+  { id: "createdAt", label: "Order Date" },
+];
 
   const { tableUI } = useTable({
     attributes,

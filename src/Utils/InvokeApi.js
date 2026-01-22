@@ -18,7 +18,7 @@ export async function invokeApi({
     withCredentials: true,
   };
 
-  if (["POST", "PUT", "DELETE"].includes(method)) {
+  if (["POST", "PUT", "DELETE","PATCH"].includes(method)) {
     reqObj.data = postData;
   }
 

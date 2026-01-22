@@ -1,188 +1,252 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
   Typography,
-  Modal,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormHelperText,
+  Switch,
+  FormControlLabel,
+  Paper,
 } from "@mui/material";
-import { createProduct } from "../../DAL/create";
-import { updateProduct } from "../../DAL/edit";
+import { toast } from "react-toastify";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "60%",
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  p: 4,
-  borderRadius: "12px",
-};
+import { getCustomerById, getCustomerOrders } from "../../DAL/fetch";
+import { updateCustomerStatus } from "../../DAL/edit";
+import { useTable3 } from "../../Components/Models/useTable3";
 
-export default function AddProduct({
-  open,
-  setOpen,
-  Modeltype,
-  Modeldata,
-  onResponse,
-}) {
-  const [productName, setProductName] = React.useState(Modeldata?.productName || "");
-  const [productId, setProductId] = React.useState(Modeldata?.productId || "");
-  const [category, setCategory] = React.useState(Modeldata?.category || "");
-  const [description, setDescription] = React.useState(Modeldata?.description || "");
-  const [status, setStatus] = React.useState(
-    typeof Modeldata?.status === "boolean" ? Modeldata.status : true
-  );
-  const [id, setId] = React.useState(Modeldata?._id || "");
-  const [errors, setErrors] = React.useState({});
+const AddCustomer = () => {
+  const { id } = useParams(); // view mode
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    setProductName(Modeldata?.productName || "");
-    setProductId(Modeldata?.productId || "");
-    setCategory(Modeldata?.category || "");
-    setDescription(Modeldata?.description || "");
-    setStatus(typeof Modeldata?.status === "boolean" ? Modeldata.status : true);
-    setId(Modeldata?._id || "");
-  }, [Modeldata]);
+  const isViewMode = Boolean(id);
 
-  const handleClose = () => setOpen(false);
+  // ---------------- State ----------------
+  const [customerId, setCustomerId] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [otpAttempts, setOtpAttempts] = useState(0);
+  const [addresses, setAddresses] = useState([]);
+  const [createdAt, setCreatedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    const productData = {
-      productName,
-      productId,
-      category,
-      description,
-      status,
-    };
-
+  // ---------------- Fetch Customer ----------------
+  const fetchCustomer = async () => {
+    if (!id) return;
     try {
-      let response;
-      if (Modeltype === "Add") {
-        response = await createProduct(productData);
-      } else {
-        response = await updateProduct(id, productData);
-      }
+      const res = await getCustomerById(id);
+      if (res?.statusCode === 200) {
+        const c = res.data;
 
-      if (response?.status === 201 || response?.status === 200) {
-        onResponse({ messageType: "success", message: response.message });
-
-        setProductName("");
-        setProductId("");
-        setCategory("");
-        setDescription("");
-        setStatus(true);
-        setErrors({});
-        setId("");
-
-        setOpen(false);
-      } else if (response?.status === 400 && response?.missingFields) {
-        const fieldErrors = {};
-        response.missingFields.forEach((f) => {
-          fieldErrors[f.name] = f.message;
-        });
-        setErrors(fieldErrors);
-      } else {
-        onResponse({ messageType: "error", message: response?.message });
+        setCustomerId(c._id);
+        setEmail(c.email);
+        setRole(c.role);
+        setIsActive(c.isActive);
+        setOtpAttempts(c.otpAttempts || 0);
+        setAddresses(c.addresses || []);
+        setCreatedAt(c.createdAt);
+        setUpdatedAt(c.updatedAt);
       }
     } catch (err) {
-      onResponse({
-        messageType: "error",
-        message: err.response?.data?.message || "Server error",
-      });
+      toast.error("Failed to load customer");
     }
   };
 
+  // ---------------- Fetch Orders ----------------
+  const fetchOrders = async () => {
+    if (!id) return;
+    try {
+      const res = await getCustomerOrders(id);
+      if (res?.statusCode === 200) {
+        setOrders(res.data || []);
+      }
+    } catch (err) {
+      setOrders([]);
+    }
+  };
+
+  // ---------------- Update Status ----------------
+  const handleUpdateStatus = async () => {
+    try {
+      setLoading(true);
+      const res = await updateCustomerStatus(id, { isActive });
+      toast.success(res.message || "Status updated");
+      navigate("/customers");
+    } catch (err) {
+      toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---------------- Orders Table ----------------
+  const orderAttributes = [
+    { id: "_id", label: "Order ID" },
+    { id: "totalAmount", label: "Total Amount" },
+    { id: "paymentMethod", label: "Payment Method" },
+    { id: "paymentStatus", label: "Payment Status" },
+    { id: "status", label: "Order Status" },
+    {
+      id: "createdAt",
+      label: "Order Date",
+      format: (val) => new Date(val).toLocaleDateString(),
+    },
+  ];
+
+  const { tableUI3 } = useTable3({
+    attributes3: orderAttributes,
+    tableType: "Orders",
+    data: orders,
+    reFetch: fetchOrders,
+    hideActions: true,
+  });
+
+  // ---------------- Effects ----------------
+  useEffect(() => {
+    fetchCustomer();
+    fetchOrders();
+  }, [id]);
+
+  // ---------------- UI ----------------
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box sx={style}>
-        <Typography variant="h6">
-          {Modeltype} Product
-        </Typography>
+    <Box sx={{ p: 3, backgroundColor: "#fff" }}>
+      <Typography variant="h4">View Customer</Typography>
 
-        <form onSubmit={handleSubmit}>
-          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Product Name"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
-              error={!!errors.productName}
-              helperText={errors.productName}
-            />
-            <TextField
-              fullWidth
-              label="Product ID"
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-              error={!!errors.productId}
-              helperText={errors.productId}
-            />
-          </Box>
+      <Box component="form" sx={{ mt: 2 }}>
+        {/* --------- Row 1: Customer ID + Email --------- */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="Customer ID"
+            fullWidth
+            value={customerId}
+            disabled
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            value={email}
+            disabled
+          />
+        </Box>
 
-          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              error={!!errors.category}
-              helperText={errors.category}
-            />
+        {/* --------- Row 2: Role + OTP Attempts --------- */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="Role"
+            fullWidth
+            value={role}
+            disabled
+          />
+          <TextField
+            label="OTP Attempts"
+            fullWidth
+            value={otpAttempts}
+            disabled
+          />
+        </Box>
 
-            <FormControl fullWidth error={!!errors.status}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={status}
-                label="Status"
-                onChange={(e) => setStatus(e.target.value)}
+        {/* --------- Row 3: Active Switch --------- */}
+        <Box sx={{ mb: 2 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isActive}
+                onChange={() => setIsActive(!isActive)}
+              />
+            }
+            label={isActive ? "Active" : "Inactive"}
+          />
+        </Box>
+
+        {/* --------- Row 4: Created At + Updated At --------- */}
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <TextField
+            label="Created At"
+            fullWidth
+            value={createdAt ? new Date(createdAt).toLocaleString() : ""}
+            disabled
+          />
+          <TextField
+            label="Updated At"
+            fullWidth
+            value={updatedAt ? new Date(updatedAt).toLocaleString() : ""}
+            disabled
+          />
+        </Box>
+
+        {/* --------- Addresses Section --------- */}
+        {addresses.length > 0 && (
+          <>
+            <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+              Addresses
+            </Typography>
+
+            {addresses.map((addr, index) => (
+              <Paper
+                key={index}
+                sx={{ p: 2, mb: 2, backgroundColor: "#fafafa" }}
               >
-                <MenuItem value={true}>Active</MenuItem>
-                <MenuItem value={false}>Inactive</MenuItem>
-              </Select>
-              <FormHelperText>{errors.status}</FormHelperText>
-            </FormControl>
-          </Box>
+                <Typography variant="subtitle1">
+                  {addr.firstName} {addr.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {addr.addressLine1}, {addr.addressLine2}
+                </Typography>
+                <Typography variant="body2">
+                  {addr.city}, {addr.postalCode}
+                </Typography>
+                <Typography variant="body2">{addr.country}</Typography>
+                <Typography variant="body2">📞 {addr.phone}</Typography>
+              </Paper>
+            ))}
+          </>
+        )}
 
-          <Box mt={2}>
-            <TextField
-              fullWidth
-              multiline
-              rows={3}
-              label="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              error={!!errors.description}
-              helperText={errors.description}
-            />
-          </Box>
+        {/* --------- Orders Section --------- */}
+        <Typography variant="h5" sx={{ mt: 4, mb: 1 }}>
+          Customer Orders
+        </Typography>
+        {tableUI3}
 
-          <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
-            <Button variant="outlined" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                background: "var(--horizontal-gradient)",
-                "&:hover": { background: "var(--vertical-gradient)" },
-              }}
-            >
-              {id ? "Update Product" : "Add Product"}
-            </Button>
-          </Box>
-        </form>
+        {/* --------- Footer --------- */}
+        <Paper
+          sx={{
+            mt: 4,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            boxShadow: "none",
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#B1B1B1" }}
+            onClick={() => navigate("/customers")}
+          >
+            Back
+          </Button>
+
+          <Button
+            variant="contained"
+            disabled={loading}
+            onClick={handleUpdateStatus}
+            sx={{
+              background: "var(--horizontal-gradient)",
+              "&:hover": {
+                background: "var(--vertical-gradient)",
+              },
+            }}
+          >
+            Update Status
+          </Button>
+        </Paper>
       </Box>
-    </Modal>
+    </Box>
   );
-}
+};
+
+export default AddCustomer;

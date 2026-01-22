@@ -33,6 +33,7 @@ import AddSubcategory from "./Pages/Category/AddSubcategory";
 import AddProducts from "./Components/Models/AddProducts";
 import AddProduct from "./Pages/Product/AddProduct";
 import AddVariant from "./Pages/Product/AddVariant";
+import AddCustomer from "./Components/Models/AddCustomer";
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
@@ -197,6 +198,14 @@ const App = ({ onLogout }) => {
             element={
               <ProtectedRoute path="/customers">
                 <Customer />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/customers/:id/edit"
+            element={
+              <ProtectedRoute>
+                <AddCustomer />
               </ProtectedRoute>
             }
           />

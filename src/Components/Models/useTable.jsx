@@ -29,6 +29,8 @@ import AddUsers from "./addUsers";
 import {
   getAllAdmins,
   getAllCategories,
+  getAllCustomers,
+  getAllOrders,
   getAllProducts,
 } from "../../DAL/fetch";
 import {
@@ -64,7 +66,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [modeltype, setModeltype] = useState("Add");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const STATUS_FIELDS = ["status", "isActive", "published"];
+  const STATUS_FIELDS = ["status", "isActive", "published", "paymentStatus"];
 
   /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
@@ -91,7 +93,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       if (tableType === "Products") {
         res = await getAllProducts(page, rowsPerPage, debouncedSearch);
       }
-
+      if (tableType === "Customers") {
+        res = await getAllCustomers(page, rowsPerPage, debouncedSearch);
+      }
+      if (tableType === "Orders") {
+        res = await getAllOrders(page, rowsPerPage, debouncedSearch);
+      }
       setData(res?.data || []);
       setTotalRecords(res?.meta?.total || 0);
     } catch (err) {
@@ -133,6 +140,10 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     }
     if (tableType === "Products") {
       navigate(`/products/${row._id}/edit`);
+      return;
+    }
+    if (tableType === "Customers") {
+      navigate(`/customers/${row._id}/edit`);
       return;
     }
 
@@ -402,22 +413,64 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                   if (value === true) value = "Active";
                                   if (value === false) value = "Inactive";
 
-                                  const styles = {
-                                    Active: { bg: "#d4edda", color: "#155724" },
-                                    Inactive: {
-                                      bg: "#f8d7da",
-                                      color: "#721c24",
+                                  const STATUS_STYLES = {
+                                    Active: {
+                                      bg: "var(--status-success-bg)",
+                                      color: "var(--status-success-text)",
                                     },
+                                    IDBCursornactive: {
+                                      bg: "var(--status-error-bg)",
+                                      color: "var(--status-error-text)",
+                                    },
+
+                                    pending: {
+                                      bg: "var(--status-warning-bg)",
+                                      color: "var(--status-warning-text)",
+                                    },
+
+                                    completed: {
+                                      bg: "var(--status-info-bg)",
+                                      color: "var(--status-info-text)",
+                                    },
+
+                                    delivered: {
+                                      bg: "var(--status-success-bg)",
+                                      color: "var(--status-success-text)",
+                                    },
+
+                                    cancelled: {
+                                      bg: "var(--status-error-bg)",
+                                      color: "var(--status-error-text)",
+                                    },
+
+                                    paid: {
+                                      bg: "var(--status-success-bg)",
+                                      color: "var(--status-success-text)",
+                                    },
+
+                                    failed: {
+                                      bg: "var(--status-error-bg)",
+                                      color: "var(--status-error-text)",
+                                    },
+                                  };
+
+                                  const style = STATUS_STYLES[value] || {
+                                    bg: "#e2e3e5",
+                                    color: "#383d41",
                                   };
 
                                   return (
                                     <span
                                       style={{
-                                        background: styles[value]?.bg,
-                                        color: styles[value]?.color,
+                                        background: style.bg,
+                                        color: style.color,
                                         padding: "5px 10px",
                                         borderRadius: "6px",
                                         fontWeight: 600,
+                                        textTransform: "capitalize",
+                                        display: "inline-block",
+                                        minWidth: "90px",
+                                        textAlign: "center",
                                       }}
                                     >
                                       {value}
@@ -433,7 +486,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                 getNestedValue(row, attr.id)
                               )}
                             </TableCell>
-                          ))}{" "}
+                          ))}
                           <TableCell>
                             <PermissionGate
                               permission={VIEW_PERMISSION_BY_TABLE[tableType]}

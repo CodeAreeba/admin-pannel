@@ -239,3 +239,43 @@ export const getVariantById = async (id) => {
 
   return invokeApi(reqObj);
 };
+export const getAllCustomers = async (page = 1, limit = 25, search = "") => {
+  const reqObj = {
+    path: `/admin/customers?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getCustomerById = async (id) => {
+  const reqObj = {
+    path: `/admin/customers/${id}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getCustomerOrders = async (id) => {
+  const reqObj = {
+    path: `/admin/customers/${id}/orders`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getAllOrders = async (page = 1, limit = 25, search = "") => {
+  const reqObj = {
+    path: `/admin/orders?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};

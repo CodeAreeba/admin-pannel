@@ -9,11 +9,12 @@ export const CREATE_PERMISSION_BY_TABLE = {
 };
 
 export const VIEW_PERMISSION_BY_TABLE = {
-  Users: "user:read",
+  Users: "admin:manage",
   Categories: "category:read",
   Products: "product:read",
   Variants: "variant:read",
   Subcategory: "subcategory:read",
+  Customers: "customer:read"
 };
 
 export const UPDATE_PERMISSION_BY_TABLE = {

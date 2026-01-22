@@ -48,3 +48,13 @@ export const updateVariant = async (id, data) => {
   };
   return invokeApi(reqObj);
 };
+
+export const updateCustomerStatus = async (id, data) => {
+  const reqObj = {
+    path: `/admin/customers/${id}/status`,
+    method: "PATCH",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};
