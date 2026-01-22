@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Box,
   Paper,
@@ -44,7 +44,6 @@ import {
   CREATE_PERMISSION_BY_TABLE,
   VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
-import { useContext } from "react";
 import AuthContext from "../../auth/AuthContext";
 import { fileUrl } from "../../Config/Config";
 
@@ -120,7 +119,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     }
 
     if (tableType === "Users") setOpenUserModal(true);
-    if (tableType === "Products") navigate("/products/add");
 
     setModeltype("Add");
     setModelData({});
@@ -128,9 +126,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
   /* ---------------- VIEW / EDIT ---------------- */
   const handleViewClick = (row) => {
-    // Permission check: agar user ko read permission nahi hai tou function execute nahi hoga
+    // Permission check: view permission nahi hai tou block kar do
     if (!can(VIEW_PERMISSION_BY_TABLE[tableType])) {
-      toast.warning("You don't have permission to view this");
+      toast.error("You don't have permission to view this");
       return;
     }
 
@@ -147,11 +145,11 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       return;
     }
 
-    if (tableType === "Users") setOpenUserModal(true);
-
-    // View mode set kar rahe hain agar update permission nahi hai
-    setModeltype("View");
-    setModelData(row);
+    if (tableType === "Users") {
+      setOpenUserModal(true);
+      setModeltype("View");
+      setModelData(row);
+    }
   };
 
   /* ---------------- DELETE ---------------- */
@@ -201,6 +199,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(1);
   };
+
+  // Check if user has view permission
+  const hasViewPermission = can(VIEW_PERMISSION_BY_TABLE[tableType]);
 
   /* ---------------- UI ---------------- */
   return {
@@ -488,27 +489,25 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             </TableCell>
                           ))}
                           <TableCell>
-                            <PermissionGate
-                              permission={VIEW_PERMISSION_BY_TABLE[tableType]}
-                              fallback={
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  disabled
-                                  sx={{
-                                    textTransform: "none",
+                            {/* Permission check: agar view permission nahi hai tou disabled button dikhao */}
+                            {!hasViewPermission ? (
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                disabled
+                                sx={{
+                                  textTransform: "none",
+                                  borderColor: "#ccc",
+                                  color: "#999",
+                                  cursor: "not-allowed",
+                                  "&:hover": {
                                     borderColor: "#ccc",
-                                    color: "#999",
-                                    cursor: "not-allowed",
-                                    "&:hover": {
-                                      borderColor: "#ccc",
-                                    },
-                                  }}
-                                >
-                                  View
-                                </Button>
-                              }
-                            >
+                                  },
+                                }}
+                              >
+                                View
+                              </Button>
+                            ) : (
                               <Button
                                 size="small"
                                 variant="outlined"
@@ -525,7 +524,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                               >
                                 View
                               </Button>
-                            </PermissionGate>
+                            )}
                           </TableCell>
                         </TableRow>
                       );

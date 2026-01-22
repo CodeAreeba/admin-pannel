@@ -27,6 +27,7 @@ import AuthContext from "../../auth/AuthContext";
 import {
   UPDATE_PERMISSION_BY_TABLE,
   CREATE_PERMISSION_BY_TABLE,
+  VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
 
 const AddProduct = () => {
@@ -52,11 +53,23 @@ const AddProduct = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Check permissions
+  const canView = can(VIEW_PERMISSION_BY_TABLE.Products);
   const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Products);
   const canCreate = can(CREATE_PERMISSION_BY_TABLE.Products);
 
+  // Agar view permission nahi hai tou redirect kar do
+  useEffect(() => {
+    if (id && !canView) {
+      toast.error("You don't have permission to view this product");
+      navigate("/products");
+    }
+  }, [id, canView, navigate]);
+
   // Determine if save button should be disabled
   const isSaveDisabled = id ? !canUpdate : !canCreate;
+
+  // Determine if fields should be read-only (view mode)
+  const isReadOnly = id && !canUpdate;
 
   /////////////////// Fetch Categories //////////////////////
   const fetchCategories = async () => {
@@ -102,6 +115,7 @@ const AddProduct = () => {
       console.error("Failed to fetch product", err);
     }
   };
+
   /////////////////// Fetch Variants //////////////////////
   const fetchVariants = async () => {
     if (!id) return;
@@ -141,6 +155,17 @@ const AddProduct = () => {
   /////////////////// Handle Submit //////////////////////
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Permission check before submission
+    if (id && !canUpdate) {
+      toast.error("You don't have permission to update this product");
+      return;
+    }
+    if (!id && !canCreate) {
+      toast.error("You don't have permission to create products");
+      return;
+    }
+
     if (
       !name.trim() ||
       !description.trim() ||
@@ -214,12 +239,13 @@ const AddProduct = () => {
     return words
       .map((w) => w[0])
       .join("")
-      .toUpperCase(); // e.g., Oxford Shoes -> OS
+      .toUpperCase();
   };
+
   return (
     <Box sx={{ p: 3, backgroundColor: "#fff" }}>
       <Typography variant="h4">
-        {id ? "Edit Product" : "Add Product"}
+        {id ? (isReadOnly ? "View Product" : "Edit Product") : "Add Product"}
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
@@ -230,9 +256,13 @@ const AddProduct = () => {
           sx={{ mb: 2 }}
           value={name}
           onChange={(e) => {
-            setName(e.target.value);
-            setBaseSku(generateBaseSku(e.target.value));
+            if (!isReadOnly) {
+              setName(e.target.value);
+              setBaseSku(generateBaseSku(e.target.value));
+            }
           }}
+          InputProps={{ readOnly: isReadOnly }}
+          disabled={isReadOnly}
         />
 
         <TextField
@@ -242,8 +272,11 @@ const AddProduct = () => {
           rows={3}
           sx={{ mb: 2 }}
           value={metaDescription}
-          onChange={(e) => setMetaDescription(e.target.value)}
+          onChange={(e) => !isReadOnly && setMetaDescription(e.target.value)}
+          InputProps={{ readOnly: isReadOnly }}
+          disabled={isReadOnly}
         />
+
         <TextField
           label="Description"
           fullWidth
@@ -252,8 +285,11 @@ const AddProduct = () => {
           rows={4}
           sx={{ mb: 2 }}
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => !isReadOnly && setDescription(e.target.value)}
+          InputProps={{ readOnly: isReadOnly }}
+          disabled={isReadOnly}
         />
+
         <Box sx={{ display: "flex", gap: 2, mb: 2, mt: 2 }}>
           <TextField
             label="Base SKU"
@@ -261,6 +297,8 @@ const AddProduct = () => {
             required
             sx={{ mb: 2 }}
             value={baseSku}
+            InputProps={{ readOnly: true }}
+            disabled
           />
 
           <TextField
@@ -268,8 +306,11 @@ const AddProduct = () => {
             fullWidth
             value={tags.join(",")}
             onChange={(e) =>
+              !isReadOnly &&
               setTags(e.target.value.split(",").map((t) => t.trim()))
             }
+            InputProps={{ readOnly: isReadOnly }}
+            disabled={isReadOnly}
           />
         </Box>
 
@@ -280,7 +321,8 @@ const AddProduct = () => {
             fullWidth
             required
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            onChange={(e) => !isReadOnly && setCategoryId(e.target.value)}
+            disabled={isReadOnly}
           >
             {categories.map((cat) => (
               <MenuItem key={cat._id} value={cat._id}>
@@ -295,7 +337,8 @@ const AddProduct = () => {
             fullWidth
             required
             value={subcategoryId}
-            onChange={(e) => setSubcategoryId(e.target.value)}
+            onChange={(e) => !isReadOnly && setSubcategoryId(e.target.value)}
+            disabled={isReadOnly}
           >
             {subcategories.map((sub) => (
               <MenuItem key={sub._id} value={sub._id}>
@@ -304,6 +347,7 @@ const AddProduct = () => {
             ))}
           </TextField>
         </Box>
+
         <Typography variant="h6" mt={1} mb={1}>
           Upload Image
         </Typography>
@@ -311,7 +355,8 @@ const AddProduct = () => {
           multiple={false}
           accept="image/*"
           initialFile={image}
-          onUploadComplete={(path) => setImage(path)}
+          onUploadComplete={(path) => !isReadOnly && setImage(path)}
+          disabled={isReadOnly}
         />
 
         {id && (
@@ -339,8 +384,8 @@ const AddProduct = () => {
             control={
               <Switch
                 checked={published}
-                onChange={() => setPublished(!published)}
-                disabled={isSaveDisabled}
+                onChange={() => !isReadOnly && setPublished(!published)}
+                disabled={isReadOnly}
               />
             }
             label={published ? "Published" : "Draft"}
@@ -351,27 +396,29 @@ const AddProduct = () => {
               sx={{ backgroundColor: "#B1B1B1" }}
               onClick={() => navigate("/products")}
             >
-              Cancel
+              {isReadOnly ? "Back" : "Cancel"}
             </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={loading || isSaveDisabled}
-              sx={{
-                background: isSaveDisabled
-                  ? "#e0e0e0"
-                  : "var(--horizontal-gradient)",
-                color: isSaveDisabled ? "#999" : "#fff",
-                cursor: isSaveDisabled ? "not-allowed" : "pointer",
-                "&:hover": {
+            {!isReadOnly && (
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading || isSaveDisabled}
+                sx={{
                   background: isSaveDisabled
                     ? "#e0e0e0"
-                    : "var(--vertical-gradient)",
-                },
-              }}
-            >
-              {id ? "Update" : "Save"}
-            </Button>
+                    : "var(--horizontal-gradient)",
+                  color: isSaveDisabled ? "#999" : "#fff",
+                  cursor: isSaveDisabled ? "not-allowed" : "pointer",
+                  "&:hover": {
+                    background: isSaveDisabled
+                      ? "#e0e0e0"
+                      : "var(--vertical-gradient)",
+                  },
+                }}
+              >
+                {id ? "Update" : "Save"}
+              </Button>
+            )}
           </Box>
         </Paper>
       </Box>

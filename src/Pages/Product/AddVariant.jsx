@@ -19,6 +19,7 @@ import AuthContext from "../../auth/AuthContext";
 import {
   UPDATE_PERMISSION_BY_TABLE,
   CREATE_PERMISSION_BY_TABLE,
+  VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
 
 const AVAILABLE_SIZES = [38, 39, 40, 41, 42, 43, 44, 45];
@@ -42,9 +43,21 @@ const AddVariant = () => {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([null, null, null, null]);
 
+  // Permission checks
+  const canView = can(VIEW_PERMISSION_BY_TABLE.Variants);
   const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Variants);
   const canCreate = can(CREATE_PERMISSION_BY_TABLE.Variants);
+
+  // Agar view permission nahi hai tou redirect kar do
+  useEffect(() => {
+    if (variantId && !canView) {
+      toast.error("You don't have permission to view this variant");
+      navigate(`/products/${productId}/edit`);
+    }
+  }, [variantId, canView, navigate, productId]);
+
   const isSaveDisabled = variantId ? !canUpdate : !canCreate;
+  const isReadOnly = variantId && !canUpdate;
 
   // Fetch variant
   const fetchVariant = async () => {
@@ -88,6 +101,7 @@ const AddVariant = () => {
   };
 
   const toggleSize = (size) => {
+    if (isReadOnly) return;
     setSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
@@ -102,6 +116,17 @@ const AddVariant = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Permission check before submission
+    if (variantId && !canUpdate) {
+      toast.error("You don't have permission to update this variant");
+      return;
+    }
+    if (!variantId && !canCreate) {
+      toast.error("You don't have permission to create variants");
+      return;
+    }
+
     if (!colorName || !colorCode || sizes.length === 0 || !price || !stock)
       return toast.warning("Please fill all required fields");
 
@@ -157,7 +182,7 @@ const AddVariant = () => {
         <Box sx={{ flex: "0 0 55%" }}>
           <Paper sx={{ p: 3, mb: 3, boxShadow: "none" }}>
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              Variant Information
+              {isReadOnly ? "View Variant" : "Variant Information"}
             </Typography>
 
             <TextField
@@ -166,22 +191,28 @@ const AddVariant = () => {
               required
               sx={{ mb: 2 }}
               value={colorName}
-              onChange={(e) => setColorName(e.target.value)}
+              onChange={(e) => !isReadOnly && setColorName(e.target.value)}
+              InputProps={{ readOnly: isReadOnly }}
+              disabled={isReadOnly}
             />
+
             <TextField
               label="Color Code"
               fullWidth
               required
               sx={{ mb: 2 }}
               value={colorCode}
-              onChange={(e) => setColorCode(e.target.value.toUpperCase())}
+              onChange={(e) =>
+                !isReadOnly && setColorCode(e.target.value.toUpperCase())
+              }
+              InputProps={{ readOnly: isReadOnly }}
+              disabled={isReadOnly}
             />
 
-         
             <Typography sx={{ mb: 1, fontWeight: 600 }}>
               Select Sizes
             </Typography>
-            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" ,mb: 3}}>
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 3 }}>
               {AVAILABLE_SIZES.map((size) => {
                 const active = sizes.includes(size);
                 return (
@@ -196,8 +227,9 @@ const AddVariant = () => {
                       borderColor: active ? "var(--primary-color)" : "#ccc",
                       backgroundColor: active ? "var(--primary-color)" : "#fff",
                       color: active ? "#fff" : "#000",
-                      cursor: "pointer",
+                      cursor: isReadOnly ? "not-allowed" : "pointer",
                       userSelect: "none",
+                      opacity: isReadOnly ? 0.6 : 1,
                     }}
                   >
                     {size}
@@ -205,12 +237,15 @@ const AddVariant = () => {
                 );
               })}
             </Box>
-               <TextField
+
+            <TextField
               label="Weight (grams)"
               fullWidth
               sx={{ mb: 2 }}
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={(e) => !isReadOnly && setWeight(e.target.value)}
+              InputProps={{ readOnly: isReadOnly }}
+              disabled={isReadOnly}
             />
 
             <TextField
@@ -220,6 +255,7 @@ const AddVariant = () => {
               sx={{ mb: 2 }}
               value={sku}
               InputProps={{ readOnly: true }}
+              disabled
               helperText={
                 !variantId && sizes.length > 1
                   ? `${sizes.length} SKUs will be generated (one per size)`
@@ -238,14 +274,18 @@ const AddVariant = () => {
                 fullWidth
                 required
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => !isReadOnly && setPrice(e.target.value)}
+                InputProps={{ readOnly: isReadOnly }}
+                disabled={isReadOnly}
               />
               <TextField
                 label="Stock"
                 fullWidth
                 required
                 value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                onChange={(e) => !isReadOnly && setStock(e.target.value)}
+                InputProps={{ readOnly: isReadOnly }}
+                disabled={isReadOnly}
               />
             </Box>
             <Box sx={{ display: "flex", gap: 2 }}>
@@ -253,13 +293,16 @@ const AddVariant = () => {
                 label="Discount (%)"
                 fullWidth
                 value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
+                onChange={(e) => !isReadOnly && setDiscount(e.target.value)}
+                InputProps={{ readOnly: isReadOnly }}
+                disabled={isReadOnly}
               />
               <TextField
                 label="Final Price"
                 fullWidth
                 value={calculatedFinalPrice}
                 InputProps={{ readOnly: true }}
+                disabled
               />
             </Box>
           </Paper>
@@ -267,7 +310,11 @@ const AddVariant = () => {
 
         <Box sx={{ flex: "0 0 43%" }}>
           <Paper sx={{ p: 3, boxShadow: "none" }}>
-            <VariantImageGallery images={images} setImages={setImages} />
+            <VariantImageGallery
+              images={images}
+              setImages={setImages}
+              disabled={isReadOnly}
+            />
           </Paper>
 
           <Paper
@@ -285,8 +332,8 @@ const AddVariant = () => {
               control={
                 <Switch
                   checked={published}
-                  onChange={() => setPublished(!published)}
-                  disabled={isSaveDisabled}
+                  onChange={() => !isReadOnly && setPublished(!published)}
+                  disabled={isReadOnly}
                 />
               }
               label={published ? "Published" : "Draft"}
@@ -297,27 +344,29 @@ const AddVariant = () => {
                 sx={{ backgroundColor: "#B1B1B1" }}
                 onClick={() => navigate(-1)}
               >
-                Cancel
+                {isReadOnly ? "Back" : "Cancel"}
               </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading || isSaveDisabled}
-                sx={{
-                  background: isSaveDisabled
-                    ? "#e0e0e0"
-                    : "var(--horizontal-gradient)",
-                  color: isSaveDisabled ? "#999" : "#fff",
-                  cursor: isSaveDisabled ? "not-allowed" : "pointer",
-                  "&:hover": {
+              {!isReadOnly && (
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading || isSaveDisabled}
+                  sx={{
                     background: isSaveDisabled
                       ? "#e0e0e0"
-                      : "var(--vertical-gradient)",
-                  },
-                }}
-              >
-                {variantId ? "Update" : "Save"}
-              </Button>
+                      : "var(--horizontal-gradient)",
+                    color: isSaveDisabled ? "#999" : "#fff",
+                    cursor: isSaveDisabled ? "not-allowed" : "pointer",
+                    "&:hover": {
+                      background: isSaveDisabled
+                        ? "#e0e0e0"
+                        : "var(--vertical-gradient)",
+                    },
+                  }}
+                >
+                  {variantId ? "Update" : "Save"}
+                </Button>
+              )}
             </Box>
           </Paper>
         </Box>
