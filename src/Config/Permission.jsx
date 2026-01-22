@@ -1,5 +1,7 @@
 // Config/Permission.js
 
+import Orders from "../Pages/Orders/Orders";
+
 export const CREATE_PERMISSION_BY_TABLE = {
   Users: "admin:manage",
   Categories: "category:create",
@@ -14,7 +16,8 @@ export const VIEW_PERMISSION_BY_TABLE = {
   Products: "product:read",
   Variants: "variant:read",
   Subcategory: "subcategory:read",
-  Customers: "customer:read"
+  Customers: "customer:read",
+  Orders: "order:read",
 };
 
 export const UPDATE_PERMISSION_BY_TABLE = {
