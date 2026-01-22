@@ -30,7 +30,6 @@ import Category from "./Pages/Category/Category";
 import Users from "./Pages/Users/Users";
 import AddCategory from "./Pages/Category/AddCategory";
 import AddSubcategory from "./Pages/Category/AddSubcategory";
-import AddProducts from "./Components/Models/AddProducts";
 import AddProduct from "./Pages/Product/AddProduct";
 import AddVariant from "./Pages/Product/AddVariant";
 import AddCustomer from "./Components/Models/AddCustomer";
@@ -184,6 +183,8 @@ const App = ({ onLogout }) => {
               </ProtectedRoute>
             }
           />
+
+          {/* ORDERS ROUTES */}
           <Route
             path="/orders"
             element={
@@ -193,6 +194,7 @@ const App = ({ onLogout }) => {
             }
           />
 
+          {/* CUSTOMERS ROUTES */}
           <Route
             path="/customers"
             element={
@@ -201,7 +203,7 @@ const App = ({ onLogout }) => {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path="/customers/:id/edit"
             element={
               <ProtectedRoute>
@@ -210,6 +212,7 @@ const App = ({ onLogout }) => {
             }
           />
 
+          {/* INVENTORY ROUTE */}
           <Route
             path="/inventory"
             element={
@@ -219,6 +222,7 @@ const App = ({ onLogout }) => {
             }
           />
 
+          {/* CATEGORIES ROUTES */}
           <Route
             path="/categories"
             element={
@@ -244,7 +248,7 @@ const App = ({ onLogout }) => {
             }
           />
 
-          {/* ✅ SUBCATEGORY ROUTES */}
+          {/* SUBCATEGORY ROUTES */}
           <Route
             path="/categories/:id/add-subcategory"
             element={
@@ -262,6 +266,7 @@ const App = ({ onLogout }) => {
             }
           />
 
+          {/* USERS ROUTE */}
           <Route
             path="/users"
             element={
@@ -271,19 +276,12 @@ const App = ({ onLogout }) => {
             }
           />
 
+          {/* SETTINGS ROUTE */}
           <Route
             path="/settings"
             element={
               <ProtectedRoute path="/settings">
                 <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/products/add"
-            element={
-              <ProtectedRoute>
-                <AddProducts />
               </ProtectedRoute>
             }
           />

@@ -41,6 +41,7 @@ export function useTable3({
   deleteFn,
   onSearch,
   navigationState,
+  onViewClick, // NEW: Custom callback for view button
 }) {
   const [selected, setSelected] = useState([]);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -66,7 +67,62 @@ export function useTable3({
     }
   }, [debouncedSearch, onSearch]);
 
-  const STATUS_FIELDS = ["status", "isActive", "published"];
+  const STATUS_FIELDS = [
+    "status",
+    "isActive",
+    "published",
+    "paymentStatus",
+    "orderStatus",
+  ];
+
+  const STATUS_STYLES = {
+    Active: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Inactive: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    pending: {
+      bg: "var(--status-warning-bg)",
+      color: "var(--status-warning-text)",
+    },
+    Pending: {
+      bg: "var(--status-warning-bg)",
+      color: "var(--status-warning-text)",
+    },
+    completed: {
+      bg: "var(--status-info-bg)",
+      color: "var(--status-info-text)",
+    },
+    delivered: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Delivered: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    cancelled: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    Cancelled: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    paid: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Paid: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    failed: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
+    Failed: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
+  };
 
   // --- Select all rows ---
   const handleSelectAllClick = (event) => {
@@ -83,6 +139,13 @@ export function useTable3({
       return;
     }
 
+    // NEW: If custom onViewClick callback is provided, use it instead of navigation
+    if (onViewClick) {
+      onViewClick(row);
+      return;
+    }
+
+    // Default behavior: navigate to viewPath
     if (viewPath)
       navigate(viewPath.replace(":id", id).replace(":subId", row._id));
   };
@@ -181,7 +244,7 @@ export function useTable3({
                   <IconButton onClick={handleDeleteClick} sx={{ color: "red" }}>
                     <DeleteIcon />
                   </IconButton>
-                ) : (
+                ) : addPath ? ( // NEW: Only show Add button if addPath is provided
                   <PermissionGate
                     permission={CREATE_PERMISSION_BY_TABLE[tableType]}
                     fallback={
@@ -212,7 +275,7 @@ export function useTable3({
                       Add {tableType}
                     </Button>
                   </PermissionGate>
-                )}
+                ) : null}
               </Box>
             </Toolbar>
 
@@ -291,34 +354,43 @@ export function useTable3({
                               }
                             />
                           </TableCell>
-
                           {attributes3.map((attr) => (
                             <TableCell
                               key={attr.id}
                               sx={{ color: "var(--black-color)" }}
                             >
-                              {attr.id === "createdAt" ||
-                              attr.id === "publishedDate" ? (
+                              {STATUS_FIELDS.includes(attr.id) ? (
+                                (() => {
+                                  let value = row[attr.id];
+                                  if (value === true) value = "Active";
+                                  if (value === false) value = "Inactive";
+
+                                  const style = STATUS_STYLES[value] || {
+                                    bg: "#e2e3e5",
+                                    color: "#383d41",
+                                  };
+
+                                  return (
+                                    <span
+                                      style={{
+                                        background: style.bg,
+                                        color: style.color,
+                                        padding: "5px 10px",
+                                        borderRadius: "6px",
+                                        fontWeight: 600,
+                                        textTransform: "capitalize",
+                                        display: "inline-block",
+                                        minWidth: "90px",
+                                        textAlign: "center",
+                                      }}
+                                    >
+                                      {value}
+                                    </span>
+                                  );
+                                })()
+                              ) : attr.id === "createdAt" ||
+                                attr.id === "publishedDate" ? (
                                 formatDate(row[attr.id])
-                              ) : STATUS_FIELDS.includes(attr.id) ? (
-                                <span
-                                  style={{
-                                    color: row[attr.id]
-                                      ? "var(--success-color)"
-                                      : "var(--warning-color)",
-                                    background: row[attr.id]
-                                      ? "var(--success-bgcolor)"
-                                      : "var(--warning-bgcolor)",
-                                    padding: "5px",
-                                    minWidth: "100px",
-                                    borderRadius:
-                                      "var(--default-border-radius)",
-                                    display: "inline-block",
-                                    textAlign: "center",
-                                  }}
-                                >
-                                  {row[attr.id] ? "Public" : "Draft"}
-                                </span>
                               ) : attr.id === "image" ? (
                                 row[attr.id] ? (
                                   <img

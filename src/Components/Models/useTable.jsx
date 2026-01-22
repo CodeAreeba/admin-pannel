@@ -26,6 +26,7 @@ import { formatDate } from "../../Utils/Formatedate";
 import truncateText from "../../Utils/truncateText";
 import DeleteModal from "./confirmDeleteModel";
 import AddUsers from "./addUsers";
+import AddOrder from "./AddOrders";
 import {
   getAllAdmins,
   getAllCategories,
@@ -62,11 +63,18 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [openUserModal, setOpenUserModal] = useState(false);
+  const [openOrderModal, setOpenOrderModal] = useState(false);
   const [modelData, setModelData] = useState({});
   const [modeltype, setModeltype] = useState("Add");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const STATUS_FIELDS = ["status", "isActive", "published", "paymentStatus"];
+  const STATUS_FIELDS = [
+    "status",
+    "isActive",
+    "published",
+    "paymentStatus",
+    "orderStatus",
+  ];
 
   /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
@@ -119,10 +127,19 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       return;
     }
 
-    if (tableType === "Users") setOpenUserModal(true);
+    if (tableType === "Users") {
+      setOpenUserModal(true);
+      setModeltype("Add");
+      setModelData({});
+      return;
+    }
 
-    setModeltype("Add");
-    setModelData({});
+    if (tableType === "Orders") {
+      setOpenOrderModal(true);
+      setModeltype("Add");
+      setModelData({});
+      return;
+    }
   };
 
   /* ---------------- VIEW / EDIT ---------------- */
@@ -150,6 +167,14 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setOpenUserModal(true);
       setModeltype("View");
       setModelData(row);
+      return;
+    }
+
+    if (tableType === "Orders") {
+      setOpenOrderModal(true);
+      setModeltype("View");
+      setModelData(row);
+      return;
     }
   };
 
@@ -219,6 +244,16 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
           />
         )}
 
+        {openOrderModal && (
+          <AddOrder
+            open={openOrderModal}
+            setOpen={setOpenOrderModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={fetchData}
+          />
+        )}
+
         <DeleteModal
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
@@ -278,13 +313,31 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                   >
                     <Button
                       sx={{
-                        background: "var(--horizontal-gradient)",
-                        color: "var(--white-color)",
+                        background:
+                          tableType === "Orders" || tableType === "Customers"
+                            ? "#e0e0e0"
+                            : "var(--horizontal-gradient)",
+                        color:
+                          tableType === "Orders" || tableType === "Customers"
+                            ? "#777"
+                            : "var(--white-color)",
                         borderRadius: "var(--border-radius-secondary)",
-                        "&:hover": { background: "var(--vertical-gradient)" },
+                        "&:hover": {
+                          background:
+                            tableType === "Orders" || tableType === "Customers"
+                              ? "#e0e0e0"
+                              : "var(--vertical-gradient)",
+                        },
                         textTransform: "none",
+                        cursor:
+                          tableType === "Orders" || tableType === "Customers"
+                            ? "not-allowed"
+                            : "pointer",
                       }}
                       onClick={handleAddButton}
+                      disabled={
+                        tableType === "Orders" || tableType === "Customers"
+                      } // Disable Add Orders & Add Customers
                     >
                       Add New {tableType}
                     </Button>
@@ -421,12 +474,17 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                       bg: "var(--status-success-bg)",
                                       color: "var(--status-success-text)",
                                     },
-                                    IDBCursornactive: {
+                                    Inactive: {
                                       bg: "var(--status-error-bg)",
                                       color: "var(--status-error-text)",
                                     },
 
                                     pending: {
+                                      bg: "var(--status-warning-bg)",
+                                      color: "var(--status-warning-text)",
+                                    },
+
+                                    Pending: {
                                       bg: "var(--status-warning-bg)",
                                       color: "var(--status-warning-text)",
                                     },
@@ -441,7 +499,17 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                       color: "var(--status-success-text)",
                                     },
 
+                                    Delivered: {
+                                      bg: "var(--status-success-bg)",
+                                      color: "var(--status-success-text)",
+                                    },
+
                                     cancelled: {
+                                      bg: "var(--status-error-bg)",
+                                      color: "var(--status-error-text)",
+                                    },
+
+                                    Cancelled: {
                                       bg: "var(--status-error-bg)",
                                       color: "var(--status-error-text)",
                                     },
@@ -451,9 +519,27 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                       color: "var(--status-success-text)",
                                     },
 
+                                    Paid: {
+                                      bg: "var(--status-success-bg)",
+                                      color: "var(--status-success-text)",
+                                    },
+
                                     failed: {
                                       bg: "var(--status-error-bg)",
                                       color: "var(--status-error-text)",
+                                    },
+
+                                    Failed: {
+                                      bg: "var(--status-error-bg)",
+                                      color: "var(--status-error-text)",
+                                    },
+                                    processing: {
+                                      bg: "var(--status-info-bg)",
+                                      color: "var(--status-info-text)",
+                                    },
+                                    Processing: {
+                                      bg: "var(--status-info-bg)",
+                                      color: "var(--status-info-text)",
                                     },
                                   };
 
@@ -491,7 +577,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             </TableCell>
                           ))}
                           <TableCell>
-                            {/* Permission check: agar view permission nahi hai tou disabled button dikhao */}
                             {!hasViewPermission ? (
                               <Button
                                 size="small"

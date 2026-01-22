@@ -279,3 +279,13 @@ export const getAllOrders = async (page = 1, limit = 25, search = "") => {
 
   return invokeApi(reqObj);
 };
+export const getOrderById = async (id) => {
+  const reqObj = {
+    path: `/admin/orders/${id}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};

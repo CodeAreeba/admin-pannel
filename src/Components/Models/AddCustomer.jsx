@@ -14,9 +14,10 @@ import { toast } from "react-toastify";
 import { getCustomerById, getCustomerOrders } from "../../DAL/fetch";
 import { updateCustomerStatus } from "../../DAL/edit";
 import { useTable3 } from "../../Components/Models/useTable3";
+import AddOrder from "./AddOrders";
 
 const AddCustomer = () => {
-  const { id } = useParams(); // view mode
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const isViewMode = Boolean(id);
@@ -33,6 +34,10 @@ const AddCustomer = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // ---------------- Order Modal State ----------------
+  const [openOrderModal, setOpenOrderModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // ---------------- Fetch Customer ----------------
   const fetchCustomer = async () => {
@@ -83,16 +88,27 @@ const AddCustomer = () => {
     }
   };
 
+  // ---------------- Custom View Handler for Modal ----------------
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+    setOpenOrderModal(true);
+  };
+
+  // ---------------- Order Modal Response ----------------
+  const handleOrderModalResponse = () => {
+    fetchOrders();
+  };
+
   // ---------------- Orders Table ----------------
   const orderAttributes = [
-    { id: "_id", label: "Order ID" },
-    { id: "totalAmount", label: "Total Amount" },
-    { id: "paymentMethod", label: "Payment Method" },
-    { id: "paymentStatus", label: "Payment Status" },
-    { id: "status", label: "Order Status" },
+    { id: "_id", label: "ORDER ID" },
+    { id: "totalAmount", label: "TOTAL AMOUNT" },
+    { id: "paymentMethod", label: "PAYMENT METHOD" },
+    { id: "paymentStatus", label: "PAYMENT STATUS" },
+    { id: "status", label: "ORDER STATUS" },
     {
       id: "createdAt",
-      label: "Order Date",
+      label: "ORDER DATE",
       format: (val) => new Date(val).toLocaleDateString(),
     },
   ];
@@ -102,7 +118,13 @@ const AddCustomer = () => {
     tableType: "Orders",
     data: orders,
     reFetch: fetchOrders,
-    hideActions: true,
+    // Don't pass addPath - this will hide "Add Orders" button
+    addPath: undefined,
+    // Don't pass viewPath - we're using onViewClick instead
+    viewPath: undefined,
+    // Pass custom view handler
+    onViewClick: handleViewOrder,
+    deleteFn: undefined,
   });
 
   // ---------------- Effects ----------------
@@ -119,34 +141,14 @@ const AddCustomer = () => {
       <Box component="form" sx={{ mt: 2 }}>
         {/* --------- Row 1: Customer ID + Email --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Customer ID"
-            fullWidth
-            value={customerId}
-            disabled
-          />
-          <TextField
-            label="Email"
-            fullWidth
-            value={email}
-            disabled
-          />
+          <TextField label="Customer ID" fullWidth value={customerId} disabled />
+          <TextField label="Email" fullWidth value={email} disabled />
         </Box>
 
         {/* --------- Row 2: Role + OTP Attempts --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Role"
-            fullWidth
-            value={role}
-            disabled
-          />
-          <TextField
-            label="OTP Attempts"
-            fullWidth
-            value={otpAttempts}
-            disabled
-          />
+          <TextField label="Role" fullWidth value={role} disabled />
+          <TextField label="OTP Attempts" fullWidth value={otpAttempts} disabled />
         </Box>
 
         {/* --------- Row 3: Active Switch --------- */}
@@ -186,10 +188,7 @@ const AddCustomer = () => {
             </Typography>
 
             {addresses.map((addr, index) => (
-              <Paper
-                key={index}
-                sx={{ p: 2, mb: 2, backgroundColor: "#fafafa" }}
-              >
+              <Paper key={index} sx={{ p: 2, mb: 2, backgroundColor: "#fafafa" }}>
                 <Typography variant="subtitle1">
                   {addr.firstName} {addr.lastName}
                 </Typography>
@@ -245,6 +244,15 @@ const AddCustomer = () => {
           </Button>
         </Paper>
       </Box>
+
+      {/* --------- Order Modal --------- */}
+      <AddOrder
+        open={openOrderModal}
+        setOpen={setOpenOrderModal}
+        Modeltype="View"
+        Modeldata={selectedOrder}
+        onResponse={handleOrderModalResponse}
+      />
     </Box>
   );
 };
