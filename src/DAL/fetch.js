@@ -288,6 +288,21 @@ export const getAllInventory = async (page = 1, limit = 25, search = "") => {
 
   return invokeApi(reqObj);
 };
+export const getLowStockInventory = async (
+  page = 1,
+  limit = 25,
+  search = ""
+) => {
+  const reqObj = {
+    path: `/admin/inventory/low-stock?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+
 export const getOrderById = async (id) => {
   const reqObj = {
     path: `/admin/orders/${id}`,

@@ -34,6 +34,7 @@ import {
   getAllOrders,
   getAllProducts,
   getAllInventory,
+  getLowStockInventory,
 } from "../../DAL/fetch";
 import {
   deleteAdmins,
@@ -70,6 +71,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [modeltype, setModeltype] = useState("Add");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openInventoryModal, setOpenInventoryModal] = useState(false);
+  const [lowStockOnly, setLowStockOnly] = useState(false);
 
   const STATUS_FIELDS = [
     "status",
@@ -82,7 +84,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
     fetchData();
-  }, [page, rowsPerPage, debouncedSearch]);
+  }, [page, rowsPerPage, debouncedSearch, lowStockOnly]);
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchQuery), 500);
@@ -110,9 +112,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       if (tableType === "Orders") {
         res = await getAllOrders(page, rowsPerPage, debouncedSearch);
       }
-       if (tableType === "Inventory") {
-        res = await getAllInventory(page, rowsPerPage, debouncedSearch);
+      if (tableType === "Inventory") {
+        res = lowStockOnly
+          ? await getLowStockInventory(page, rowsPerPage, debouncedSearch)
+          : await getAllInventory(page, rowsPerPage, debouncedSearch);
       }
+
       setData(res?.data || []);
       setTotalRecords(res?.meta?.total || 0);
     } catch (err) {
@@ -146,7 +151,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setModelData({});
       return;
     }
-     if (tableType === "Inventory") {
+    if (tableType === "Inventory") {
       setOpenInventoryModal(true);
       setModeltype("Add");
       setModelData({});
@@ -188,7 +193,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setModelData(row);
       return;
     }
-    
+
     if (tableType === "Inventory") {
       setOpenInventoryModal(true);
       setModeltype("View");
@@ -273,7 +278,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
           />
         )}
 
-         {openInventoryModal && (
+        {openInventoryModal && (
           <AddInventory
             open={openInventoryModal}
             setOpen={setOpenInventoryModal}
@@ -283,7 +288,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
           />
         )}
 
-        
         <DeleteModal
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
@@ -316,6 +320,31 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     ),
                   }}
                 />
+
+                {tableType === "Inventory" && (
+                  <Button
+                    variant={lowStockOnly ? "contained" : "outlined"}
+                    sx={{
+                      textTransform: "none",
+                      borderColor: "var(--primary-color)",
+                      color: lowStockOnly ? "#fff" : "var(--primary-color)",
+                      backgroundColor: lowStockOnly
+                        ? "var(--primary-color)"
+                        : "transparent",
+                      "&:hover": {
+                        backgroundColor: "var(--primary-color)",
+                        color: "#fff",
+                      },
+                    }}
+                    onClick={() => {
+                      setLowStockOnly((prev) => !prev);
+                      setPage(1); // reset pagination
+                    }}
+                  >
+                    Low Stock
+                  </Button>
+                )}
+
                 {selected.length > 0 ? (
                   <IconButton
                     onClick={() => setOpenDeleteModal(true)}
