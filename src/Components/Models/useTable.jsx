@@ -599,6 +599,14 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                                       bg: "var(--status-info-bg)",
                                       color: "var(--status-info-text)",
                                     },
+                                    shipped: {
+                                      bg: "var(--status-shipped-bg)",
+                                      color: "var(--status-shipped-text)",
+                                    },
+                                    Shipped: {
+                                      bg: "var(--status-shipped-bg)",
+                                      color: "var(--status-shipped-text)",
+                                    },
                                   };
 
                                   const style = STATUS_STYLES[value] || {

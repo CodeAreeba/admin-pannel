@@ -12,6 +12,7 @@ import {
   Select,
   MenuItem,
   IconButton,
+  Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
@@ -44,35 +45,34 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
   }, [open, Modeltype, Modeldata]);
 
   // ---------------- Update Order ----------------
-const handleUpdateOrder = async () => {
-  if (!orderStatus) {
-    toast.error("Order status is required");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    // Backend expects `status`, not `orderStatus`
-    const payload = { status: orderStatus };
-
-    const res = await updateOrderStatus(Modeldata._id, payload);
-
-    if (res?.statusCode === 200) {
-      toast.success(res.message || "Order updated successfully");
-      onResponse();
-      handleClose();
-    } else {
-      toast.error(res.message || "Failed to update order");
+  const handleUpdateOrder = async () => {
+    if (!orderStatus) {
+      toast.error("Order status is required");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to update order");
-  } finally {
-    setLoading(false);
-  }
-};
 
+    try {
+      setLoading(true);
+
+      // Backend expects `status`, not `orderStatus`
+      const payload = { status: orderStatus };
+
+      const res = await updateOrderStatus(Modeldata._id, payload);
+
+      if (res?.statusCode === 200) {
+        toast.success(res.message || "Order updated successfully");
+        onResponse();
+        handleClose();
+      } else {
+        toast.error(res.message || "Failed to update order");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update order");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ---------------- Handle Close ----------------
   const handleClose = () => {
@@ -95,28 +95,45 @@ const handleUpdateOrder = async () => {
       onClose={handleClose}
       maxWidth="md"
       fullWidth
+      scroll="paper"
       PaperProps={{
         sx: {
           borderRadius: "12px",
+          maxHeight: "85vh",
+          m: 2,
         },
       }}
     >
       <DialogTitle
         sx={{
-          // background: "var(--horizontal-gradient)",
           color: "black",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          p: 2.5,
+          minHeight: "64px",
         }}
       >
-        {Modeltype === "Add" ? "Add New Order" : "View Order"}
-        <IconButton onClick={handleClose} sx={{ color: "black" }}>
+        <Typography variant="h6" component="div">
+          {Modeltype === "Add" ? "Add New Order" : "View Order"}
+        </Typography>
+        <IconButton 
+          onClick={handleClose} 
+          sx={{ 
+            color: "black",
+            ml: 2,
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ mt: 2 }}>
+      <DialogContent 
+        dividers
+        sx={{ 
+          p: 3,
+        }}
+      >
         {/* -------- Row 1 -------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           <TextField
@@ -154,39 +171,39 @@ const handleUpdateOrder = async () => {
         </Box>
 
         {/* -------- Row 3 - Editable Status Fields -------- */}
-<Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-  <FormControl fullWidth size="small">
-    <InputLabel>Payment Status</InputLabel>
-    <Select
-      value={paymentStatus}
-      label="Payment Status"
-      onChange={(e) => setPaymentStatus(e.target.value)}
-      disabled={Modeltype === "View"} // <-- make it read-only in View mode
-    >
-      <MenuItem value="pending">Pending</MenuItem>
-      <MenuItem value="paid">Paid</MenuItem>
-      <MenuItem value="failed">Failed</MenuItem>
-    </Select>
-  </FormControl>
+        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+          <FormControl fullWidth size="small">
+            <InputLabel>Payment Status</InputLabel>
+            <Select
+              value={paymentStatus}
+              label="Payment Status"
+              onChange={(e) => setPaymentStatus(e.target.value)}
+              disabled={Modeltype === "View"}
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="paid">Paid</MenuItem>
+              <MenuItem value="failed">Failed</MenuItem>
+            </Select>
+          </FormControl>
 
-  <FormControl fullWidth size="small">
-  <InputLabel>Order Status</InputLabel>
-  <Select
-    value={orderStatus}
-    label="Order Status"
-    onChange={(e) => setOrderStatus(e.target.value)}
-  >
-    <MenuItem value="pending">Pending</MenuItem>
-    <MenuItem value="processing">Processing</MenuItem>
-    <MenuItem value="shipped">Shipped</MenuItem>
-    <MenuItem value="delivered">Delivered</MenuItem>
-    <MenuItem value="cancelled">Cancelled</MenuItem>
-  </Select>
-</FormControl>
-</Box>
+          <FormControl fullWidth size="small">
+            <InputLabel>Order Status</InputLabel>
+            <Select
+              value={orderStatus}
+              label="Order Status"
+              onChange={(e) => setOrderStatus(e.target.value)}
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="processing">Processing</MenuItem>
+              <MenuItem value="shipped">Shipped</MenuItem>
+              <MenuItem value="delivered">Delivered</MenuItem>
+              <MenuItem value="cancelled">Cancelled</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
 
         {/* -------- Row 4 -------- */}
-        <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+        <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
             label="Created At"
             fullWidth
@@ -204,7 +221,7 @@ const handleUpdateOrder = async () => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, gap: 1 }}>
+      <DialogActions sx={{ p: 2.5, gap: 1 }}>
         <Button
           variant="outlined"
           onClick={handleClose}
@@ -216,7 +233,6 @@ const handleUpdateOrder = async () => {
               backgroundColor: "rgba(177, 177, 177, 0.1)",
             },
           }}
-          
         >
           Cancel
         </Button>
