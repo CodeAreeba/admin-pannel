@@ -1,7 +1,9 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { generateReceipt } from "../DAL/fetch"; // adjust path if needed
+import { generateReceipt } from "../DAL/fetch";
+import DownloadIcon from "@mui/icons-material/Download";
+import { IconButton, Tooltip, CircularProgress } from "@mui/material";
 
 const OrderReceipt = ({ orderId }) => {
   const [loading, setLoading] = useState(false);
@@ -14,207 +16,277 @@ const OrderReceipt = ({ orderId }) => {
 
       console.log("RECEIPT RESPONSE 👉", result);
 
-      // ✅ result has: { success, data }
       if (!result?.success || !result?.data) {
         throw new Error("Invalid receipt response");
       }
 
       generatePDF(result.data);
     } catch (error) {
-      console.error("DOWNLOAD ERROR 👉", error);
+      console.error("DOWNLOAD ERROR", error);
       alert(error.message || "Error while downloading receipt");
     } finally {
       setLoading(false);
     }
   };
 
-  const generatePDF = (data) => {
-    const doc = new jsPDF();
+  const generatePDF = async(data) => {
+    // Thermal receipt size (80mm width)
+    const doc = new jsPDF({
+      unit: "mm",
+      format: [80, 297], // 80mm width, auto height
+    });
+
+    // Brown Theme Colors
+    const primaryBrown = [101, 67, 33];
+    const lightBrown = [139, 90, 43];
+    const darkText = [51, 51, 51];
+
+    let yPos = 10;
+
+   const img = new Image();
+img.src = "/logo.png";
+
+await new Promise((resolve) => {
+  img.onload = resolve;
+});
+
+doc.addImage(img, "PNG", 25, yPos, 30, 12);
+yPos += 18;
+
+
 
     /* =======================
        COMPANY HEADER
     ======================= */
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text(data.company?.name || "Company Name", 105, 20, {
-      align: "center",
-    });
-
-    doc.setFontSize(10);
+    doc.setTextColor(...primaryBrown);
+    doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text(data.company?.address || "", 105, 28, { align: "center" });
-    doc.text(`Phone: ${data.company?.phone || ""}`, 105, 34, {
+    doc.text(data.company?.address || "123 Business St, Karachi", 40, yPos, {
       align: "center",
     });
-    doc.text(data.company?.website || "", 105, 40, { align: "center" });
 
-    doc.setLineWidth(0.5);
-    doc.line(20, 45, 190, 45);
+    yPos += 4;
+    doc.text(`Tel: ${data.company?.phone || "+92 XXX XXXXXXX"}`, 40, yPos, {
+      align: "center",
+    });
+
+    yPos += 4;
+    doc.text(data.company?.website || "www.shoeman.com", 40, yPos, {
+      align: "center",
+    });
+
+    yPos += 5;
+    doc.setDrawColor(...lightBrown);
+    doc.setLineWidth(0.3);
+    doc.line(10, yPos, 70, yPos);
 
     /* =======================
-       ORDER HEADER
+       ORDER INFO
     ======================= */
-    doc.setFontSize(16);
+    yPos += 5;
+    doc.setTextColor(...darkText);
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text("ORDER RECEIPT", 105, 55, { align: "center" });
+    doc.text("ORDER RECEIPT", 40, yPos, { align: "center" });
+
+    yPos += 5;
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
 
     const orderDate = data.date
-      ? new Date(data.date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+      ? new Date(data.date).toLocaleDateString("en-US")
       : "";
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Order ID: ${data.orderId}`, 20, 65);
-    doc.text(`Date: ${orderDate}`, 20, 71);
-    doc.text(`Status: ${data.status?.toUpperCase()}`, 20, 77);
+    doc.text(`Order ID: ${data.orderId}`, 10, yPos);
+    yPos += 4;
+    doc.text(`Date: ${orderDate}`, 10, yPos);
+    yPos += 4;
+    doc.text(`Status: ${data.status?.toUpperCase()}`, 10, yPos);
+
+    yPos += 5;
+    doc.line(10, yPos, 70, yPos);
 
     /* =======================
-       CUSTOMER DETAILS
+       CUSTOMER INFO
     ======================= */
+    yPos += 5;
     doc.setFont("helvetica", "bold");
-    doc.text("CUSTOMER DETAILS", 20, 87);
-
+    doc.text("CUSTOMER DETAILS", 10, yPos);
     doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${data.customer?.name}`, 20, 93);
-    doc.text(`Email: ${data.customer?.email}`, 20, 99);
-    doc.text(`Phone: ${data.customer?.phone}`, 20, 105);
 
-    const addressLines = doc.splitTextToSize(
-      `Address: ${data.customer?.address || ""}`,
-      170
-    );
-    doc.text(addressLines, 20, 111);
+    yPos += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text("Name:", 10, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(data.customer?.name || "", 24, yPos);
+
+    yPos += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text("Email:", 10, yPos);
+    doc.setFont("helvetica", "normal");
+    const emailLines = doc.splitTextToSize(data.customer?.email || "", 50);
+    doc.text(emailLines, 24, yPos);
+    yPos += emailLines.length * 3;
+
+    yPos += 1;
+    doc.setFont("helvetica", "bold");
+    doc.text("Phone:", 10, yPos);
+    doc.setFont("helvetica", "normal");
+    doc.text(data.customer?.phone || "", 24, yPos);
+
+    yPos += 4;
+    doc.setFont("helvetica", "bold");
+    doc.text("Address:", 10, yPos);
+    doc.setFont("helvetica", "normal");
+    const addressLines = doc.splitTextToSize(data.customer?.address || "", 50);
+    doc.text(addressLines, 24, yPos);
+    yPos += addressLines.length * 3;
+
+    yPos += 2;
+    doc.line(10, yPos, 70, yPos);
 
     /* =======================
-       ITEMS TABLE
+       ITEMS
     ======================= */
-    const tableData =
-      data.items?.map((item) => [
-        item.description,
-        item.sku,
-        item.quantity,
-        `Rs. ${item.unitPrice.toLocaleString()}`,
-        `Rs. ${item.total.toLocaleString()}`,
-      ]) || [];
+    yPos += 5;
+    doc.setFont("helvetica", "bold");
+    doc.text("ITEMS", 10, yPos);
 
-    if (!tableData.length) {
-      throw new Error("No items found in receipt");
-    }
+    yPos += 5;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.5);
 
-    autoTable(doc, {
-      startY: 125,
-      head: [["Description", "SKU", "Qty", "Unit Price", "Total"]],
-      body: tableData,
-      theme: "grid",
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontSize: 10,
-        fontStyle: "bold",
-      },
-      bodyStyles: { fontSize: 9 },
-      columnStyles: {
-        0: { cellWidth: 60 },
-        1: { cellWidth: 35 },
-        2: { cellWidth: 20, halign: "center" },
-        3: { cellWidth: 35, halign: "right" },
-        4: { cellWidth: 35, halign: "right" },
-      },
+    data.items?.forEach((item) => {
+      // Item name
+      const itemLines = doc.splitTextToSize(item.description, 60);
+      doc.text(itemLines, 10, yPos);
+      yPos += itemLines.length * 3;
+
+      // SKU, Qty, Price
+      doc.text(`SKU: ${item.sku}`, 10, yPos);
+      doc.text(
+        `${item.quantity} x Rs.${item.unitPrice.toLocaleString()}`,
+        70,
+        yPos,
+        { align: "right" }
+      );
+      yPos += 3;
+
+      // Item total
+      doc.setFont("helvetica", "bold");
+      doc.text(`Rs. ${item.total.toLocaleString()}`, 70, yPos, {
+        align: "right",
+      });
+      doc.setFont("helvetica", "normal");
+
+      yPos += 5;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.1);
+      doc.line(10, yPos, 70, yPos);
+      yPos += 3;
     });
-
-    const finalY = doc.lastAutoTable.finalY + 10;
-    const summary = data.summary;
 
     /* =======================
        SUMMARY
     ======================= */
-    doc.setFontSize(10);
-    doc.text("Subtotal:", 140, finalY);
-    doc.text(`Rs. ${summary.subtotal.toLocaleString()}`, 185, finalY, {
+    yPos += 2;
+    doc.setFontSize(7);
+
+    doc.text("Subtotal:", 10, yPos);
+    doc.text(`Rs. ${data.summary.subtotal.toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
-    doc.text("Tax:", 140, finalY + 6);
-    doc.text(`Rs. ${summary.tax.toLocaleString()}`, 185, finalY + 6, {
+    yPos += 4;
+    doc.text("Tax:", 10, yPos);
+    doc.text(`Rs. ${data.summary.tax.toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
-    doc.text("Shipping:", 140, finalY + 12);
-    doc.text(`Rs. ${summary.shipping.toLocaleString()}`, 185, finalY + 12, {
+    yPos += 4;
+    doc.text("Shipping:", 10, yPos);
+    doc.text(`Rs. ${data.summary.shipping.toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
-    doc.setLineWidth(0.3);
-    doc.line(140, finalY + 16, 190, finalY + 16);
+    yPos += 5;
+    doc.setDrawColor(...primaryBrown);
+    doc.setLineWidth(0.5);
+    doc.line(10, yPos, 70, yPos);
 
+    yPos += 5;
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("TOTAL:", 140, finalY + 22);
-    doc.text(`Rs. ${summary.total.toLocaleString()}`, 185, finalY + 22, {
+    doc.setFontSize(9);
+    doc.text("TOTAL:", 10, yPos);
+    doc.text(`Rs. ${data.summary.total.toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
     /* =======================
-       PAYMENT INFO
+       PAYMENT
     ======================= */
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("PAYMENT INFORMATION", 20, finalY);
-
+    yPos += 6;
+    doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
+    doc.line(10, yPos, 70, yPos);
+
+    yPos += 4;
     doc.text(
-      `Method: ${data.payment?.method.toUpperCase()}`,
-      20,
-      finalY + 6
-    );
-    doc.text(
-      `Status: ${data.payment?.status.toUpperCase()}`,
-      20,
-      finalY + 12
+      `Payment: ${data.payment?.method.toUpperCase()} - ${data.payment?.status.toUpperCase()}`,
+      40,
+      yPos,
+      { align: "center" }
     );
 
     /* =======================
        FOOTER
     ======================= */
-    doc.setFontSize(8);
+    yPos += 8;
+    doc.setFontSize(6);
     doc.setFont("helvetica", "italic");
-    doc.text("Thank you for your business!", 105, 280, {
+    doc.text("Thank you for shopping with us!", 40, yPos, {
       align: "center",
     });
-    doc.text(
-      "For any queries, contact us at support@shoeman.com",
-      105,
-      285,
-      { align: "center" }
-    );
 
-    doc.save(`Order_Receipt_${data.orderId}.pdf`);
+    yPos += 3;
+    doc.text("support@shoeman.com", 40, yPos, { align: "center" });
+
+    doc.save(`Receipt_${data.orderId}.pdf`);
   };
 
   return (
-    <button
-      onClick={downloadReceipt}
-      disabled={loading}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        padding: "6px 14px",
-        fontSize: "0.85rem",
-        fontWeight: 500,
-        color: "var(--primary-color)",
-        border: "1px solid var(--primary-color)",
-        background: "#fff",
-        borderRadius: "6px",
-        cursor: loading ? "not-allowed" : "pointer",
-      }}
-    >
-      {loading ? "Generating..." : "📄 Receipt"}
-    </button>
+    <Tooltip title="Download Receipt" arrow>
+      <IconButton
+        onClick={downloadReceipt}
+        disabled={loading}
+        size="small"
+        sx={{
+          color: "#654321",
+          border: "1px solid #654321",
+          borderRadius: "6px",
+          padding: "4px 8px",
+          fontSize: "0.75rem",
+          "&:hover": {
+            backgroundColor: "#654321",
+            color: "#fff",
+          },
+          "&:disabled": {
+            opacity: 0.5,
+          },
+        }}
+      >
+        {loading ? (
+          <CircularProgress size={16} sx={{ color: "#654321" }} />
+        ) : (
+          <>
+            <DownloadIcon sx={{ fontSize: "16px", mr: 0.5 }} />
+            <span style={{ fontSize: "0.75rem", fontWeight: 500 }}>
+              Download
+            </span>
+          </>
+        )}
+      </IconButton>
+    </Tooltip>
   );
 };
 
