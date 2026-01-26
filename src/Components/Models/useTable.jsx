@@ -50,7 +50,6 @@ import {
 } from "../../Config/Permission";
 import AuthContext from "../../auth/AuthContext";
 import { fileUrl } from "../../Config/Config";
-import OrderReceipt from '../OrderReceipt';
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
@@ -440,12 +439,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     {attributes.map((attr) => (
                       <TableCell key={attr._id}>{attr.label}</TableCell>
                     ))}
-                    { tableType=="Orders" && (
-                      <TableCell sx={{ textAlign: "center" }}>Receipt</TableCell>
-                    )}
-                     { tableType=="Customers" && (
-                      <TableCell sx={{ textAlign: "center" }}>Receipt</TableCell>
-                    )}
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -649,16 +642,6 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                               )}
                             </TableCell>
                           ))}
-                           {tableType === "Orders" && (
-                            <TableCell align="center">
-                              <OrderReceipt orderId={row._id} />
-                            </TableCell>
-                          )}
-                          {tableType === "Customers" && (
-                            <TableCell align="center">
-                              <OrderReceipt orderId={row._id} />
-                            </TableCell>
-                          )}
                           <TableCell>
                             {!hasViewPermission ? (
                               <Button
