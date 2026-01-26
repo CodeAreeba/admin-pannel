@@ -313,3 +313,15 @@ export const getOrderById = async (id) => {
 
   return invokeApi(reqObj);
 };
+export const generateReceipt = async (id) => {
+  const reqObj = {
+    path: `/admin/orders/${id}/receipt`,
+    method: "GET",
+    headers: {
+       'Cache-Control': 'no-cache'
+    },
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};

@@ -30,6 +30,10 @@ import {
   CREATE_PERMISSION_BY_TABLE,
   VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
+import DownloadIcon from '@mui/icons-material/Download';
+import OrderReceipt from '../OrderReceipt';
+
+
 
 export function useTable3({
   attributes3,
@@ -314,6 +318,9 @@ export function useTable3({
                     {attributes3.map((attr) => (
                       <TableCell key={attr.id}>{attr.label}</TableCell>
                     ))}
+                     {tableType === "Orders" && (
+      <TableCell sx={{ textAlign: "center" }}>Receipt</TableCell>
+    )}
                     <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
@@ -413,6 +420,14 @@ export function useTable3({
                               )}
                             </TableCell>
                           ))}
+   
+   {tableType === "Orders" && (
+  <TableCell align="center">
+    <OrderReceipt orderId={row._id} />
+  </TableCell>
+)}
+
+
 
                           <TableCell>
                             <PermissionGate
