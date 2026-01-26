@@ -18,6 +18,7 @@ export const VIEW_PERMISSION_BY_TABLE = {
   Subcategory: "subcategory:read",
   Customers: "customer:read",
   Orders: "order:read",
+  Inventory: "inventory:read",
 };
 
 export const UPDATE_PERMISSION_BY_TABLE = {

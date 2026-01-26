@@ -112,10 +112,9 @@ export const fetchAllProductList = async (
   page,
   rowsPerPage,
   searchQuery,
-  filter
 ) => {
   const reqObj = {
-    path: `/product/list`,
+    path: `/product/list?limit=${rowsPerPage}&page=${page}&keyword=${searchQuery}`,
     method: "GET",
     headers: {
       Authorization: `Bearer ${localStorage.getItem("Token")}`,
@@ -272,6 +271,16 @@ export const getCustomerOrders = async (id) => {
 export const getAllOrders = async (page = 1, limit = 25, search = "") => {
   const reqObj = {
     path: `/admin/orders?page=${page}&limit=${limit}&search=${search}`,
+    method: "GET",
+    headers: {},
+    postData: {},
+  };
+
+  return invokeApi(reqObj);
+};
+export const getAllInventory = async (page = 1, limit = 25, search = "") => {
+  const reqObj = {
+    path: `/admin/inventory/all?page=${page}&limit=${limit}&search=${search}`,
     method: "GET",
     headers: {},
     postData: {},

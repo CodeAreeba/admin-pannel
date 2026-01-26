@@ -20,7 +20,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteModal from "./confirmDeleteModel";
 import { useParams, useNavigate } from "react-router-dom";
-import { baseUrl, fileUrl } from "../../Config/Config";
+import {  fileUrl } from "../../Config/Config";
 import truncateText from "../../Utils/truncateText";
 import { formatDate } from "../../Utils/Formatedate";
 import { toast } from "react-toastify";

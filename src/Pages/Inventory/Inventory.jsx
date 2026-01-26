@@ -3,12 +3,16 @@ import { useTable } from "../../Components/Models/useTable";
 
 const Inventory = () => {
   // 🔹 Table Columns / Attributes
-  const attributes = [
-    { id: "productName", label: "Product Name" },
-    { id: "productId", label: "Product ID" },
-    { id: "category", label: "Category" },
-    { id: "status", label: "Status" },
-    { id: "description", label: "Description" },
+ const attributes = [
+    { id: "product.name", label: "Product Name" },
+    { id: "color.name", label: "Color" },
+    { id: "size", label: "Size" },
+    { id: "sku", label: "SKU" },
+    { id: "price", label: "Price" },
+    { id: "discount", label: "Discount (%)" },
+    { id: "finalPrice", label: "Final Price" },
+    { id: "stock", label: "Stock" },
+    { id: "published", label: "Status" },
   ];
 
   const { tableUI } = useTable({

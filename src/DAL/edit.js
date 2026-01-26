@@ -67,3 +67,12 @@ export const updateOrderStatus = async (id, data) => {
   };
   return invokeApi(reqObj);
 };
+export const updateInventoryStatus = async (id, data) => {
+  const reqObj = {
+    path: `/admin/inventory/${id}/status`,
+    method: "PUT",
+    headers: {},
+    postData: data,
+  };
+  return invokeApi(reqObj);
+};

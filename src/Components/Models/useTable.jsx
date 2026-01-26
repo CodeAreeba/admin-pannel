@@ -33,6 +33,7 @@ import {
   getAllCustomers,
   getAllOrders,
   getAllProducts,
+  getAllInventory,
 } from "../../DAL/fetch";
 import {
   deleteAdmins,
@@ -48,6 +49,7 @@ import {
 } from "../../Config/Permission";
 import AuthContext from "../../auth/AuthContext";
 import { fileUrl } from "../../Config/Config";
+import AddInventory from "./AddInventory";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
@@ -67,6 +69,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const [modelData, setModelData] = useState({});
   const [modeltype, setModeltype] = useState("Add");
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openInventoryModal, setOpenInventoryModal] = useState(false);
 
   const STATUS_FIELDS = [
     "status",
@@ -107,6 +110,9 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       if (tableType === "Orders") {
         res = await getAllOrders(page, rowsPerPage, debouncedSearch);
       }
+       if (tableType === "Inventory") {
+        res = await getAllInventory(page, rowsPerPage, debouncedSearch);
+      }
       setData(res?.data || []);
       setTotalRecords(res?.meta?.total || 0);
     } catch (err) {
@@ -136,6 +142,12 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
     if (tableType === "Orders") {
       setOpenOrderModal(true);
+      setModeltype("Add");
+      setModelData({});
+      return;
+    }
+     if (tableType === "Inventory") {
+      setOpenInventoryModal(true);
       setModeltype("Add");
       setModelData({});
       return;
@@ -172,6 +184,13 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
 
     if (tableType === "Orders") {
       setOpenOrderModal(true);
+      setModeltype("View");
+      setModelData(row);
+      return;
+    }
+    
+    if (tableType === "Inventory") {
+      setOpenInventoryModal(true);
       setModeltype("View");
       setModelData(row);
       return;
@@ -254,6 +273,17 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
           />
         )}
 
+         {openInventoryModal && (
+          <AddInventory
+            open={openInventoryModal}
+            setOpen={setOpenInventoryModal}
+            Modeltype={modeltype}
+            Modeldata={modelData}
+            onResponse={fetchData}
+          />
+        )}
+
+        
         <DeleteModal
           open={openDeleteModal}
           setOpen={setOpenDeleteModal}
