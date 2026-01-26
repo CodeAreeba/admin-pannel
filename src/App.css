@@ -72,8 +72,8 @@
   --status-error-text: #b3261e;
   --status-neutral-bg: #f1f3f4;
   --status-neutral-text: #3c4043;
-  --status-shipped-bg: #fef4e8;
-  --status-shipped-text: #ecb13c;
+  --status-shipped-bg: #fee8f3;
+  --status-shipped-text: #ec3cae;
 }
 
 body {
