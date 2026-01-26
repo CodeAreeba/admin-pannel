@@ -33,6 +33,7 @@ import AddSubcategory from "./Pages/Category/AddSubcategory";
 import AddProduct from "./Pages/Product/AddProduct";
 import AddVariant from "./Pages/Product/AddVariant";
 import AddCustomer from "./Components/Models/AddCustomer";
+import InventoryViewPage from "./Pages/Inventory/InventoryViewPage";
 
 //////////////////////////// Auth & Permissions ////////////////////////////
 const Settings = () => <h1>Settings</h1>;
@@ -212,12 +213,22 @@ const App = ({ onLogout }) => {
             }
           />
 
-          {/* INVENTORY ROUTE */}
+          {/* INVENTORY ROUTES */}
           <Route
             path="/inventory"
             element={
               <ProtectedRoute path="/inventory">
                 <Inventory />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* ⭐ NEW ROUTE FOR INVENTORY VIEW PAGE */}
+          <Route
+            path="/inventory/view/:id"
+            element={
+              <ProtectedRoute path="/inventory">
+                <InventoryViewPage />
               </ProtectedRoute>
             }
           />

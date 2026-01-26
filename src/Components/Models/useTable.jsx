@@ -50,7 +50,6 @@ import {
 } from "../../Config/Permission";
 import AuthContext from "../../auth/AuthContext";
 import { fileUrl } from "../../Config/Config";
-import AddInventory from "./AddInventory";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
@@ -157,6 +156,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setModelData({});
       return;
     }
+    
+    // Inventory: Disabled (no add functionality)
   };
 
   /* ---------------- VIEW / EDIT ---------------- */
@@ -195,9 +196,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
     }
 
     if (tableType === "Inventory") {
-      setOpenInventoryModal(true);
-      setModeltype("View");
-      setModelData(row);
+      navigate(`/inventory/view/${row._id}`);
       return;
     }
   };
@@ -373,30 +372,30 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     <Button
                       sx={{
                         background:
-                          tableType === "Orders" || tableType === "Customers"
+                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
                             ? "#e0e0e0"
                             : "var(--horizontal-gradient)",
                         color:
-                          tableType === "Orders" || tableType === "Customers"
+                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
                             ? "#777"
                             : "var(--white-color)",
                         borderRadius: "var(--border-radius-secondary)",
                         "&:hover": {
                           background:
-                            tableType === "Orders" || tableType === "Customers"
+                            tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
                               ? "#e0e0e0"
                               : "var(--vertical-gradient)",
                         },
                         textTransform: "none",
                         cursor:
-                          tableType === "Orders" || tableType === "Customers"
+                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
                             ? "not-allowed"
                             : "pointer",
                       }}
                       onClick={handleAddButton}
                       disabled={
-                        tableType === "Orders" || tableType === "Customers"
-                      } // Disable Add Orders & Add Customers
+                        tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                      }
                     >
                       Add New {tableType}
                     </Button>
