@@ -1,4 +1,4 @@
-import { useState } from "react";
+ import { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { generateReceipt } from "../DAL/fetch";
@@ -29,31 +29,26 @@ const OrderReceipt = ({ orderId }) => {
     }
   };
 
-  const generatePDF = async(data) => {
-    // Thermal receipt size (80mm width)
+  const generatePDF = async (data) => {
     const doc = new jsPDF({
       unit: "mm",
       format: [80, 297], // 80mm width, auto height
     });
 
-    // Brown Theme Colors
     const primaryBrown = [101, 67, 33];
     const lightBrown = [139, 90, 43];
     const darkText = [51, 51, 51];
 
     let yPos = 10;
 
-   const img = new Image();
-img.src = "/logo.png";
-
-await new Promise((resolve) => {
-  img.onload = resolve;
-});
-
-doc.addImage(img, "PNG", 25, yPos, 30, 12);
-yPos += 18;
-
-
+    // Logo
+    const img = new Image();
+    img.src = "/logo.png";
+    await new Promise((resolve) => {
+      img.onload = resolve;
+    });
+    doc.addImage(img, "PNG", 25, yPos, 30, 12);
+    yPos += 18;
 
     /* =======================
        COMPANY HEADER
@@ -64,17 +59,14 @@ yPos += 18;
     doc.text(data.company?.address || "123 Business St, Karachi", 40, yPos, {
       align: "center",
     });
-
     yPos += 4;
     doc.text(`Tel: ${data.company?.phone || "+92 XXX XXXXXXX"}`, 40, yPos, {
       align: "center",
     });
-
     yPos += 4;
     doc.text(data.company?.website || "www.shoeman.com", 40, yPos, {
       align: "center",
     });
-
     yPos += 5;
     doc.setDrawColor(...lightBrown);
     doc.setLineWidth(0.3);
@@ -146,50 +138,59 @@ yPos += 18;
     doc.line(10, yPos, 70, yPos);
 
     /* =======================
-       ITEMS
+       ITEMS (TABLE FORMAT)
     ======================= */
     yPos += 5;
     doc.setFont("helvetica", "bold");
     doc.text("ITEMS", 10, yPos);
+    yPos += 3;
 
-    yPos += 5;
     doc.setFont("helvetica", "normal");
     doc.setFontSize(6.5);
 
-    data.items?.forEach((item) => {
-      // Item name
-      const itemLines = doc.splitTextToSize(item.description, 60);
-      doc.text(itemLines, 10, yPos);
-      yPos += itemLines.length * 3;
+    const tableColumn = ["Description", "Qty", "Unit Price", "Total"];
+    const tableRows = data.items.map((item) => [
+      item.description,
+      item.quantity,
+      `Rs. ${item.unitPrice.toLocaleString()}`,
+      `Rs. ${item.total.toLocaleString()}`,
+    ]);
 
-      // SKU, Qty, Price
-      doc.text(`SKU: ${item.sku}`, 10, yPos);
-      doc.text(
-        `${item.quantity} x Rs.${item.unitPrice.toLocaleString()}`,
-        70,
-        yPos,
-        { align: "right" }
-      );
-      yPos += 3;
-
-      // Item total
-      doc.setFont("helvetica", "bold");
-      doc.text(`Rs. ${item.total.toLocaleString()}`, 70, yPos, {
-        align: "right",
-      });
-      doc.setFont("helvetica", "normal");
-
-      yPos += 5;
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.1);
-      doc.line(10, yPos, 70, yPos);
-      yPos += 3;
+    autoTable(doc, {
+      startY: yPos,
+      head: [tableColumn],
+      body: tableRows,
+      theme: "plain",
+      styles: {
+        font: "helvetica",
+        fontSize: 6.5,
+        textColor: [51, 51, 51],
+        cellPadding: 1.5,
+      },
+      headStyles: {
+        fillColor: primaryBrown,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+       columnStyles: {
+    0: { cellWidth: 20 }, // Description column
+    1: { halign: "center", cellWidth: 10 }, // Qty
+    2: { halign: "right", cellWidth: 15 }, // Unit Price
+    3: { halign: "right", cellWidth: 15 }, // Total
+  },
+  tableWidth: 50,          // total table width
+  margin: { left: 10, right: 5 },
     });
+
+    yPos = doc.lastAutoTable.finalY + 3;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.1);
+    doc.line(10, yPos, 70, yPos);
+    yPos += 3;
 
     /* =======================
        SUMMARY
     ======================= */
-    yPos += 2;
     doc.setFontSize(7);
 
     doc.text("Subtotal:", 10, yPos);
@@ -244,9 +245,7 @@ yPos += 18;
     yPos += 8;
     doc.setFontSize(6);
     doc.setFont("helvetica", "italic");
-    doc.text("Thank you for shopping with us!", 40, yPos, {
-      align: "center",
-    });
+    doc.text("Thank you for shopping with us!", 40, yPos, { align: "center" });
 
     yPos += 3;
     doc.text("support@shoeman.com", 40, yPos, { align: "center" });
