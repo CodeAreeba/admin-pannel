@@ -17,7 +17,7 @@ import { Tooltip } from "@mui/material";
 
 import "./App.css";
 import useAuth from "./auth/useAuth";
-import pagePermissions from "./config/pagePermissions";
+import pagePermissions from "./Config/pagePermissions";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
 /////////////////////// Pages ////////////////////////////

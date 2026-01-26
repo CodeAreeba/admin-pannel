@@ -50,7 +50,7 @@ import {
 } from "../../Config/Permission";
 import AuthContext from "../../auth/AuthContext";
 import { fileUrl } from "../../Config/Config";
-import OrderReceipt from '../OrderReceipt';
+import OrderReceipt from "../OrderReceipt";
 
 export function useTable({ attributes, tableType, limitPerPage = 25 }) {
   const navigate = useNavigate();
