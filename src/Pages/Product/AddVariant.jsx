@@ -69,7 +69,7 @@ const AddVariant = () => {
         setColorName(v.color?.name || "");
         setColorCode(v.color?.code || "");
         setSizes([v.size]);
-        setPrice(v.price || "");
+        setPrice(v.price.PKR || "");
         setDiscount(v.discount || 0);
         setStock(v.stock || "");
         setSku(v.sku || "");

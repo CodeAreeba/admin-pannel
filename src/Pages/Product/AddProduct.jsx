@@ -206,7 +206,7 @@ const AddProduct = () => {
     { id: "sku", label: "SKU" },
     { id: "color.name", label: "Color" },
     { id: "size", label: "Size" },
-    { id: "finalPrice", label: "Final Price" },
+    { id: "finalPrice.PKR", label: "Final Price" },
     { id: "stock", label: "Stock" },
     { id: "published", label: "Status" },
   ];
