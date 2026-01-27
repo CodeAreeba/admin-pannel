@@ -34,11 +34,14 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
   useEffect(() => {
     if (open && Modeltype === "View" && Modeldata) {
       setOrderId(Modeldata._id || "");
-      setCustomerEmail(Modeldata.customerEmail || "");
+      
+      // Customer email is in user.email
+      setCustomerEmail(Modeldata.user?.email || "");
+      
       setTotalAmount(Modeldata.totalAmount || 0);
       setPaymentMethod(Modeldata.paymentMethod || "");
       setPaymentStatus(Modeldata.paymentStatus || "");
-      setOrderStatus(Modeldata.orderStatus || "");
+      setOrderStatus(Modeldata.status || "");
       setCreatedAt(Modeldata.createdAt || "");
       setUpdatedAt(Modeldata.updatedAt || "");
     }
@@ -136,13 +139,6 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
       >
         {/* -------- Row 1 -------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
-            label="Order ID"
-            fullWidth
-            value={orderId}
-            disabled
-            size="small"
-          />
           <TextField
             label="Customer Email"
             fullWidth
