@@ -260,13 +260,13 @@ const OrderReceipt = ({ orderId }) => {
         disabled={loading}
         size="small"
         sx={{
-          color: "#654321",
-          border: "1px solid #654321",
+          color: "rgba(135, 90, 34, 0.863)",
+          border: "1px solid   rgba(135, 90, 34, 0.863)",
           borderRadius: "6px",
           padding: "4px 8px",
           fontSize: "0.75rem",
           "&:hover": {
-            backgroundColor: "#654321",
+            backgroundColor: "  rgba(135, 90, 34, 0.863)",
             color: "#fff",
           },
           "&:disabled": {
