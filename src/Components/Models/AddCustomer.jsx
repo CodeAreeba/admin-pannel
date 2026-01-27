@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
@@ -20,10 +20,8 @@ const AddCustomer = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const isViewMode = Boolean(id);
-
   // ---------------- State ----------------
-  // const [customerId, setCustomerId] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -34,6 +32,11 @@ const AddCustomer = () => {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // 🔹 Search + Pagination (added)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(25);
 
   // ---------------- Order Modal State ----------------
   const [openOrderModal, setOpenOrderModal] = useState(false);
@@ -47,7 +50,7 @@ const AddCustomer = () => {
       if (res?.statusCode === 200) {
         const c = res.data;
 
-        // setCustomerId(c._id);
+        setCustomerName(c.name);
         setEmail(c.email);
         setRole(c.role);
         setIsActive(c.isActive);
@@ -61,17 +64,32 @@ const AddCustomer = () => {
     }
   };
 
-  // ---------------- Fetch Orders ----------------
-  const fetchOrders = async () => {
+  // ---------------- Fetch Orders (updated params only) ----------------
+  const fetchOrders = async (
+    pageParam = page,
+    limitParam = limit,
+    searchParam = searchTerm
+  ) => {
     if (!id) return;
     try {
-      const res = await getCustomerOrders(id);
+      const res = await getCustomerOrders(
+        id,
+        pageParam,
+        limitParam,
+        searchParam
+      );
       if (res?.statusCode === 200) {
         setOrders(res.data || []);
       }
     } catch (err) {
       setOrders([]);
     }
+  };
+
+  // ---------------- Search Handler (added) ----------------
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    setPage(1); // reset page on new search
   };
 
   // ---------------- Update Status ----------------
@@ -88,18 +106,18 @@ const AddCustomer = () => {
     }
   };
 
-  // ---------------- Custom View Handler for Modal ----------------
+  // ---------------- Custom View Handler ----------------
   const handleViewOrder = (order) => {
     setSelectedOrder(order);
     setOpenOrderModal(true);
   };
 
-  // ---------------- Order Modal Response ----------------
+  // ---------------- Modal Response ----------------
   const handleOrderModalResponse = () => {
     fetchOrders();
   };
 
-  // ---------------- Orders Table ----------------
+  // ---------------- Orders Table Config ----------------
   const orderAttributes = [
     { id: "orderId", label: "ORDER ID" },
     { id: "totalAmount", label: "TOTAL AMOUNT" },
@@ -118,11 +136,9 @@ const AddCustomer = () => {
     tableType: "Orders",
     data: orders,
     reFetch: fetchOrders,
-    // Don't pass addPath - this will hide "Add Orders" button
+    onSearch: handleSearch, // ✅ added (same as AddCategory)
     addPath: undefined,
-    // Don't pass viewPath - we're using onViewClick instead
     viewPath: undefined,
-    // Pass custom view handler
     onViewClick: handleViewOrder,
     deleteFn: undefined,
   });
@@ -130,8 +146,8 @@ const AddCustomer = () => {
   // ---------------- Effects ----------------
   useEffect(() => {
     fetchCustomer();
-    fetchOrders();
-  }, [id]);
+    fetchOrders(page, limit, searchTerm);
+  }, [id, page, limit, searchTerm]);
 
   // ---------------- UI ----------------
   return (
@@ -139,19 +155,16 @@ const AddCustomer = () => {
       <Typography variant="h4">View Customer</Typography>
 
       <Box component="form" sx={{ mt: 2 }}>
-        {/* --------- Row 1: Customer ID + Email --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          {/* <TextField label="Customer ID" fullWidth value={customerId} disabled /> */}
+          <TextField label="Customer Name" fullWidth value={customerName} disabled />
           <TextField label="Email" fullWidth value={email} disabled />
         </Box>
 
-        {/* --------- Row 2: Role + OTP Attempts --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           <TextField label="Role" fullWidth value={role} disabled />
           <TextField label="OTP Attempts" fullWidth value={otpAttempts} disabled />
         </Box>
 
-        {/* --------- Row 3: Active Switch --------- */}
         <Box sx={{ mb: 2 }}>
           <FormControlLabel
             control={
@@ -164,7 +177,6 @@ const AddCustomer = () => {
           />
         </Box>
 
-        {/* --------- Row 4: Created At + Updated At --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
           <TextField
             label="Created At"
@@ -180,7 +192,6 @@ const AddCustomer = () => {
           />
         </Box>
 
-        {/* --------- Addresses Section --------- */}
         {addresses.length > 0 && (
           <>
             <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
@@ -205,13 +216,11 @@ const AddCustomer = () => {
           </>
         )}
 
-        {/* --------- Orders Section --------- */}
         <Typography variant="h5" sx={{ mt: 4, mb: 1 }}>
           Customer Orders
         </Typography>
         {tableUI3}
 
-        {/* --------- Footer --------- */}
         <Paper
           sx={{
             mt: 4,
@@ -245,7 +254,6 @@ const AddCustomer = () => {
         </Paper>
       </Box>
 
-      {/* --------- Order Modal --------- */}
       <AddOrder
         open={openOrderModal}
         setOpen={setOpenOrderModal}

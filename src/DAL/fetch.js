@@ -214,9 +214,9 @@ export const getCustomerById = async (id) => {
 
   return invokeApi(reqObj);
 };
-export const getCustomerOrders = async (id) => {
+export const getCustomerOrders = async (id,page = 1, limit = 25, search = "") => {
   const reqObj = {
-    path: `/admin/customers/${id}/orders`,
+    path: `/admin/customers/${id}/orders?page=${page}&limit=${limit}&search=${search}`,
     method: "GET",
     headers: {},
     postData: {},

@@ -4,7 +4,7 @@ import { useTable } from "../../Components/Models/useTable";
 const Customer = () => {
   // 🔹 Table Columns / Attributes (API ke according)
   const attributes = [
-    // { id: "_id", label: "Customer ID" },
+     { id: "name", label: "Customer Name" },
     { id: "email", label: "Email" },
     { id: "role", label: "Role" },
     { id: "isActive", label: "Status" },
