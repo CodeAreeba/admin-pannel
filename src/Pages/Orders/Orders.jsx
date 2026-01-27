@@ -4,8 +4,8 @@ import { useTable } from "../../Components/Models/useTable";
 const Orders = () => { 
   const attributes = [
   { id: "orderId", label: "Order ID" },
+  { id: "user.name", label: "Customer Name" },
   { id: "user.email", label: "Customer Email" },
-  // { id: "itemsCount", label: "Total Items" },
   { id: "totalAmount", label: "Total Amount" },
   { id: "status", label: "Order Status" },
   { id: "paymentStatus", label: "Payment Status" },

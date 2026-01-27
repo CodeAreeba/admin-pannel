@@ -145,13 +145,13 @@ const handleUpdateInventory = async () => {
 
       <Box sx={{ mt: 2 }}>
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField
+          {/* <TextField
             label="Inventory ID"
             fullWidth
             required
             value={inventoryId}
             disabled
-          />
+          /> */}
           <TextField
             label="Product Name"
             fullWidth

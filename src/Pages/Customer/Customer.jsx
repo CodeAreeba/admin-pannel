@@ -8,7 +8,7 @@ const Customer = () => {
     { id: "email", label: "Email" },
     { id: "role", label: "Role" },
     { id: "isActive", label: "Status" },
-    { id: "otpAttempts", label: "OTP Attempts" },
+    // { id: "otpAttempts", label: "OTP Attempts" },
     { id: "createdAt", label: "Created At" },
   ];
 

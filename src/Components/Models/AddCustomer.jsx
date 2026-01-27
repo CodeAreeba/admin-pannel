@@ -23,7 +23,7 @@ const AddCustomer = () => {
   const isViewMode = Boolean(id);
 
   // ---------------- State ----------------
-  const [customerId, setCustomerId] = useState("");
+  // const [customerId, setCustomerId] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -47,7 +47,7 @@ const AddCustomer = () => {
       if (res?.statusCode === 200) {
         const c = res.data;
 
-        setCustomerId(c._id);
+        // setCustomerId(c._id);
         setEmail(c.email);
         setRole(c.role);
         setIsActive(c.isActive);
@@ -141,7 +141,7 @@ const AddCustomer = () => {
       <Box component="form" sx={{ mt: 2 }}>
         {/* --------- Row 1: Customer ID + Email --------- */}
         <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-          <TextField label="Customer ID" fullWidth value={customerId} disabled />
+          {/* <TextField label="Customer ID" fullWidth value={customerId} disabled /> */}
           <TextField label="Email" fullWidth value={email} disabled />
         </Box>
 
