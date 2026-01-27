@@ -1,265 +1,316 @@
-import React, { useEffect, useState } from "react";
-import { Download, TrendingUp, Package } from "lucide-react";
-import { GiMoneyStack } from "react-icons/gi";
-import { GiTakeMyMoney } from "react-icons/gi";
-import { GrUserWorker } from "react-icons/gr";
-import "./Dashboard.css";
-// import { fetchDashboard } from "../../DAL/fetch"; // ❌ Commented - Backend nahi hai
-// import { exportDashboardPDF } from "../../Utils/ExportPdf";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { fetchDashboardStats } from '../../DAL/fetch';
+import { useNavigate } from 'react-router-dom';
+import { FaDollarSign } from "react-icons/fa6";
+import { LuShoppingBag } from "react-icons/lu";
+import { AiOutlineAppstore } from "react-icons/ai";
+import { HiOutlineCube } from "react-icons/hi";
+import { LuUsers } from "react-icons/lu";
+import { LuRefreshCcw } from "react-icons/lu";
+import { RiErrorWarningLine } from "react-icons/ri";
+import './Dashboard.css';
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [dashboardData, setDashboardData] = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const formatPKR = (num) => {
-    return num?.toLocaleString("en-PK", { style: "currency", currency: "PKR" });
-  };
 
   useEffect(() => {
-    const getDashboardData = async () => {
-      try {
-        setLoading(true);
-        
-        // ❌ Backend call commented out
-        // const res = await fetchDashboard();
-
-        // 🔥 FAKE DATA - Backend ke bagair
-        const res = {
-          products: {
-            totalProducts: {
-              quantity: 1250,
-              price: 3750000
-            },
-            totalSold: {
-              quantity: 850,
-              sale: 2550000
-            },
-            today: {
-              quantity: 25,
-              sale: 75000
-            },
-            yesterday: {
-              quantity: 30,
-              sale: 90000
-            },
-            thisWeek: {
-              quantity: 180,
-              sale: 540000
-            },
-            thisMonth: {
-              quantity: 650,
-              sale: 1950000
-            }
-          },
-          pendingAmount: 450000,
-          expense: {
-            totalExpense: 850000,
-            today: 15000,
-            yesterday: 12000,
-            thisWeek: 95000,
-            thisMonth: 285000
-          },
-          labourCost: {
-            totalLabourCost: 560000,
-            today: 8000,
-            yesterday: 7500,
-            thisWeek: 52000,
-            thisMonth: 180000,
-            lastMonth: 175000
-          }
-        };
-
-        // Simulate API delay
-        setTimeout(() => {
-          if (res) {
-            setDashboardData(res);
-          } else {
-            setDashboardData(null);
-          }
-          setLoading(false);
-        }, 500);
-
-      } catch (err) {
-        console.error("❌ Error fetching dashboard:", err);
-        setLoading(false);
-      }
-    };
-
-    getDashboardData();
+    loadDashboardStats();
   }, []);
 
-  if (loading)
+  const loadDashboardStats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetchDashboardStats();
+      
+      if (response.success) {
+        setStats(response.data);
+      } else {
+        setError(response.message || 'Failed to load dashboard data');
+      }
+    } catch (err) {
+      setError('Error connecting to server. Please try again.');
+      console.error('Dashboard API Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-PK', {
+      style: 'currency',
+      currency: 'PKR',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const getStatusColor = (status) => {
+    const statusColors = {
+      'delivered': 'status-delivered',
+      'shipped': 'status-shipped',
+      'processing': 'status-processing',
+      'cancelled': 'status-cancelled'
+    };
+    return statusColors[status] || 'status-default';
+  };
+
+  if (loading) {
     return (
-      <div className="dashboard-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading Dashboard...</p>
+      <div className="dashboard-container">
+        <div className="loading-state">
+          <div className="loader"></div>
+          <p>Loading dashboard...</p>
+        </div>
       </div>
     );
+  }
 
-  if (!dashboardData)
-    return <p className="dashboard-loading">No data available</p>;
-
-  return (
-    <main className="dashboard-container">
-      <div className="dashboard-wrapper">
-
-        {/* Header */}
-        <div className="dashboard-header">
-          <div>
-            <h1 className="dashboard-title">Dashboard</h1>
-            <p className="dashboard-subtitle">Business performance overview.</p>
-          </div>
-
-          {/* <button className="export-button" onClick={() => exportDashboardPDF(dashboardData)}>
-            <Download size={18} />
-            Export Report
-          </button> */}
-
-        </div>
-
-        {/* Summary Cards */}
-        <div className="summary-cards-grid">
-          <div className="dashboard-card card-blue" onClick={() => { navigate("/stockData") }}>
-            <div className="card-header">
-              <Package size={24} />
-              <span>Total Products</span>
-            </div>
-            <div className="card-value">
-              {dashboardData.products.totalProducts.quantity}
-            </div>
-            <div className="card-subvalue">
-              {formatPKR(dashboardData.products.totalProducts.price)}
-            </div>
-          </div>
-
-          <div className="dashboard-card card-emerald" onClick={() => { navigate("/salesReport") }}>
-            <div className="card-header">
-              <TrendingUp size={24} />
-              <span>Total Sold</span>
-            </div>
-            <div className="card-value">
-              {dashboardData.products.totalSold.quantity}
-            </div>
-            <div className="card-subvalue">
-              {formatPKR(dashboardData.products.totalSold.sale)}
-            </div>
-          </div>
-
-          <div className="dashboard-card card-amber" onClick={() => { navigate("/PendingAmount") }}>
-            <div className="card-header">
-              <GiTakeMyMoney size={24} />
-              <span>Pending Amount</span>
-            </div>
-            <div className="card-value">
-              {formatPKR(dashboardData.pendingAmount)}
-            </div>
-            <div className="card-subvalue">To be collected</div>
-          </div>
-
-          <div className="dashboard-card card-red" onClick={() => { navigate("/ExpenseData") }}>
-            <div className="card-header">
-             <GiMoneyStack size={24} />
-              <span>Total Expense</span>
-            </div>
-            <div className="card-value">
-              {formatPKR(dashboardData.expense.totalExpense)}
-            </div>
-          </div>
-          <div className="dashboard-card card-gray">
-            <div className="card-header">
-              <GrUserWorker size={24} />
-              <span>Total Labour Cost</span>
-            </div>
-            <div className="card-value">
-              {formatPKR(dashboardData.labourCost.totalLabourCost)}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Sections */}
-        <div className="main-grid">
-
-          {/* Product Overview */}
-          <div className="section-products">
-            <div className="section-header">
-              <Package size={24} />
-              <div>
-                <h2>Products & Sales Overview</h2>
-                <p>Track inventory and sales performance</p>
-              </div>
-            </div>
-
-            <div className="metrics-grid">
-              {[
-                { label: "Today", data: dashboardData.products.today },
-                { label: "Yesterday", data: dashboardData.products.yesterday },
-                { label: "This Week", data: dashboardData.products.thisWeek },
-                { label: "This Month", data: dashboardData.products.thisMonth },
-              ].map((item) => (
-                <div key={item.label} className="metric-card">
-                  <div className="metric-label">{item.label}</div>
-                  <div className="metric-value">{item.data.quantity}</div>
-                  <div className="metric-subvalue">{formatPKR(item.data.sale)}</div>
-                </div>
-              ))}
-            </div>
-            {/* /////////////////// Labour Cost Overview //////////////////// */}
-            <div className="section-header labour">
-              <GrUserWorker size={24} />
-              <div>
-                <h2>Labour Cost Overview</h2>
-                <p>Track and monitor labour cost</p>
-              </div>
-            </div>
-
-            <div className="metrics-grid">
-              {[
-                { label: "Today", value: dashboardData.labourCost.today },
-                { label: "Yesterday", value: dashboardData.labourCost.yesterday },
-                { label: "This Week", value: dashboardData.labourCost.thisWeek },
-                { label: "This Month", value: dashboardData.labourCost.thisMonth },
-                { label: "Last Month", value: dashboardData.labourCost.lastMonth },
-              ].map((item) => (
-                <div key={item.label} className="metric-card">
-                  <div className="metric-label">{item.label}</div>
-                  <div className="metric-value">{formatPKR(item.value)}</div>
-                </div>
-              ))}
-            </div>
-
-
-          </div>
-
-          {/* Expenses */}
-          <div className="section-expenses">
-            <div className="section-header">
-              <GiMoneyStack size={24} />
-              <div>
-                <h2>Expenses</h2>
-                <p>Expense tracking</p>
-              </div>
-            </div>
-
-            <div className="metrics-grid-expense">
-              {[
-                { label: "Today", value: dashboardData.expense.today },
-                { label: "Yesterday", value: dashboardData.expense.yesterday },
-                { label: "This Week", value: dashboardData.expense.thisWeek },
-                { label: "This Month", value: dashboardData.expense.thisMonth },
-              ].map((item) => (
-                <div key={item.label} className="metric-card">
-                  <div className="metric-label">{item.label}</div>
-                  <div className="metric-value">{formatPKR(item.value)}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <div className="error-state">
+          <RiErrorWarningLine />
+          <p>{error}</p>
+          <button onClick={loadDashboardStats} className="retry-btn">
+            <LuRefreshCcw />
+            Try Again
+          </button>
         </div>
       </div>
-    </main>
+    );
+  }
+
+  return (
+    <div className="dashboard-container">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="header-content">
+          <h1 className="dashboard-title">Dashboard Overview</h1>
+          <p className="dashboard-subtitle">Welcome back! Your store’s latest updates are ready.</p>
+        </div>
+        <button onClick={loadDashboardStats} className="refresh-btn">
+          <LuRefreshCcw className="refresh-icon" />
+          Refresh
+        </button>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="stats-grid">
+        <div className="stat-card stat-card-revenue">
+          <div className="stat-icon-wrapper">
+            <FaDollarSign className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <p className="stat-label">Total Revenue</p>
+            <h2 className="stat-value">{formatCurrency(stats.totalRevenue)}</h2>
+            <p className="stat-change positive">+12.5% from last month</p>
+          </div>
+        </div>
+
+        <div className="stat-card stat-card-orders">
+          <div className="stat-icon-wrapper">
+            <LuShoppingBag className="stat-icon"/>
+          </div>
+          <div className="stat-content">
+            <p className="stat-label">Total Orders</p>
+            <h2 className="stat-value">{stats.totalOrders}</h2>
+            <p className="stat-change positive">+{stats.totalOrders} orders</p>
+          </div>
+        </div>
+
+        <div className="stat-card stat-card-products">
+          <div className="stat-icon-wrapper">
+           <AiOutlineAppstore className="stat-icon"/>
+          </div>
+          <div className="stat-content">
+            <p className="stat-label">Total Products</p>
+            <h2 className="stat-value">{stats.totalProducts}</h2>
+            <p className="stat-change neutral">{stats.totalVariants} variants</p>
+          </div>
+        </div>
+
+        <div className="stat-card stat-card-inventory">
+          <div className="stat-icon-wrapper">
+            <HiOutlineCube className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <p className="stat-label">Inventory</p>
+            <h2 className="stat-value">{stats.totalInventory}</h2>
+            <p className="stat-change warning">{stats.lowStockCount} low stock alerts</p>
+          </div>
+        </div>
+
+        <div className="stat-card stat-card-users">
+          <div className="stat-icon-wrapper">
+            <LuUsers className="stat-icon" />
+          </div>
+          <div className="stat-content">
+            <p className="stat-label">Total Users</p>
+            <h2 className="stat-value">{stats.totalUsers}</h2>
+            <p className="stat-change neutral">Active customers</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Tables Section */}
+      <div className="content-grid">
+        {/* Best Selling Products Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">Best Selling Products</h3>
+          </div>
+          <div className="card-body">
+            {stats.topSellingProducts && stats.topSellingProducts.length > 0 ? (
+              <div className="table-wrapper">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Product Name</th>
+                      <th>Units Sold</th>
+                      <th>Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.topSellingProducts.map((product, index) => (
+                      <tr key={product._id}>
+                        <td>
+                          <div className="rank-badge">#{index + 1}</div>
+                        </td>
+                        <td>
+                          <span className="product-name">{product.name}</span>
+                        </td>
+                        <td>
+                          <span className="units-sold">{product.totalSold} units</span>
+                        </td>
+                        <td>
+                          <span className="revenue-text">{formatCurrency(product.revenue)}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>No sales data available yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Orders Table */}
+        <div className="content-card">
+          <div className="card-header">
+            <h3 className="card-title">Recent Orders</h3>
+            <span className="card-link" onClick={() => navigate('/orders')}>View All</span>
+          </div>
+          <div className="card-body">
+            {stats.recentOrders && stats.recentOrders.length > 0 ? (
+              <div className="table-wrapper">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {stats.recentOrders.map((order) => (
+                      <tr key={order._id}>
+                        <td>
+                          <div className="customer-info-cell">
+                            <span className="customer-email">{order.user.email}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="order-amount-text">{formatCurrency(order.totalAmount)}</span>
+                        </td>
+                        <td>
+                          <span className={`status-badge ${getStatusColor(order.status)}`}>
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="order-info-cell">
+                            <span className="order-date">{formatDate(order.createdAt)}</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <p>No orders yet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="analytics-section">
+        <div className="analytics-card">
+          <div className="card-header">
+            <h3 className="card-title">Quick Analytics</h3>
+          </div>
+          <div className="card-body">
+            <div className="analytics-grid">
+              <div className="analytics-item">
+                <div className="analytics-label">Average Order Value</div>
+                <div className="analytics-value">
+                  {formatCurrency(stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0)}
+                </div>
+              </div>
+              <div className="analytics-item">
+                <div className="analytics-label">Products per Order</div>
+                <div className="analytics-value">
+                  {stats.totalOrders > 0 ? (stats.totalProducts / stats.totalOrders).toFixed(1) : '0'}
+                </div>
+              </div>
+              <div className="analytics-item">
+                <div className="analytics-label">Inventory Turnover</div>
+                <div className="analytics-value">
+                  {stats.totalInventory > 0 ? ((stats.totalProducts / stats.totalInventory) * 100).toFixed(1) + '%' : '0%'}
+                </div>
+              </div>
+              <div className="analytics-item">
+                <div className="analytics-label">Low Stock Items</div>
+                <div className="analytics-value warning-value">{stats.lowStockCount}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
