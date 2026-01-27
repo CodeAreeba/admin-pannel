@@ -157,7 +157,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
       setModelData({});
       return;
     }
-    
+
     // Inventory: Disabled (no add functionality)
   };
 
@@ -373,29 +373,39 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                     <Button
                       sx={{
                         background:
-                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                          tableType === "Orders" ||
+                          tableType === "Customers" ||
+                          tableType === "Inventory"
                             ? "#e0e0e0"
                             : "var(--horizontal-gradient)",
                         color:
-                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                          tableType === "Orders" ||
+                          tableType === "Customers" ||
+                          tableType === "Inventory"
                             ? "#777"
                             : "var(--white-color)",
                         borderRadius: "var(--border-radius-secondary)",
                         "&:hover": {
                           background:
-                            tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                            tableType === "Orders" ||
+                            tableType === "Customers" ||
+                            tableType === "Inventory"
                               ? "#e0e0e0"
                               : "var(--vertical-gradient)",
                         },
                         textTransform: "none",
                         cursor:
-                          tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                          tableType === "Orders" ||
+                          tableType === "Customers" ||
+                          tableType === "Inventory"
                             ? "not-allowed"
                             : "pointer",
                       }}
                       onClick={handleAddButton}
                       disabled={
-                        tableType === "Orders" || tableType === "Customers" || tableType === "Inventory"
+                        tableType === "Orders" ||
+                        tableType === "Customers" ||
+                        tableType === "Inventory"
                       }
                     >
                       Add New {tableType}
@@ -406,8 +416,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             </Toolbar>
 
             <TableContainer sx={{ maxHeight: "76vh" }}>
-              <Table stickyHeader
-              >
+              <Table stickyHeader>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -438,23 +447,22 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                         onChange={handleSelectAllClick}
                       />
                     </TableCell>
-                    {/* {attributes.map((attr) => (
-                      <TableCell key={attr._id}>{attr.label}</TableCell>
-                    ))} */}
                     {attributes.map((attr) => (
-  <TableCell
-    key={attr._id}
-    sx={{
-      minWidth: 80,          // or 200
-      whiteSpace: "nowrap",
-    }}
-  >
-    {attr.label}
-  </TableCell>
-))}
+                      <TableCell
+                        key={attr._id}
+                        sx={{
+                          minWidth: 80, // or 200
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {attr.label}
+                      </TableCell>
+                    ))}
 
-                    { tableType=="Orders" && (
-                      <TableCell sx={{ textAlign: "center" }}>Receipt</TableCell>
+                    {tableType == "Orders" && (
+                      <TableCell sx={{ textAlign: "center" }}>
+                        Receipt
+                      </TableCell>
                     )}
                     <TableCell>Action</TableCell>
                   </TableRow>
@@ -520,16 +528,15 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             />
                           </TableCell>
                           {attributes.map((attr) => (
-  <TableCell
-    key={attr.id}
-    sx={{
-      minWidth: 80,          // or 200
-      whiteSpace: "nowrap",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-    }}
-  >
-
+                            <TableCell
+                              key={attr.id}
+                              sx={{
+                                minWidth: 80, // or 200
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
                               {attr.id === "createdAt" ? (
                                 formatDate(row[attr.id])
                               ) : attr.id === "image" ||
@@ -668,7 +675,7 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                               )}
                             </TableCell>
                           ))}
-                           {tableType === "Orders" && (
+                          {tableType === "Orders" && (
                             <TableCell align="center">
                               <OrderReceipt orderId={row._id} />
                             </TableCell>
