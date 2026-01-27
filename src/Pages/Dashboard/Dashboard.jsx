@@ -230,6 +230,7 @@ const Dashboard = () => {
                 <table className="data-table">
                   <thead>
                     <tr>
+                      <th>Order Id</th>
                       <th>Customer</th>
                       <th>Amount</th>
                       <th>Status</th>
@@ -239,6 +240,11 @@ const Dashboard = () => {
                   <tbody>
                     {stats.recentOrders.map((order) => (
                       <tr key={order._id}>
+                        <td>
+                          <div className="order-info-cell">
+                            <span className="order-id">{order.orderId}</span>
+                          </div>
+                        </td>
                         <td>
                           <div className="customer-info-cell">
                             <span className="customer-email">{order.user.email}</span>

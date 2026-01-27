@@ -406,7 +406,8 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
             </Toolbar>
 
             <TableContainer sx={{ maxHeight: "76vh" }}>
-              <Table stickyHeader>
+              <Table stickyHeader
+              >
                 <TableHead>
                   <TableRow
                     sx={{
@@ -437,9 +438,21 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                         onChange={handleSelectAllClick}
                       />
                     </TableCell>
-                    {attributes.map((attr) => (
+                    {/* {attributes.map((attr) => (
                       <TableCell key={attr._id}>{attr.label}</TableCell>
-                    ))}
+                    ))} */}
+                    {attributes.map((attr) => (
+  <TableCell
+    key={attr._id}
+    sx={{
+      minWidth: 80,          // or 200
+      whiteSpace: "nowrap",
+    }}
+  >
+    {attr.label}
+  </TableCell>
+))}
+
                     { tableType=="Orders" && (
                       <TableCell sx={{ textAlign: "center" }}>Receipt</TableCell>
                     )}
@@ -507,7 +520,16 @@ export function useTable({ attributes, tableType, limitPerPage = 25 }) {
                             />
                           </TableCell>
                           {attributes.map((attr) => (
-                            <TableCell key={attr.id}>
+  <TableCell
+    key={attr.id}
+    sx={{
+      minWidth: 80,          // or 200
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    }}
+  >
+
                               {attr.id === "createdAt" ? (
                                 formatDate(row[attr.id])
                               ) : attr.id === "image" ||

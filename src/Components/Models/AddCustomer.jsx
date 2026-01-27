@@ -101,7 +101,7 @@ const AddCustomer = () => {
 
   // ---------------- Orders Table ----------------
   const orderAttributes = [
-    { id: "_id", label: "ORDER ID" },
+    { id: "orderId", label: "ORDER ID" },
     { id: "totalAmount", label: "TOTAL AMOUNT" },
     { id: "paymentMethod", label: "PAYMENT METHOD" },
     { id: "paymentStatus", label: "PAYMENT STATUS" },
