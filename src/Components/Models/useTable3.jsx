@@ -30,7 +30,7 @@ import {
   CREATE_PERMISSION_BY_TABLE,
   VIEW_PERMISSION_BY_TABLE,
 } from "../../Config/Permission";
-import OrderReceipt from '../OrderReceipt';
+import OrderReceipt from "../OrderReceipt";
 
 export function useTable3({
   attributes3,
@@ -75,23 +75,68 @@ export function useTable3({
   ];
 
   const STATUS_STYLES = {
-    Active: { bg: "var(--status-success-bg)", color: "var(--status-success-text)" },
-    Inactive: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
-    pending: { bg: "var(--status-warning-bg)", color: "var(--status-warning-text)" },
-    Pending: { bg: "var(--status-warning-bg)", color: "var(--status-warning-text)" },
-    completed: { bg: "var(--status-info-bg)", color: "var(--status-info-text)" },
-    delivered: { bg: "var(--status-success-bg)", color: "var(--status-success-text)" },
-    Delivered: { bg: "var(--status-success-bg)", color: "var(--status-success-text)" },
-    cancelled: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
-    Cancelled: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
-    paid: { bg: "var(--status-success-bg)", color: "var(--status-success-text)" },
-    Paid: { bg: "var(--status-success-bg)", color: "var(--status-success-text)" },
+    Active: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Inactive: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    pending: {
+      bg: "var(--status-warning-bg)",
+      color: "var(--status-warning-text)",
+    },
+    Pending: {
+      bg: "var(--status-warning-bg)",
+      color: "var(--status-warning-text)",
+    },
+    completed: {
+      bg: "var(--status-info-bg)",
+      color: "var(--status-info-text)",
+    },
+    delivered: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Delivered: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    cancelled: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    Cancelled: {
+      bg: "var(--status-error-bg)",
+      color: "var(--status-error-text)",
+    },
+    paid: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
+    Paid: {
+      bg: "var(--status-success-bg)",
+      color: "var(--status-success-text)",
+    },
     failed: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
     Failed: { bg: "var(--status-error-bg)", color: "var(--status-error-text)" },
-    shipped: { bg: "var(--status-shipped-bg)", color: "var(--status-shipped-text)" },
-    Shipped: { bg: "var(--status-shipped-bg)", color: "var(--status-shipped-text)" },
-    processing: { bg: "var(--status-info-bg)", color: "var(--status-info-text)" },
-    Processing: { bg: "var(--status-info-bg)", color: "var(--status-info-text)" },
+    shipped: {
+      bg: "var(--status-shipped-bg)",
+      color: "var(--status-shipped-text)",
+    },
+    Shipped: {
+      bg: "var(--status-shipped-bg)",
+      color: "var(--status-shipped-text)",
+    },
+    processing: {
+      bg: "var(--status-info-bg)",
+      color: "var(--status-info-text)",
+    },
+    Processing: {
+      bg: "var(--status-info-bg)",
+      color: "var(--status-info-text)",
+    },
   };
 
   // --- Select all rows ---
@@ -153,10 +198,12 @@ export function useTable3({
   };
 
   const getNestedValue = (obj, path) =>
-    path.split(".").reduce(
-      (acc, key) => (acc && acc[key] !== undefined ? acc[key] : "N/A"),
-      obj
-    );
+    path
+      .split(".")
+      .reduce(
+        (acc, key) => (acc && acc[key] !== undefined ? acc[key] : "N/A"),
+        obj,
+      );
 
   // --- Table UI ---
   return {
@@ -171,7 +218,10 @@ export function useTable3({
         <Box sx={{ width: "100%", marginBottom: "50px" }}>
           <Paper sx={{ width: "100%", maxHeight: "95vh", boxShadow: "none" }}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h5" sx={{ color: "var(--background-color)" }}>
+              <Typography
+                variant="h5"
+                sx={{ color: "var(--background-color)" }}
+              >
                 {tableType} List
               </Typography>
 
@@ -182,7 +232,11 @@ export function useTable3({
                   variant="outlined"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  sx={{ minWidth: 200, backgroundColor: "white", borderRadius: 1 }}
+                  sx={{
+                    minWidth: 200,
+                    backgroundColor: "white",
+                    borderRadius: 1,
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -230,8 +284,8 @@ export function useTable3({
               </Box>
             </Toolbar>
 
-            <TableContainer sx={{ overflowX: "auto", maxWidth: "100%" }}>
-              <Table stickyHeader sx={{ tableLayout: "fixed", minWidth: 1400 }}>
+            <TableContainer sx={{ width: "100%", overflowX: "hidden" }}>
+              <Table stickyHeader sx={{ tableLayout: "fixed", width: "100%" }}>
                 <TableHead>
                   <TableRow
                     sx={{
@@ -244,15 +298,21 @@ export function useTable3({
                       },
                     }}
                   >
-                    <TableCell padding="checkbox" sx={{ width: 60 }}>
+                    <TableCell padding="checkbox">
                       <Checkbox
                         sx={{
                           color: "var(--white-color)",
                           "&.Mui-checked": { color: "var(--white-color)" },
-                          "&.MuiCheckbox-indeterminate": { color: "var(--white-color)" },
+                          "&.MuiCheckbox-indeterminate": {
+                            color: "var(--white-color)",
+                          },
                         }}
-                        indeterminate={selected.length > 0 && selected.length < data.length}
-                        checked={data.length > 0 && selected.length === data.length}
+                        indeterminate={
+                          selected.length > 0 && selected.length < data.length
+                        }
+                        checked={
+                          data.length > 0 && selected.length === data.length
+                        }
                         onChange={handleSelectAllClick}
                       />
                     </TableCell>
@@ -261,30 +321,32 @@ export function useTable3({
                       <TableCell
                         key={attr.id}
                         sx={{
-                          minWidth: attr.width || 150,
-                          maxWidth: attr.width || 150,
-                          whiteSpace: "nowrap",
+                          wordBreak: "break-word",
+                          whiteSpace: "normal",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          color: "var(--black-color)",
                         }}
                       >
                         {attr.label}
                       </TableCell>
                     ))}
 
-                    {tableType === "Orders" && (
-                      <TableCell sx={{ width: 120, textAlign: "center" }}>Receipt</TableCell>
-                    )}
-                    <TableCell sx={{ width: 120 }}>Action</TableCell>
+                    {tableType === "Orders" && <TableCell>Receipt</TableCell>}
+                    <TableCell>Action</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   {data.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={attributes3.length + 2} align="center" sx={{ py: 4 }}>
-                        <Typography color="text.secondary">No results found</Typography>
+                      <TableCell
+                        colSpan={attributes3.length + 2}
+                        align="center"
+                        sx={{ py: 4 }}
+                      >
+                        <Typography color="text.secondary">
+                          No results found
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -296,14 +358,16 @@ export function useTable3({
                             <Checkbox
                               sx={{
                                 color: "var(--primary-color)",
-                                "&.Mui-checked": { color: "var(--primary-color)" },
+                                "&.Mui-checked": {
+                                  color: "var(--primary-color)",
+                                },
                               }}
                               checked={isItemSelected}
                               onChange={() =>
                                 setSelected((prev) =>
                                   isItemSelected
                                     ? prev.filter((id) => id !== row._id)
-                                    : [...prev, row._id]
+                                    : [...prev, row._id],
                                 )
                               }
                             />
@@ -313,56 +377,63 @@ export function useTable3({
                             <TableCell
                               key={attr.id}
                               sx={{
-                                minWidth: attr.width || 150,
-                                maxWidth: attr.width || 150,
-                                whiteSpace: "nowrap",
+                                wordBreak: "break-word",
+                                whiteSpace: "normal",
                                 overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                color: "var(--black-color)",
                               }}
                             >
-                              {STATUS_FIELDS.includes(attr.id)
-                                ? (() => {
-                                    let value = row[attr.id];
-                                    if (value === true) value = "Active";
-                                    if (value === false) value = "Inactive";
-                                    const style = STATUS_STYLES[value] || {
-                                      bg: "#e2e3e5",
-                                      color: "#383d41",
-                                    };
-                                    return (
-                                      <span
-                                        style={{
-                                          background: style.bg,
-                                          color: style.color,
-                                          padding: "5px 10px",
-                                          borderRadius: "6px",
-                                          fontWeight: 600,
-                                          textTransform: "capitalize",
-                                          display: "inline-block",
-                                          minWidth: "90px",
-                                          textAlign: "center",
-                                        }}
-                                      >
-                                        {value}
-                                      </span>
-                                    );
-                                  })()
-                                : attr.id === "createdAt" || attr.id === "publishedDate"
-                                ? formatDate(row[attr.id])
-                                : attr.id === "image"
-                                ? row[attr.id]
-                                  ? (
-                                    <img
-                                      alt=""
-                                      src={fileUrl + row[attr.id]}
-                                      style={{ height: "50px", maxWidth: "200px", objectFit: "contain" }}
-                                    />
-                                  )
-                                  : "N/A"
-                                : typeof getNestedValue(row, attr.id) === "string"
-                                ? truncateText(getNestedValue(row, attr.id), 30)
-                                : getNestedValue(row, attr.id)}
+                              {STATUS_FIELDS.includes(attr.id) ? (
+                                (() => {
+                                  let value = row[attr.id];
+                                  if (value === true) value = "Active";
+                                  if (value === false) value = "Inactive";
+                                  const style = STATUS_STYLES[value] || {
+                                    bg: "#e2e3e5",
+                                    color: "#383d41",
+                                  };
+                                  return (
+                                    <span
+                                      style={{
+                                        background: style.bg,
+                                        color: style.color,
+                                        padding: "5px 10px",
+                                        borderRadius: "6px",
+                                        fontWeight: 600,
+                                        textTransform: "capitalize",
+                                        display: "inline-block",
+                                        minWidth: "90px",
+                                        textAlign: "center",
+                                      }}
+                                    >
+                                      {value}
+                                    </span>
+                                  );
+                                })()
+                              ) : attr.id === "createdAt" ||
+                                attr.id === "publishedDate" ? (
+                                formatDate(row[attr.id])
+                              ) : attr.id === "image" ? (
+                                row[attr.id] ? (
+                                  <img
+                                    alt=""
+                                    src={fileUrl + row[attr.id]}
+                                    style={{
+                                      height: 60,
+                                      width: "auto",
+                                      maxWidth: "100%",
+                                      display: "block",
+                                      objectFit: "contain",
+                                    }}
+                                  />
+                                ) : (
+                                  "N/A"
+                                )
+                              ) : typeof getNestedValue(row, attr.id) ===
+                                "string" ? (
+                                truncateText(getNestedValue(row, attr.id), 30)
+                              ) : (
+                                getNestedValue(row, attr.id)
+                              )}
                             </TableCell>
                           ))}
 
