@@ -53,9 +53,9 @@ const InventoryViewPage = () => {
           setColor(inventoryItem.color?.name || "");
           setSize(inventoryItem.size || "");
           setSku(inventoryItem.sku || "");
-          setPrice(inventoryItem.price || 0);
+          setPrice(inventoryItem.price.PKR || 0);
           setDiscount(inventoryItem.discount || 0);
-          setFinalPrice(inventoryItem.finalPrice || 0);
+          setFinalPrice(inventoryItem.finalPrice.PKR || 0);
           setStock(inventoryItem.stock || 0);
           setLowStockThreshold(inventoryItem.lowStockThreshold || 0);
           setWeight(inventoryItem.weight || 0);

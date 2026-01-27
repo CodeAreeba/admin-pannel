@@ -8,9 +8,9 @@ const Inventory = () => {
     { id: "color.name", label: "Color" },
     { id: "size", label: "Size" },
     { id: "sku", label: "SKU" },
-    { id: "price", label: "Price" },
+    { id: "price.PKR", label: "Price" },
     { id: "discount", label: "Discount (%)" },
-    { id: "finalPrice", label: "Final Price" },
+    { id: "finalPrice.PKR", label: "Final Price" },
     { id: "stock", label: "Stock" },
     { id: "published", label: "Status" },
   ];
