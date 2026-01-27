@@ -14,8 +14,6 @@ const OrderReceipt = ({ orderId }) => {
     try {
       const result = await generateReceipt(orderId);
 
-      console.log("RECEIPT RESPONSE 👉", result);
-
       if (!result?.success || !result?.data) {
         throw new Error("Invalid receipt response");
       }
@@ -32,7 +30,7 @@ const OrderReceipt = ({ orderId }) => {
   const generatePDF = async (data) => {
     const doc = new jsPDF({
       unit: "mm",
-      format: [80, 297], // 80mm width, auto height
+      format: [80, 297],  
     });
 
     const primaryBrown = [101, 67, 33];
