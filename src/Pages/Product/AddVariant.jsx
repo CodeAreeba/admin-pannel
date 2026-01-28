@@ -9,10 +9,8 @@ import {
   FormControlLabel,
   Switch,
   InputAdornment,
-  IconButton,
 } from "@mui/material";
 import { toast } from "react-toastify";
-import ColorLensIcon from "@mui/icons-material/ColorLens";
 
 import { getVariantById } from "../../DAL/fetch";
 import { updateVariant } from "../../DAL/edit";
@@ -37,7 +35,6 @@ const AddVariant = () => {
   const [colorName, setColorName] = useState("");
   const [colorCode, setColorCode] = useState("");
   const [colorHex, setColorHex] = useState("#000000");
-  const [showColorPicker, setShowColorPicker] = useState(false);
   const [sizes, setSizes] = useState([]);
   const [price, setPrice] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -249,103 +246,42 @@ const AddVariant = () => {
               helperText="Short code used in SKU generation (e.g., BRN for Brown)"
             />
 
-            <Box sx={{ position: "relative" }}>
-              <TextField
-                label="Color Hex Code"
-                fullWidth
-                required
-                sx={{ mb: 2 }}
-                value={colorHex}
-                onChange={(e) => handleColorHexChange(e.target.value)}
-                InputProps={{
-                  readOnly: isReadOnly,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Box
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: "4px",
-                          backgroundColor: isValidHex(colorHex) ? colorHex : "#ccc",
-                          border: "1px solid #ddd",
-                          cursor: isReadOnly ? "not-allowed" : "pointer",
-                        }}
-                        onClick={() => !isReadOnly && setShowColorPicker(!showColorPicker)}
-                      />
-                    </InputAdornment>
-                  ),
-                  endAdornment: !isReadOnly && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowColorPicker(!showColorPicker)}
-                        edge="end"
-                        size="small"
-                      >
-                        <ColorLensIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                disabled={isReadOnly}
-                placeholder="#000000"
-                helperText={
-                  !isValidHex(colorHex) && colorHex.length === 7
-                    ? "Invalid hex format (use #RRGGBB)"
-                    : "Format: #RRGGBB (e.g., #FF5733)"
-                }
-                error={!isValidHex(colorHex) && colorHex.length === 7}
-              />
-
-              {/* Color Picker Popup */}
-              {showColorPicker && !isReadOnly && (
-                <Paper
-                  sx={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    zIndex: 1000,
-                    p: 2,
-                    mt: 1,
-                    boxShadow: 3,
-                    width: "100%",
-                  }}
-                >
-                  <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
-                    Pick a Color
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <TextField
+              label="Color Hex Code"
+              fullWidth
+              required
+              sx={{ mb: 2 }}
+              value={colorHex}
+              onChange={(e) => handleColorHexChange(e.target.value)}
+              InputProps={{
+                readOnly: isReadOnly,
+                startAdornment: (
+                  <InputAdornment position="start">
                     <input
                       type="color"
                       value={isValidHex(colorHex) ? colorHex : "#000000"}
-                      onChange={(e) => setColorHex(e.target.value.toUpperCase())}
+                      onChange={(e) => !isReadOnly && setColorHex(e.target.value.toUpperCase())}
+                      disabled={isReadOnly}
                       style={{
-                        width: "60px",
-                        height: "40px",
+                        width: "32px",
+                        height: "32px",
                         border: "1px solid #ddd",
                         borderRadius: "4px",
-                        cursor: "pointer",
+                        cursor: isReadOnly ? "not-allowed" : "pointer",
                       }}
                     />
-                    <TextField
-                      size="small"
-                      fullWidth
-                      value={colorHex}
-                      onChange={(e) => handleColorHexChange(e.target.value)}
-                      placeholder="#000000"
-                    />
-                  </Box>
-                  <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end", mt: 2 }}>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => setShowColorPicker(false)}
-                    >
-                      Close
-                    </Button>
-                  </Box>
-                </Paper>
-              )}
-            </Box>
+                  </InputAdornment>
+                ),
+              }}
+              disabled={isReadOnly}
+              placeholder="#000000"
+              helperText={
+                !isValidHex(colorHex) && colorHex.length === 7
+                  ? "Invalid hex format (use #RRGGBB)"
+                  : "Format: #RRGGBB (e.g., #FF5733)"
+              }
+              error={!isValidHex(colorHex) && colorHex.length === 7}
+            />
 
             <Typography sx={{ mb: 1, fontWeight: 600 }}>
               Select Sizes
