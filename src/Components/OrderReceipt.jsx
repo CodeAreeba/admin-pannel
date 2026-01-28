@@ -1,4 +1,4 @@
- import { useState } from "react";
+import { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { generateReceipt } from "../DAL/fetch";
@@ -25,6 +25,14 @@ const OrderReceipt = ({ orderId }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper function to extract PKR value from price object
+  const extractPKR = (value) => {
+    if (typeof value === 'object' && value !== null) {
+      return value.PKR || 0;
+    }
+    return value || 0;
   };
 
   const generatePDF = async (data) => {
@@ -147,12 +155,18 @@ const OrderReceipt = ({ orderId }) => {
     doc.setFontSize(6.5);
 
     const tableColumn = ["Description", "Qty", "Unit Price", "Total"];
-    const tableRows = data.items.map((item) => [
-      item.description,
-      item.quantity,
-      `Rs. ${item.unitPrice.toLocaleString()}`,
-      `Rs. ${item.total.toLocaleString()}`,
-    ]);
+    const tableRows = data.items.map((item) => {
+      // Extract PKR values from price objects
+      const unitPrice = extractPKR(item.unitPrice);
+      const total = extractPKR(item.total);
+      
+      return [
+        item.description,
+        item.quantity,
+        `Rs. ${unitPrice.toLocaleString()}`,
+        `Rs. ${total.toLocaleString()}`,
+      ];
+    });
 
     autoTable(doc, {
       startY: yPos,
@@ -170,14 +184,14 @@ const OrderReceipt = ({ orderId }) => {
         textColor: [255, 255, 255],
         fontStyle: "bold",
       },
-       columnStyles: {
-    0: { cellWidth: 20 }, // Description column
-    1: { halign: "center", cellWidth: 10 }, // Qty
-    2: { halign: "right", cellWidth: 15 }, // Unit Price
-    3: { halign: "right", cellWidth: 15 }, // Total
-  },
-  tableWidth: 50,          // total table width
-  margin: { left: 10, right: 5 },
+      columnStyles: {
+        0: { cellWidth: 20 }, // Description column
+        1: { halign: "center", cellWidth: 10 }, // Qty
+        2: { halign: "right", cellWidth: 15 }, // Unit Price
+        3: { halign: "right", cellWidth: 15 }, // Total
+      },
+      tableWidth: 50,          // total table width
+      margin: { left: 10, right: 5 },
     });
 
     yPos = doc.lastAutoTable.finalY + 3;
@@ -192,19 +206,19 @@ const OrderReceipt = ({ orderId }) => {
     doc.setFontSize(7);
 
     doc.text("Subtotal:", 10, yPos);
-    doc.text(`Rs. ${data.summary.subtotal.toLocaleString()}`, 70, yPos, {
+    doc.text(`Rs. ${extractPKR(data.summary.subtotal).toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
     yPos += 4;
     doc.text("Tax:", 10, yPos);
-    doc.text(`Rs. ${data.summary.tax.toLocaleString()}`, 70, yPos, {
+    doc.text(`Rs. ${extractPKR(data.summary.tax).toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
     yPos += 4;
     doc.text("Shipping:", 10, yPos);
-    doc.text(`Rs. ${data.summary.shipping.toLocaleString()}`, 70, yPos, {
+    doc.text(`Rs. ${extractPKR(data.summary.shipping).toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
@@ -217,7 +231,7 @@ const OrderReceipt = ({ orderId }) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.text("TOTAL:", 10, yPos);
-    doc.text(`Rs. ${data.summary.total.toLocaleString()}`, 70, yPos, {
+    doc.text(`Rs. ${extractPKR(data.summary.total).toLocaleString()}`, 70, yPos, {
       align: "right",
     });
 
