@@ -50,7 +50,6 @@ const AddVariant = () => {
   const canUpdate = can(UPDATE_PERMISSION_BY_TABLE.Variants);
   const canCreate = can(CREATE_PERMISSION_BY_TABLE.Variants);
 
-  // Agar view permission nahi hai tou redirect kar do
   useEffect(() => {
     if (variantId && !canView) {
       toast.error("You don't have permission to view this variant");
