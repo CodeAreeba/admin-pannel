@@ -100,7 +100,7 @@ const Dashboard = () => {
       <div className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">Dashboard Overview</h1>
-          <p className="dashboard-subtitle">Welcome back! Your store’s latest updates are ready.</p>
+          <p className="dashboard-subtitle">Welcome back! Your store's latest updates are ready.</p>
         </div>
         <button onClick={loadDashboardStats} className="refresh-btn">
           <LuRefreshCcw className="refresh-icon" />
@@ -247,7 +247,9 @@ const Dashboard = () => {
                           </div>
                         </td>
                         <td>
-                          <span className="order-amount-text">{formatCurrency(order.totalAmount)}</span>
+                          <span className="order-amount-text">
+                            {order.totalAmount?.PKR ? formatCurrency(order.totalAmount.PKR) : 'N/A'}
+                          </span>
                         </td>
                         <td>
                           <span className={`status-badge ${getStatusColor(order.status)}`}>
