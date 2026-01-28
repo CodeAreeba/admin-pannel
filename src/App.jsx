@@ -20,6 +20,7 @@ import useAuth from "./auth/useAuth";
 import pagePermissions from "./Config/pagePermissions";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
+
 /////////////////////// Pages ////////////////////////////
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Product from "./Pages/Product/Product";
@@ -62,8 +63,8 @@ const App = ({ onLogout }) => {
       icon: <FaWarehouse />,
     },
     { name: "Category Management", route: "/categories", icon: <FaTags /> },
-    { name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
-    { name: "Settings", route: "/settings", icon: <FaCog /> },
+    // { name: "Analytics & Reports", route: "/reports", icon: <FaChartBar /> },
+    // { name: "Settings", route: "/settings", icon: <FaCog /> },
     { name: "User Management", route: "/users", icon: <FaUserShield /> },
   ];
 
