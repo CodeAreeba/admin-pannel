@@ -22,7 +22,7 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
   // ---------------- State ----------------
   const [orderId, setOrderId] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalAmount, setTotalAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [orderStatus, setOrderStatus] = useState("");
@@ -38,7 +38,16 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
       // Customer email is in user.email
       setCustomerEmail(Modeldata.user?.email || "");
       
-      setTotalAmount(Modeldata.totalAmount || 0);
+      // Handle totalAmount object or number
+      const amount = Modeldata.totalAmount;
+      if (typeof amount === "object" && amount?.PKR) {
+        setTotalAmount(`Rs ${amount.PKR.toLocaleString()}`);
+      } else if (typeof amount === "number") {
+        setTotalAmount(`Rs ${amount.toLocaleString()}`);
+      } else {
+        setTotalAmount("N/A");
+      }
+      
       setPaymentMethod(Modeldata.paymentMethod || "");
       setPaymentStatus(Modeldata.paymentStatus || "");
       setOrderStatus(Modeldata.status || "");
@@ -83,7 +92,7 @@ const AddOrder = ({ open, setOpen, Modeltype, Modeldata, onResponse }) => {
     // Reset fields
     setOrderId("");
     setCustomerEmail("");
-    setTotalAmount(0);
+    setTotalAmount("");
     setPaymentMethod("");
     setPaymentStatus("");
     setOrderStatus("");

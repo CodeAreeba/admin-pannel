@@ -136,7 +136,7 @@ const AddCustomer = () => {
     tableType: "Orders",
     data: orders,
     reFetch: fetchOrders,
-    onSearch: handleSearch, // ✅ added (same as AddCategory)
+    onSearch: handleSearch,
     addPath: undefined,
     viewPath: undefined,
     onViewClick: handleViewOrder,

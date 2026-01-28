@@ -409,6 +409,18 @@ export function useTable3({
                                     </span>
                                   );
                                 })()
+                              ) : attr.id === "totalAmount" ? (
+                                (() => {
+                                  const amount = row[attr.id];
+                                  if (!amount) return "N/A";
+                                  if (typeof amount === "object" && amount.PKR) {
+                                    return `Rs ${amount.PKR.toLocaleString()}`;
+                                  }
+                                  if (typeof amount === "number") {
+                                    return `Rs ${amount.toLocaleString()}`;
+                                  }
+                                  return "N/A";
+                                })()
                               ) : attr.id === "createdAt" ||
                                 attr.id === "publishedDate" ? (
                                 formatDate(row[attr.id])
