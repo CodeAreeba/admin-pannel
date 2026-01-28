@@ -253,6 +253,7 @@
   font-weight: 600;
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .card-link::after {
@@ -393,6 +394,11 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.status-pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #f57c00;
 }
 
 .status-delivered {

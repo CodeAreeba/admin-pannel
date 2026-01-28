@@ -60,6 +60,7 @@ const Dashboard = () => {
 
   const getStatusColor = (status) => {
     const statusColors = {
+      'pending': 'status-pending',
       'delivered': 'status-delivered',
       'shipped': 'status-shipped',
       'processing': 'status-processing',
